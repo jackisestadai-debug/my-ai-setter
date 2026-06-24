@@ -55,6 +55,7 @@ async function synthesize(req: NextRequest, rawText: string) {
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) {
+      console.error("[hq/speak] ELEVENLABS_API_KEY missing. Env keys with ELEVEN:", Object.keys(process.env).filter(k => k.includes("ELEVEN")));
       return NextResponse.json({ error: "voice_not_configured" }, { status: 503 });
     }
 
