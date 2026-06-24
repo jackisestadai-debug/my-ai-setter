@@ -1023,22 +1023,22 @@ gl_FragColor=vec4(col,a);}`;
     setCinema(true);
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; demoChat?: "open" | "close"; hold?: number };
     const beats: Beat[] = [
-      { say: kickoff || "Alright — let me show you what I actually do.", rings: true,
-        panels: [{ kind: "metric", title: "CASH · LAST 30 DAYS", value: "$52,400", sub: "9 deals closed", accent: true }] },
-      { say: "While you sleep, I'm in your DMs — qualifying every lead, handling the objections, and booking the call. Automatically.",
-        panels: [{ kind: "funnel", title: "LAST 30 DAYS", rows: [{ label: "Leads", value: 612 }, { label: "Engaged", value: 233 }, { label: "Qualified", value: 74 }, { label: "Booked", value: 38 }] }] },
-      { say: "Here — watch me close a cold lead in real time. Go on, type something as the lead.", demoChat: "open", hold: 2600 },
-      { say: "And every conversation, I study. Then I hand you the exact moves to close more of them.", demoChat: "close",
-        panels: [{ kind: "report", title: "DM INTELLIGENCE", summary: "Your best closers anchor the money to a deeper why before they ever pitch the call. The ones that die skip straight to the calendar.", sections: [{ h: "WHERE THEY DIE", body: "62% of drop-offs land right after the price question — with no reframe first." }], fixes: [{ n: 1, title: "Reframe before the number", body: "Tie the call to their dream and their pain before asking budget.", why: "Every won deal did exactly this.", impact: "+18% booking rate", confidence: "high" }] }] },
-      { say: "Every dollar, every closer, every source — tracked to the cent. No spreadsheets, no guessing.", rings: true,
+      { say: kickoff || "Okej — låt mig visa dig exakt vad jag gör varje natt medan du sover.", rings: true,
+        panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "47 800 kr", sub: "11 möten bokade", accent: true }] },
+      { say: "Varje kund som skickar ett DM — jag svarar på sekunder, kvalificerar dem och bokar mötet. Automatiskt. Dygnet runt. Medan du är i behandlingsrummet.",
+        panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "Leads in", value: 284 }, { label: "Engagerade", value: 119 }, { label: "Kvalificerade", value: 52 }, { label: "Bokade", value: 31 }] }] },
+      { say: "Titta — se hur jag tar en kall lead hela vägen till bokat möte. Skriv som kunden så kör vi live.", demoChat: "open", hold: 2800 },
+      { say: "Varje konversation analyserar jag. Sedan visar jag dig exakt var du tappar kunder och hur du stänger fler.", demoChat: "close",
+        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens frustration till resultatet INNAN mötet pitchas. De som dör hoppar direkt till tid och pris.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "68% av avhopp sker direkt efter att priset nämns — utan att först förankra värdet." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens mål och frustration innan du frågar om budget.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }] },
+      { say: "Varje krona, varje källa, varje konvertering — spårat i realtid. Inga kalkylark. Inga gissningar.", rings: true,
         panels: [
-          { kind: "stats", title: "THIS MONTH", items: [{ label: "Show rate", value: "71%" }, { label: "Close rate", value: "34%" }, { label: "Cash / call", value: "$1,380" }, { label: "Speed-to-lead", value: "12s" }] },
-          { kind: "bars", title: "CASH BY SOURCE", rows: [{ label: "IG DMs", value: 38400 }, { label: "Referrals", value: 9200 }, { label: "Content", value: 4800 }] },
+          { kind: "stats", title: "DENNA MÅNAD", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "Svarstid", value: "9s" }] },
+          { kind: "bars", title: "LEADS PER KÄLLA", rows: [{ label: "Instagram DMs", value: 181 }, { label: "Stories", value: 64 }, { label: "Reels", value: 39 }] },
         ] },
-      { say: "I never miss a follow-up, I never sleep, and I cost a fraction of a single hire.",
-        panels: [{ kind: "list", title: "FOLLOW-UPS · TODAY", rows: [{ primary: "Leads revived", secondary: "7" }, { primary: "Rebooked", secondary: "3" }, { primary: "Touches sent", secondary: "21" }] }] },
-      { say: "I'm Jarvis. I run the entire front of this business — twenty-four seven. The only question left is whether I'm running yours next.", rings: true,
-        panels: [{ kind: "metric", title: "JARVIS", value: "ONLINE", sub: "24 / 7 · never off", accent: true }] },
+      { say: "De som inte svarat? Jag följer upp automatiskt tills de bokar. Ingen lead faller bort. Aldrig.",
+        panels: [{ kind: "list", title: "UPPFÖLJNINGAR · IDAG", rows: [{ primary: "Kunder återaktiverade", secondary: "6" }, { primary: "Ombokade", secondary: "4" }, { primary: "Meddelanden skickade", secondary: "18" }] }] },
+      { say: "Jag är Jarvis. Jag sköter hela fronten av din klinik — dygnet runt, sju dagar i veckan. Du vaknar till en fullbokad dag. Frågan är bara om du vill ha det så.", rings: true,
+        panels: [{ kind: "metric", title: "JARVIS", value: "ONLINE", sub: "24 / 7 · aldrig offline", accent: true }] },
     ];
     for (const b of beats) {
       if (!pitchRef.current) return; // a new command cancelled the reel
@@ -1058,7 +1058,7 @@ gl_FragColor=vec4(col,a);}`;
     pitchRef.current = false;
     setCinema(false);
     setDemoChatOpen(false);
-    setSaid("That's me. Say 'exit demo' to drop back to real numbers.");
+    setSaid("Det är mig. Säg 'avsluta demo' för att gå tillbaka till riktiga siffror.");
     startMic();
   }, [speak, replacePanels, startMic]);
 

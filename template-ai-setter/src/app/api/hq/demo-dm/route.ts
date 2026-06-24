@@ -18,7 +18,7 @@ import { getAccessKey } from "@/lib/access";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
-const OPENER = "yo brother — what you working on these days?";
+const OPENER = "hej! såg att du följer oss — är det något du funderar på? 😊";
 
 export async function POST(req: NextRequest) {
   try {
