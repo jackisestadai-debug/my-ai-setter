@@ -81,8 +81,8 @@ const ACK_AFTER_MS = 900;     // brain slower than this → Jarvis acknowledges 
 // a "doing it" line, and control commands (sleep/shutdown/theme/demo/clear) or
 // small talk get NO ack (they'd sound wrong, or he just answers instantly).
 const ACK_SETS: Record<"ask" | "act", string[]> = {
-  ask: ["Let me check.", "One sec.", "Pulling that up.", "Checking now."],
-  act: ["On it.", "Got it.", "Doing it now.", "Done in a sec."],
+  ask: ["Kollar.", "Ett ögonblick.", "Hämtar det.", "Checkar nu."],
+  act: ["Fixar det.", "Klart.", "Gör det nu.", "Klart om en sekund."],
 };
 type AckCat = "ask" | "act" | null;
 function ackCategory(text: string): AckCat {
@@ -182,7 +182,7 @@ function endpointDelay(text: string, lastFinal: boolean): number {
   return lastFinal ? 500 : 750;            // sounds complete — stay snappy
 }
 
-const GREETINGS = ["Online.", "Systems up, boss.", "All systems green.", "At your service.", "Powered up. Ready when you are."];
+const GREETINGS = ["Online.", "System igång, chef.", "Alla system gröna.", "Till din tjänst.", "Uppstartad. Redo när du är det."];
 function nextGreeting(): string {
   let i = 0;
   try {
@@ -214,6 +214,7 @@ function Hq() {
   const [fxLabel, setFxLabel] = useState("");
   const [fxMode, setFxMode] = useState<FxMode>("");
   const [srSupported, setSrSupported] = useState(true);
+  const [textInput, setTextInput] = useState("");
 
   const orbRef = useRef<OrbState>("idle"); orbRef.current = orb;
   const fxModeRef = useRef<FxMode>(""); fxModeRef.current = fxMode;
@@ -439,7 +440,7 @@ function Hq() {
       micState.current = "ready";
     } catch {
       micState.current = "off";
-      setNote("mic blocked — tap the orb to talk");
+      setNote("mikrofon blockerad — tryck på orben för att prata");
     }
   }, [ensureAC]);
 
@@ -447,7 +448,7 @@ function Hq() {
   const goSleep = useCallback(() => {
     if (!onlineRef.current || orbRef.current === "asleep") return;
     sfx("sleep");
-    playFx("down", 1400, "STANDBY", 200);
+    playFx("down", 1400, "VILOLÄGE", 200);
     setOrb("asleep"); setSaid(""); setHeard("");
     startMic(); // keep the clap ear open
   }, [sfx, playFx, startMic]);
@@ -456,7 +457,7 @@ function Hq() {
   const powerOff = useCallback(() => {
     if (!onlineRef.current) return;
     sfx("off");
-    playFx("off", 2000, "POWERING DOWN", 100);
+    playFx("off", 2000, "STÄNGER AV", 100);
     const sr = srRef.current; if (sr) { sr.onend = null; sr.onresult = null; try { sr.stop(); } catch { /* */ } srRef.current = null; }
     stopMic(); micState.current = "off";
     if (bootTimer.current) clearTimeout(bootTimer.current);
@@ -968,7 +969,7 @@ gl_FragColor=vec4(col,a);}`;
     // stream straight from the GET endpoint: he starts TALKING as soon as the
     // first audio chunks arrive instead of waiting for the full mp3
     const url = `/api/hq/speak?k=${encodeURIComponent(key)}&text=${encodeURIComponent(text.slice(0, 1900))}`;
-    await playTts(url, after, () => { setNote("voice not connected yet"); setOrb("idle"); startMic(); });
+    await playTts(url, after, () => { setNote("röst ej ansluten ännu"); setOrb("idle"); startMic(); });
   }, [bump, playTts, startMic]);
 
   // ── panels: ADDITIVE — new cards pixel-in alongside the old ones; only an
@@ -1081,7 +1082,7 @@ gl_FragColor=vec4(col,a);}`;
       // PITCH: kick off the self-running showcase reel (always forced into demo).
       if (data.pitch) { applyDemo(true); histRef.current.push({ role: "assistant", content: data.speech || "(pitch)" }); runPitch(data.speech || ""); return; }
       if (data.demoChat) setDemoChatOpen(true);
-      const speech = data.speech || "Done.";
+      const speech = data.speech || "Klart.";
       histRef.current.push({ role: "assistant", content: speech }); setSaid(speech);
       // CINEMA: a numbers-heavy answer takes over the room — orb pulls up,
       // the data materializes large front and center (and is still draggable)
@@ -1095,7 +1096,7 @@ gl_FragColor=vec4(col,a);}`;
       speak(speech);
     } catch {
       if (ackTimer.current) clearTimeout(ackTimer.current);
-      setSaid("Lost connection for a sec — say that again?"); setOrb("idle"); startMic();
+      setSaid("Tappade anslutningen — försök igen?"); setOrb("idle"); startMic();
     }
   }, [speak, bump, startMic, powerOff, goSleep, replacePanels, playAck, applyTheme, applyDemo, runPitch]);
 
@@ -1147,7 +1148,7 @@ gl_FragColor=vec4(col,a);}`;
       full = full.trim(); if (!full) return;
       captureBuf.current = full; lastFinalRef.current = lastFinal; setHeard(full); bump(); armSilence();
     };
-    sr.onerror = (ev) => { if (ev.error === "not-allowed" || ev.error === "service-not-allowed") setNote("mic blocked — allow microphone access"); };
+    sr.onerror = (ev) => { if (ev.error === "not-allowed" || ev.error === "service-not-allowed") setNote("mikrofon blockerad — tillåt åtkomst"); };
     sr.onend = () => { if (micState.current === "capturing" && srRef.current === sr) { try { sr.start(); } catch { /* */ } } };
     srRef.current = sr;
     try { sr.start(); } catch { /* */ }
@@ -1188,7 +1189,7 @@ gl_FragColor=vec4(col,a);}`;
     onlineRef.current = true; setOnline(true); setNote("");
     try { const ac = ensureAC(); if (ac.state === "suspended") ac.resume().catch(() => { /* */ }); } catch { /* */ }
     sfx("boot");
-    playFx("boot", BOOT_MS, "SYSTEMS ONLINE", Math.round(BOOT_MS * BOOT_IGNITE));
+    playFx("boot", BOOT_MS, "SYSTEM ONLINE", Math.round(BOOT_MS * BOOT_IGNITE));
     startMic();
     prefetchGreeting();
     // pre-fetch both ack sets once — instant, context-fitting ack later
@@ -1313,14 +1314,14 @@ gl_FragColor=vec4(col,a);}`;
       {fxMode === "boot" && <div className="hq-flash" />}
       <span className="hq-corner tl" /><span className="hq-corner tr" /><span className="hq-corner bl" /><span className="hq-corner br" />
       <style>{themeCss(themeRgb)}</style>
-      {demo && <div className="hq-demobadge">DEMO MODE — showcase data, no real numbers</div>}
+      {demo && <div className="hq-demobadge">DEMO-LÄGE — demodata, inga riktiga siffror</div>}
       {dealClose && (
         <div className="hq-dealclose" onClick={() => setDealClose(null)} key={dealClose.at}>
           <div className="hq-dc-ring" />
           <div className="hq-dc-inner">
-            <div className="hq-dc-label">CASH COLLECTED</div>
+            <div className="hq-dc-label">INBETALNING</div>
             <div className="hq-dc-amount">{dcAmount}</div>
-            <div className="hq-dc-sub">just landed · tap to dismiss</div>
+            <div className="hq-dc-sub">just inkommit · tryck för att stänga</div>
           </div>
         </div>
       )}
@@ -1333,7 +1334,7 @@ gl_FragColor=vec4(col,a);}`;
           <button className={`hq-tab ${tab === "jarvis" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("jarvis")}>JARVIS</button>
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
         </nav>
-        <span className={`hq-state s-${orb}`}>{online ? `● ${orb}` : "○ offline"}</span>
+        <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>
 
       {tab === "jarvis" && (
@@ -1344,19 +1345,33 @@ gl_FragColor=vec4(col,a);}`;
             <PanelCard key={p.id} panel={p} index={i} cine={cinema} onHover={() => sfx("tick")} onDismiss={() => dismiss(p.id)} onMove={(x, y) => setPanels((ps) => ps.map((q) => q.id === p.id ? { ...q, x, y } : q))} />
           ))}
 
-          <div className="hq-orbwrap" onClick={tapOrb} role="button" title={online ? "clap or tap to talk" : "tap to power up"}>
+          <div className="hq-orbwrap" onClick={tapOrb} role="button" title={online ? "klappa eller tryck för att prata" : "tryck för att starta"}>
             <canvas ref={glCanvas} className="hq-orb gl" />
             <canvas ref={orbCanvas} className="hq-orb top" />
-            {!online && fxMode !== "off" && <div className="hq-wake">tap to power up</div>}
-            {online && fxMode === "boot" && <div className="hq-wake dim">tap to skip</div>}
-            {online && fxMode !== "boot" && orb === "asleep" && <div className="hq-wake sleep">standby — clap or tap to wake</div>}
-            {online && fxMode !== "boot" && orb === "idle" && <div className="hq-wake dim">{srSupported ? "clap or tap to talk" : "voice input needs Chrome"}</div>}
-            {online && orb === "listening" && <div className="hq-wake live">{heard ? heard : "listening…"}</div>}
+            {!online && fxMode !== "off" && <div className="hq-wake">tryck för att starta</div>}
+            {online && fxMode === "boot" && <div className="hq-wake dim">tryck för att hoppa över</div>}
+            {online && fxMode !== "boot" && orb === "asleep" && <div className="hq-wake sleep">viloläge — klappa eller tryck för att väcka</div>}
+            {online && fxMode !== "boot" && orb === "idle" && <div className="hq-wake dim">{srSupported ? "klappa eller tryck för att prata" : "röstinput kräver Chrome"}</div>}
+            {online && orb === "listening" && <div className="hq-wake live">{heard ? heard : "lyssnar…"}</div>}
             {online && orb === "thinking" && <div className="hq-wake live">…</div>}
           </div>
 
           {said && orb !== "listening" && !asleep && <div className="hq-said">{said}</div>}
           {note && !asleep && <div className="hq-note">{note}</div>}
+
+          {online && !asleep && (
+            <form className="hq-textinput" onSubmit={(e) => { e.preventDefault(); const msg = textInput.trim(); if (!msg || orb === "thinking") return; setTextInput(""); send(msg); }}>
+              <input
+                className="hq-textinput-field"
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="skriv ett meddelande…"
+                disabled={orb === "thinking"}
+                autoComplete="off"
+              />
+              <button type="submit" className="hq-textinput-btn" disabled={!textInput.trim() || orb === "thinking"}>Skicka</button>
+            </form>
+          )}
         </div>
       )}
 
@@ -1367,11 +1382,11 @@ gl_FragColor=vec4(col,a);}`;
 
 /** Subsystem checklist that types itself out down the left edge during boot. */
 const BOOT_CHECKS: [number, string][] = [
-  [0.10, "CORE POWER"],
-  [0.24, "NEURAL LINK"],
-  [0.36, "LEAD INTEL"],
-  [0.48, "GHL UPLINK"],
-  [0.56, "VOICE SYSTEMS"],
+  [0.10, "KÄRNKRAFT"],
+  [0.24, "NEURALLÄNK"],
+  [0.36, "LEAD-INTEL"],
+  [0.48, "GHL-LÄNK"],
+  [0.56, "RÖSTSYSTEM"],
 ];
 function BootChecks() {
   const [frac, setFrac] = useState(0);
@@ -1388,7 +1403,7 @@ function BootChecks() {
           <span className={frac >= at + 0.08 ? "ok" : "wait"}>{frac >= at + 0.08 ? "OK" : "…"}</span>
         </div>
       ))}
-      {frac >= BOOT_IGNITE && <div className="hq-check go">ALL SYSTEMS GO</div>}
+      {frac >= BOOT_IGNITE && <div className="hq-check go">ALLA SYSTEM REDO</div>}
     </div>
   );
 }
@@ -1403,8 +1418,8 @@ function HudStatus({ online, asleep, ringRef }: { online: boolean; asleep: boole
   return (
     <div className="hq-hud" aria-hidden>
       <span>{t}</span>
-      <span className={online && !asleep ? "ok" : ""}>{!online ? "OFFLINE" : asleep ? "STANDBY" : "ALL SYSTEMS NOMINAL"}</span>
-      {online && ring && <span>{ring.leads7} LEADS · {ring.booked7} BOOKED · {ring.cash7}</span>}
+      <span className={online && !asleep ? "ok" : ""}>{!online ? "OFFLINE" : asleep ? "VILOLÄGE" : "ALLA SYSTEM NOMINELLA"}</span>
+      {online && ring && <span>{ring.leads7} LEADS · {ring.booked7} BOKADE · {ring.cash7}</span>}
     </div>
   );
 }
@@ -1443,24 +1458,24 @@ function DemoDM({ accessKey, onClose, onTick }: { accessKey: string; onClose: ()
         await new Promise((r) => setTimeout(r, i ? 950 : 350));
         setMsgs((m) => [...m, { role: "setter", text: bubbles[i] }]); onTick?.();
       }
-    } catch { setMsgs((m) => [...m, { role: "setter", text: "one sec — say that again?" }]); }
+    } catch { setMsgs((m) => [...m, { role: "setter", text: "ett ögonblick — säg det igen?" }]); }
     setBusy(false);
   };
 
   return (
     <div className="hq-panel hq-dm" style={{ left: `${pos.x}%`, top: `${pos.y}%` }}>
       <div className="hq-panel-bar" onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUp} onPointerCancel={onUp}>
-        <span className="hq-panel-title">● LIVE · AI SETTER DEMO</span>
+        <span className="hq-panel-title">● LIVE · AI SETTER DEMO (SV)</span>
         <button className="hq-panel-x" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>✕</button>
       </div>
       <div className="hq-dm-body" ref={bodyRef}>
-        {msgs.length === 0 && <div className="hq-dm-hint">Type as the lead — watch the setter close.</div>}
+        {msgs.length === 0 && <div className="hq-dm-hint">Skriv som leaden — se settern stänga.</div>}
         {msgs.map((m, i) => (<div key={i} className={`hq-bub ${m.role === "lead" ? "us" : "lead"}`}>{m.text}</div>))}
         {busy && <div className="hq-bub lead hq-dm-typing">typing…</div>}
       </div>
       <form className="hq-dm-input" onSubmit={(e) => { e.preventDefault(); send(); }}>
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="type as the lead…" autoFocus />
-        <button type="submit" className="hq-dm-send" disabled={busy}>Send</button>
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="skriv som leaden…" autoFocus />
+        <button type="submit" className="hq-dm-send" disabled={busy}>Skicka</button>
       </form>
     </div>
   );
@@ -1651,6 +1666,13 @@ function HqStyles() {
       .hq-fxlabel.big { font-size: 22px; letter-spacing: 0.7em; font-weight: 800; text-shadow: 0 0 30px rgba(201,168,76,0.9), 0 0 60px rgba(201,168,76,0.5); }
       .hq-said { max-width: 600px; text-align: center; margin-top: 30px; font-size: 19px; line-height: 1.5; color: #f5f0e1; text-shadow: 0 0 20px rgba(0,0,0,0.6); animation: hqFade .4s ease; z-index: 3; padding: 0 24px; }
       .hq-note { margin-top: 10px; font-size: 12px; color: #8b6914; }
+      .hq-textinput { display: flex; gap: 8px; margin-top: 18px; z-index: 4; width: min(500px, 90vw); }
+      .hq-textinput-field { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.28); border-radius: 10px; padding: 10px 14px; color: #f5f0e1; font-size: 14px; outline: none; backdrop-filter: blur(10px); transition: border-color .2s; }
+      .hq-textinput-field::placeholder { color: #6b6750; }
+      .hq-textinput-field:focus { border-color: rgba(201,168,76,0.65); }
+      .hq-textinput-field:disabled { opacity: 0.5; }
+      .hq-textinput-btn { background: linear-gradient(90deg,#c9a84c,#8b6914); color: #0a0e1a; font-weight: 800; border: none; border-radius: 10px; padding: 0 18px; cursor: pointer; font-size: 13px; letter-spacing: 0.06em; transition: opacity .2s; }
+      .hq-textinput-btn:disabled { opacity: 0.45; cursor: default; }
       .hq-panel { position: absolute; z-index: 8; width: 320px; max-width: 34vw; max-height: 74vh; display: flex; flex-direction: column;
         background: linear-gradient(160deg, rgba(201,168,76,0.07), rgba(13,19,36,0.52)); border: 1px solid rgba(201,168,76,0.45); border-radius: 12px; backdrop-filter: blur(18px) saturate(1.25);
         box-shadow: 0 0 0 1px rgba(201,168,76,0.08), 0 18px 60px rgba(0,0,0,0.6), 0 0 40px rgba(201,168,76,0.12); overflow: hidden; animation: hqMaterial .38s cubic-bezier(.16,1,.3,1) backwards;
