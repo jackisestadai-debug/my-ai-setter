@@ -1428,7 +1428,7 @@ gl_FragColor=vec4(col,a);}`;
 
       <header className="hq-top">
         <span className="hq-wm">
-          <img src="/logo.svg" alt="Svea AI Partners" style={{ height: 38, display: "block" }} />
+          <img src="/logo.svg" alt="Svea AI Partners" style={{ height: 56, display: "block" }} />
         </span>
         <nav className="hq-tabs">
           <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
