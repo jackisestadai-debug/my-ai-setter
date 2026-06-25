@@ -1118,14 +1118,9 @@ gl_FragColor=vec4(col,a);}`;
       },
       {
         say: "Du kan testa det helt gratis i sju dagar. Ingen bindning, ingen installation, inget krångel. Vi sätter upp allt åt dig och du ser resultaten direkt.",
-        panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
-        hold: 800,
-      },
-      {
-        say: "Boka ett kort möte med Jack så visar vi hur det ser ut för just din klinik — vad du missar idag och vad du kan tjäna. Länken finns i beskrivningen. Vi ses snart.",
         rings: true,
-        panels: [{ kind: "metric", title: "NÄSTA STEG", value: "BOKA MÖTE", sub: "30 min · gratis · ingen säljpitch", accent: true }],
-        hold: 600,
+        panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
+        hold: 1000,
       },
     ];
 
