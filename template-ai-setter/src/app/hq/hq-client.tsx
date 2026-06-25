@@ -1046,13 +1046,17 @@ gl_FragColor=vec4(col,a);}`;
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
       { role: "lead",   text: "Hej! Har ni några lediga tider för botox nästa vecka?" },
-      { role: "setter", text: "Hej! Ja absolut, vi har flera tider tillgängliga 😊 Är det något specifikt område du vill behandla — pannan, runt ögonen, eller något annat?" },
+      { role: "setter", text: "Hej! Ja absolut 😊" },
+      { role: "setter", text: "Vi har flera tider tillgängliga nästa vecka. Är det något specifikt område du vill behandla?" },
       { role: "lead",   text: "Mest pannan, har haft rynkor där ett tag och vill testa. Har aldrig gjort det förut" },
-      { role: "setter", text: "Perfekt ställe att börja på! Pannan är en av våra vanligaste behandlingar och ger ett väldigt naturligt resultat. Tar ca 20 minuter och är nästan smärtfri 🙌 Har du någon dag som passar bättre — förmiddag eller eftermiddag?" },
-      { role: "lead",   text: "Förmiddag helst, typ tisdag eller onsdag?" },
-      { role: "setter", text: "Onsdag förmiddag funkar perfekt! Jag bokar in dig kl 10.00 ✅ Du får en bekräftelse via SMS inom kort med all info. Är det något du undrar innan dess?" },
-      { role: "lead",   text: "Nej det låter bra, tack!" },
-      { role: "setter", text: "Toppen, vi ses på onsdag! 🎉 Hör av dig om något dyker upp 😊" },
+      { role: "setter", text: "Perfekt ställe att börja på!" },
+      { role: "setter", text: "Pannan är en av våra vanligaste behandlingar och ger ett väldigt naturligt resultat. Ca 20 minuter och nästan smärtfri 🙌" },
+      { role: "setter", text: "Har du någon dag nästa vecka som passar bättre, förmiddag eller eftermiddag?" },
+      { role: "lead",   text: "Förmiddag helst, tisdag eller onsdag?" },
+      { role: "setter", text: "Onsdag förmiddag funkar perfekt!" },
+      { role: "setter", text: "Jag bokar in dig kl 10.00 ✅ Du får en bekräftelse via SMS inom kort med all info." },
+      { role: "lead",   text: "Toppen, tack så mycket!" },
+      { role: "setter", text: "Vi ses på onsdag 🎉 Hör av dig om något dyker upp!" },
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
