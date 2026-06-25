@@ -1465,7 +1465,7 @@ gl_FragColor=vec4(col,a);}`;
         </div>
       )}
 
-      {tab === "dashboard" && <div className="hq-frame"><iframe src={demo ? "/dashboard?demo=1" : "/dashboard"} title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
+      {tab === "dashboard" && <div className="hq-frame"><iframe src="/dashboard?demo=1" title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
     </div>
   );
 }
