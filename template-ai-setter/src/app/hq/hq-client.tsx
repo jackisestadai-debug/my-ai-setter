@@ -248,6 +248,8 @@ function Hq() {
   const [cinema, setCinema] = useState(false);
   const [demo, setDemo] = useState(false);
   const [demoChatOpen, setDemoChatOpen] = useState(false);
+  const [autoConvMsgs, setAutoConvMsgs] = useState<{ role: "lead" | "setter"; text: string }[]>([]);
+  const autoConvRef = useRef(false);
   // Cinematic "deal closed" takeover — fires when cash lands (real events only).
   const [dealClose, setDealClose] = useState<{ amount: number; at: number } | null>(null);
   const [themeRgb, setThemeRgb] = useState<RGB>([201, 168, 76]);
@@ -1018,49 +1020,113 @@ gl_FragColor=vec4(col,a);}`;
   //    the panels + cinematics on its own, beat by beat, using showcase data only.
   //    Forced into demo mode by the caller so it can never run on real numbers. ──
   const pitchRef = useRef(false);
+
+  const runAutoConv = useCallback(async (script: { role: "lead" | "setter"; text: string }[]) => {
+    autoConvRef.current = true;
+    setAutoConvMsgs([]);
+    setDemoChatOpen(true);
+    for (const msg of script) {
+      if (!autoConvRef.current) break;
+      await new Promise<void>((r) => setTimeout(r, msg.role === "lead" ? 900 : 1400));
+      if (!autoConvRef.current) break;
+      setAutoConvMsgs((prev) => [...prev, msg]);
+    }
+  }, []);
+
   const runPitch = useCallback(async (kickoff: string) => {
     pitchRef.current = true;
+    autoConvRef.current = false;
+    setAutoConvMsgs([]);
+    setDemoChatOpen(false);
     setCinema(true);
-    type Beat = { say: string; panels?: Panel[]; rings?: boolean; demoChat?: "open" | "close"; hold?: number };
-    const beats: Beat[] = [
-      { say: kickoff || "Okej — låt mig visa dig exakt vad jag gör varje natt medan du sover.", rings: true,
-        panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "47 800 kr", sub: "11 möten bokade", accent: true }] },
-      { say: "Varje kund som skickar ett DM — jag svarar på sekunder, kvalificerar dem och bokar mötet. Automatiskt. Dygnet runt. Medan du är i behandlingsrummet.",
-        panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "Leads in", value: 284 }, { label: "Engagerade", value: 119 }, { label: "Kvalificerade", value: 52 }, { label: "Bokade", value: 31 }] }] },
-      { say: "Titta — se hur jag tar en kall lead hela vägen till bokat möte. Skriv som kunden så kör vi live.", demoChat: "open", hold: 2800 },
-      { say: "Varje konversation analyserar jag. Sedan visar jag dig exakt var du tappar kunder och hur du stänger fler.", demoChat: "close",
-        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens frustration till resultatet INNAN mötet pitchas. De som dör hoppar direkt till tid och pris.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "68% av avhopp sker direkt efter att priset nämns — utan att först förankra värdet." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens mål och frustration innan du frågar om budget.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }] },
-      { say: "Varje krona, varje källa, varje konvertering — spårat i realtid. Inga kalkylark. Inga gissningar.", rings: true,
-        panels: [
-          { kind: "stats", title: "DENNA MÅNAD", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "Svarstid", value: "9s" }] },
-          { kind: "bars", title: "LEADS PER KÄLLA", rows: [{ label: "Instagram DMs", value: 181 }, { label: "Stories", value: 64 }, { label: "Reels", value: 39 }] },
-        ] },
-      { say: "De som inte svarat? Jag följer upp automatiskt tills de bokar. Ingen lead faller bort. Aldrig.",
-        panels: [{ kind: "list", title: "UPPFÖLJNINGAR · IDAG", rows: [{ primary: "Kunder återaktiverade", secondary: "6" }, { primary: "Ombokade", secondary: "4" }, { primary: "Meddelanden skickade", secondary: "18" }] }] },
-      { say: "Jag är Jarvis. Jag sköter hela fronten av din klinik — dygnet runt, sju dagar i veckan. Du vaknar till en fullbokad dag. Frågan är bara om du vill ha det så.", rings: true,
-        panels: [{ kind: "metric", title: "JARVIS", value: "ONLINE", sub: "24 / 7 · aldrig offline", accent: true }] },
+
+    const CONV: { role: "lead" | "setter"; text: string }[] = [
+      { role: "setter", text: "Hej! Såg att du kollade in våra resultat på Instagram 👀 — är det botox eller fillers du funderar på?" },
+      { role: "lead",   text: "Hej! Botox mest, har velat göra det ett tag men vet inte riktigt var jag ska börja" },
+      { role: "setter", text: "Förstår! Många känner så — det är mycket information där ute. Vad är det du vill åt framförallt, är det pannan, runt ögonen eller något annat?" },
+      { role: "lead",   text: "Mest pannan tror jag, och lite runt ögonen" },
+      { role: "setter", text: "Perfekt kombination faktiskt! De flesta av våra kunder gör precis det — det ger ett väldigt naturligt och fräscht resultat utan att se «gjord» ut 😊 Har du testat botox förut?" },
+      { role: "lead",   text: "Nej aldrig, lite nervös faktiskt" },
+      { role: "setter", text: "Det är helt normalt! Våra kunder brukar säga att oron försvinner direkt när de träffar oss — behandlingen tar 20 minuter och är nästan smärtfri. Vi har lediga tider redan denna vecka. Vad passar dig bäst, förmiddag eller eftermiddag?" },
+      { role: "lead",   text: "Förmiddag funkar bra" },
+      { role: "setter", text: "Toppen! 🎉 Jag bokar in dig på torsdag kl 10.00 — du får en bekräftelse på SMS om en stund. Vi ses då! 😊" },
     ];
+
+    type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
+    const beats: Beat[] = [
+      {
+        say: kickoff || "Okej — låt mig visa dig exakt vad jag gör varje natt medan du sover.",
+        rings: true,
+        panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "47 800 kr", sub: "11 möten bokade automatiskt", accent: true }],
+      },
+      {
+        say: "Varje gång en potentiell kund skickar ett DM — svarar jag inom nio sekunder. Automatiskt. Dygnet runt. Även när du är mitt i en behandling eller sover.",
+        panels: [{ kind: "stats", title: "REALTID", items: [{ label: "Svarstid", value: "9s" }, { label: "Svarar dygnet runt", value: "24/7" }, { label: "Uppföljningar", value: "Auto" }, { label: "Bokningar idag", value: "3" }] }],
+      },
+      {
+        say: "Jag kvalificerar varje lead — ställer rätt frågor, sållar bort de som inte passar och fokuserar energin på dem som faktiskt vill boka. Du ser bara bokade möten i din kalender.",
+        panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "Leads in", value: 284 }, { label: "Engagerade", value: 119 }, { label: "Kvalificerade", value: 52 }, { label: "Bokade möten", value: 31 }] }],
+      },
+      {
+        say: "Titta här — en riktig konversation. Kunden var kall och nervös. Åtta meddelanden senare hade vi ett bokat möte. Ingen människa behövde lyfta ett finger.",
+        autoConv: true,
+        hold: 500,
+      },
+      {
+        say: "Och det stannar inte där. De som inte svarar direkt — dem följer jag upp automatiskt. Påminnelser, erbjudanden, återaktivering. Ingen lead faller bort.",
+        closeConv: true,
+        panels: [{ kind: "list", title: "UPPFÖLJNINGAR · IDAG", rows: [{ primary: "Leads återaktiverade", secondary: "6" }, { primary: "Ombokade", secondary: "4" }, { primary: "Påminnelser skickade", secondary: "18" }, { primary: "Avhopp räddade", secondary: "3" }] }],
+      },
+      {
+        say: "Varje konversation analyserar jag. Jag ser exakt var du tappar kunder, vad som funkar och hur du stänger fler möten. Inga gissningar — bara data.",
+        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens oro till resultatet INNAN priset nämns. Konversationer som dör hoppar direkt till pris utan att förankra värdet.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "71% av avhopp sker direkt efter att priset nämns — utan att first bygga förtroende och visa resultatet." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens oro och önskade resultat innan budget nämns.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }],
+      },
+      {
+        say: "Alla leads, alla kanaler — Instagram, stories, reels — spårat i realtid. Du ser exakt varifrån dina kunder kommer och vad som genererar mest intäkt.",
+        rings: true,
+        panels: [
+          { kind: "bars", title: "LEADS PER KÄLLA · 30 DAGAR", rows: [{ label: "Instagram DMs", value: 181 }, { label: "Stories", value: 64 }, { label: "Reels", value: 39 }] },
+          { kind: "stats", title: "KONVERTERING", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "ROI", value: "11x" }] },
+        ],
+      },
+      {
+        say: "Jag är Jarvis. Jag sköter hela fronten av din klinik — svarar, kvalificerar, bokar, följer upp. Dygnet runt, sju dagar i veckan. Du vaknar till en fullbokad dag. Frågan är bara om du vill ha det så.",
+        rings: true,
+        panels: [{ kind: "metric", title: "JARVIS · SVEA AI", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid på", accent: true }],
+      },
+    ];
+
     for (const b of beats) {
-      if (!pitchRef.current) return; // a new command cancelled the reel
-      if (b.demoChat === "open") setDemoChatOpen(true);
-      if (b.demoChat === "close") setDemoChatOpen(false);
+      if (!pitchRef.current) return;
+      if (b.closeConv) { autoConvRef.current = false; setDemoChatOpen(false); }
       if (b.panels) replacePanels(b.panels, true, true);
       if (b.rings) ringsAt.current = performance.now();
       setSaid(b.say);
-      // speak the line; advance even if TTS isn't available (hard cap per beat)
-      await Promise.race([
-        new Promise<void>((res) => speak(b.say, res)),
-        new Promise<void>((res) => setTimeout(res, 13000)),
-      ]);
+      if (b.autoConv) {
+        runAutoConv(CONV);
+        await Promise.race([
+          new Promise<void>((res) => speak(b.say, res)),
+          new Promise<void>((res) => setTimeout(res, 14000)),
+        ]);
+        // wait for conversation to finish playing (max 20s)
+        await new Promise<void>((res) => setTimeout(res, 20000));
+      } else {
+        await Promise.race([
+          new Promise<void>((res) => speak(b.say, res)),
+          new Promise<void>((res) => setTimeout(res, 14000)),
+        ]);
+      }
       if (!pitchRef.current) return;
       if (b.hold) await new Promise<void>((res) => setTimeout(res, b.hold));
     }
     pitchRef.current = false;
+    autoConvRef.current = false;
     setCinema(false);
     setDemoChatOpen(false);
+    setAutoConvMsgs([]);
     setSaid("Det är mig. Säg 'avsluta demo' för att gå tillbaka till riktiga siffror.");
     startMic();
-  }, [speak, replacePanels, startMic]);
+  }, [speak, replacePanels, startMic, runAutoConv]);
 
   // ── send ──
   const send = useCallback(async (text: string) => {
@@ -1325,7 +1391,7 @@ gl_FragColor=vec4(col,a);}`;
           </div>
         </div>
       )}
-      {demoChatOpen && <DemoDM accessKey={keyRef.current} onClose={() => setDemoChatOpen(false)} onTick={() => sfx("tick")} />}
+      {demoChatOpen && <DemoDM accessKey={keyRef.current} onClose={() => { setDemoChatOpen(false); autoConvRef.current = false; setAutoConvMsgs([]); }} onTick={() => sfx("tick")} autoMsgs={autoConvMsgs} />}
       <HudStatus online={online} asleep={asleep} ringRef={ringRef} />
 
       <header className="hq-top">
@@ -1426,14 +1492,16 @@ function HudStatus({ online, asleep, ringRef }: { online: boolean; asleep: boole
 
 /** LIVE DEMO SETTER — a draggable IG-style chat. Maher (or a prospect) types
  *  as the lead; the real AI setter persona replies. Pure showcase. */
-function DemoDM({ accessKey, onClose, onTick }: { accessKey: string; onClose: () => void; onTick?: () => void }) {
+function DemoDM({ accessKey, onClose, onTick, autoMsgs }: { accessKey: string; onClose: () => void; onTick?: () => void; autoMsgs?: { role: "lead" | "setter"; text: string }[] }) {
   const [msgs, setMsgs] = useState<{ role: "lead" | "setter"; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const isAuto = autoMsgs && autoMsgs.length > 0;
+  const displayMsgs = isAuto ? autoMsgs : msgs;
   const [pos, setPos] = useState({ x: 34, y: 15 });
   const drag = useRef<{ dx: number; dy: number } | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => { bodyRef.current?.scrollTo({ top: 1e6, behavior: "smooth" }); }, [msgs, busy]);
+  useEffect(() => { bodyRef.current?.scrollTo({ top: 1e6, behavior: "smooth" }); }, [msgs, busy, autoMsgs]);
 
   const onDown = (e: React.PointerEvent) => {
     const r = (e.currentTarget.parentElement as HTMLElement).getBoundingClientRect();
@@ -1469,14 +1537,14 @@ function DemoDM({ accessKey, onClose, onTick }: { accessKey: string; onClose: ()
         <button className="hq-panel-x" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>✕</button>
       </div>
       <div className="hq-dm-body" ref={bodyRef}>
-        {msgs.length === 0 && <div className="hq-dm-hint">Skriv som leaden — se settern stänga.</div>}
-        {msgs.map((m, i) => (<div key={i} className={`hq-bub ${m.role === "lead" ? "us" : "lead"}`}>{m.text}</div>))}
-        {busy && <div className="hq-bub lead hq-dm-typing">typing…</div>}
+        {displayMsgs.length === 0 && <div className="hq-dm-hint">{isAuto ? "Konversation laddar…" : "Skriv som leaden — se settern stänga."}</div>}
+        {displayMsgs.map((m, i) => (<div key={i} className={`hq-bub ${m.role === "lead" ? "us" : "lead"}`}>{m.text}</div>))}
+        {busy && !isAuto && <div className="hq-bub lead hq-dm-typing">typing…</div>}
       </div>
-      <form className="hq-dm-input" onSubmit={(e) => { e.preventDefault(); send(); }}>
+      {!isAuto && <form className="hq-dm-input" onSubmit={(e) => { e.preventDefault(); send(); }}>
         <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="skriv som leaden…" autoFocus />
         <button type="submit" className="hq-dm-send" disabled={busy}>Skicka</button>
-      </form>
+      </form>}
     </div>
   );
 }
