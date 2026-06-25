@@ -1021,16 +1021,20 @@ gl_FragColor=vec4(col,a);}`;
   //    Forced into demo mode by the caller so it can never run on real numbers. ──
   const pitchRef = useRef(false);
 
-  const runAutoConv = useCallback(async (script: { role: "lead" | "setter"; text: string }[]) => {
+  const runAutoConv = useCallback(async (script: { role: "lead" | "setter"; text: string }[]): Promise<void> => {
     autoConvRef.current = true;
     setAutoConvMsgs([]);
     setDemoChatOpen(true);
     for (const msg of script) {
       if (!autoConvRef.current) break;
-      await new Promise<void>((r) => setTimeout(r, msg.role === "lead" ? 900 : 1400));
+      // lead types faster, setter "thinks" a bit longer
+      const delay = msg.role === "lead" ? 1800 : 2400;
+      await new Promise<void>((r) => setTimeout(r, delay));
       if (!autoConvRef.current) break;
       setAutoConvMsgs((prev) => [...prev, msg]);
     }
+    // linger on last message so viewer can read it
+    await new Promise<void>((r) => setTimeout(r, 3000));
   }, []);
 
   const runPitch = useCallback(async (kickoff: string) => {
@@ -1096,28 +1100,33 @@ gl_FragColor=vec4(col,a);}`;
       },
     ];
 
+    const sayAndWait = (text: string) =>
+      Promise.race([
+        new Promise<void>((res) => speak(text, res)),
+        new Promise<void>((res) => setTimeout(res, 18000)),
+      ]);
+
     for (const b of beats) {
       if (!pitchRef.current) return;
       if (b.closeConv) { autoConvRef.current = false; setDemoChatOpen(false); }
       if (b.panels) replacePanels(b.panels, true, true);
       if (b.rings) ringsAt.current = performance.now();
       setSaid(b.say);
-      if (b.autoConv) {
-        runAutoConv(CONV);
-        await Promise.race([
-          new Promise<void>((res) => speak(b.say, res)),
-          new Promise<void>((res) => setTimeout(res, 14000)),
-        ]);
-        // wait for conversation to finish playing (max 20s)
-        await new Promise<void>((res) => setTimeout(res, 20000));
-      } else {
-        await Promise.race([
-          new Promise<void>((res) => speak(b.say, res)),
-          new Promise<void>((res) => setTimeout(res, 14000)),
-        ]);
-      }
+
+      // 1. speak the line and wait until it's done
+      await sayAndWait(b.say);
       if (!pitchRef.current) return;
-      if (b.hold) await new Promise<void>((res) => setTimeout(res, b.hold));
+
+      // 2. if this beat triggers an auto-conversation, play it AFTER speech finishes
+      if (b.autoConv) {
+        await new Promise<void>((res) => setTimeout(res, 600));
+        await runAutoConv(CONV);
+        if (!pitchRef.current) return;
+      }
+
+      // 3. optional extra pause between beats
+      const pause = b.hold ?? 1200;
+      await new Promise<void>((res) => setTimeout(res, pause));
     }
     pitchRef.current = false;
     autoConvRef.current = false;
