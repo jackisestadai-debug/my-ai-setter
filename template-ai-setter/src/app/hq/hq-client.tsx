@@ -1052,7 +1052,7 @@ gl_FragColor=vec4(col,a);}`;
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
       { role: "lead",   text: "Hej! Såg era reels, gör ni lip fillers?" },
-      { role: "setter", text: "Hej! Ja det gör vi 😊 Vad vill du uppnå?" },
+      { role: "setter", text: "Hej! Ja det gör vi 😊 Vad vill du göra?" },
       { role: "lead",   text: "Vill ha fylligare läppar men är rädd att det ser konstigt ut..." },
       { role: "setter", text: "Den oron hör vi ofta! Målet är alltid att det ska se naturligt ut — ingen ska kunna se att du gjort något, bara att du ser bra ut." },
       { role: "lead",   text: "Gör det ont?" },
