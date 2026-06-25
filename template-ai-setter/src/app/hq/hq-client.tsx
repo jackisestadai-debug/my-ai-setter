@@ -52,7 +52,7 @@ function getSR(): SR | null {
 }
 
 /** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
-const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "AI SETTER";
+const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "SVEA AI";
 
 type Tab = "aura" | "dashboard";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
@@ -182,7 +182,13 @@ function endpointDelay(text: string, lastFinal: boolean): number {
   return lastFinal ? 500 : 750;            // sounds complete — stay snappy
 }
 
-const GREETINGS = ["Online.", "System igång, chef.", "Alla system gröna.", "Till din tjänst.", "Uppstartad. Redo när du är det."];
+const GREETINGS = [
+  "Aura online. Välkommen tillbaka — vad kan jag hjälpa dig med idag?",
+  "Systemen är gröna. Vad behöver du?",
+  "Uppstartad och redo. Hur kan jag assistera dig?",
+  "Allt körs smidigt. Säg bara till.",
+  "Bra timing — allt ser bra ut. Vad vill du gå igenom?",
+];
 function nextGreeting(): string {
   let i = 0;
   try {
@@ -1045,72 +1051,74 @@ gl_FragColor=vec4(col,a);}`;
     setCinema(true);
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
-      { role: "lead",   text: "Hej! Har ni några lediga tider för botox nästa vecka?" },
+      { role: "lead",   text: "Hej! Jag undrar om ni gör lip fillers?" },
       { role: "setter", text: "Hej! Ja absolut 😊" },
-      { role: "setter", text: "Vi har flera tider tillgängliga nästa vecka. Är det något specifikt område du vill behandla?" },
-      { role: "lead",   text: "Mest pannan, har haft rynkor där ett tag och vill testa. Har aldrig gjort det förut" },
-      { role: "setter", text: "Perfekt ställe att börja på!" },
-      { role: "setter", text: "Pannan är en av våra vanligaste behandlingar och ger ett väldigt naturligt resultat. Ca 20 minuter och nästan smärtfri 🙌" },
-      { role: "setter", text: "Har du någon dag nästa vecka som passar bättre, förmiddag eller eftermiddag?" },
-      { role: "lead",   text: "Förmiddag helst, tisdag eller onsdag?" },
-      { role: "setter", text: "Onsdag förmiddag funkar perfekt!" },
-      { role: "setter", text: "Jag bokar in dig kl 10.00 ✅ Du får en bekräftelse via SMS inom kort med all info." },
-      { role: "lead",   text: "Toppen, tack så mycket!" },
-      { role: "setter", text: "Vi ses på onsdag 🎉 Hör av dig om något dyker upp!" },
+      { role: "setter", text: "Vi gör lip fillers och det är faktiskt en av våra mest populära behandlingar just nu." },
+      { role: "setter", text: "Är det mer volym du är ute efter, eller vill du mest forma och definiera?" },
+      { role: "lead",   text: "Mest forma, läpparna känns lite ojämna och jag vill ha ett mer naturligt resultat" },
+      { role: "setter", text: "Det låter som ett perfekt case för oss!" },
+      { role: "setter", text: "Naturlig formning är precis vad vi specialiserar oss på. Resultatet ska se ut som du bara är dig — fast lite bättre." },
+      { role: "setter", text: "Behandlingen tar ca 30 min och du kan gå tillbaka till jobbet direkt efteråt 🙌" },
+      { role: "setter", text: "Har du någon dag denna vecka eller nästa som kan funka?" },
+      { role: "lead",   text: "Nästa vecka är bättre, helst torsdag eller fredag" },
+      { role: "setter", text: "Fredag funkar utmärkt!" },
+      { role: "setter", text: "Jag bokar in dig kl 11.00 på fredag ✅ Du får en bekräftelse via SMS med all info." },
+      { role: "lead",   text: "Perfekt, tack så jättemycket!" },
+      { role: "setter", text: "Vi ses på fredag 🎉 Hör av dig om du har några frågor innan dess!" },
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
     const beats: Beat[] = [
       {
-        say: kickoff || "Okej — låt mig visa dig exakt vad jag gör varje natt medan du sover.",
+        say: kickoff || "Okej — låt mig visa dig exakt vad jag gör för din klinik varje dag medan du är mitt i behandlingar.",
         rings: true,
-        panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "47 800 kr", sub: "11 möten bokade automatiskt", accent: true }],
+        panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "63 400 kr", sub: "14 behandlingar bokade automatiskt", accent: true }],
         hold: 800,
       },
       {
-        say: "Tänk på alla DM som kommer in när du är mitt i en behandling. Du ser dem inte förrän kvällen — och då är kunden redan hos konkurrenten. Jag svarar inom nio sekunder. Alltid.",
-        panels: [{ kind: "stats", title: "MEDAN DU ARBETAR", items: [{ label: "Svarstid", value: "9s" }, { label: "Förlorade leads/mån utan AI", value: "~40" }, { label: "Intäkt du missar", value: "~28 000 kr" }, { label: "Bokningar idag", value: "3" }] }],
+        say: "Tänk på alla DM som trillar in när du står med handskar på och är mitt i en behandling. Du ser dem inte förrän på kvällen — och då är kunden redan bokad hos konkurrenten. Jag svarar inom nio sekunder. Alltid.",
+        panels: [{ kind: "stats", title: "MEDAN DU BEHANDLAR", items: [{ label: "Svarstid", value: "9s" }, { label: "Förlorade kunder/mån utan AI", value: "~35" }, { label: "Intäkt du missar", value: "~42 000 kr" }, { label: "Bokningar idag", value: "4" }] }],
         hold: 800,
       },
       {
-        say: "Jag kvalificerar varje lead automatiskt. Ställer rätt frågor, sållar de som inte passar, och pushar de varma direkt mot bokning. Du öppnar kalendern på morgonen — den är full.",
-        panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "Leads in", value: 284 }, { label: "Engagerade", value: 119 }, { label: "Kvalificerade", value: 52 }, { label: "Bokade möten", value: 31 }] }],
+        say: "Jag hanterar hela resan — från första nyfikna DM till bokat möte. Ställer rätt frågor, bygger förtroende, och stänger bokningen. Du öppnar kalendern på morgonen — den är full.",
+        panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "DMs in", value: 247 }, { label: "Engagerade", value: 103 }, { label: "Intresserade av behandling", value: 61 }, { label: "Bokade möten", value: 34 }] }],
         hold: 800,
       },
       {
-        say: "Titta här — en riktig konversation. Kunden var kall och lite nervös. Åtta meddelanden senare: bokat möte. Noll manuellt arbete.",
+        say: "Här är en riktig konversation — en kund som undrade om lip fillers. Elva meddelanden senare: bokat möte, bekräftelse skickad. Noll manuellt arbete från kliniken.",
         autoConv: true,
         hold: 400,
       },
       {
-        say: "De som inte svarade direkt? Dem följer jag upp automatiskt — dag tre, dag sju, dag fjorton. Tre av fyra bokar till slut. Ingen lead försvinner någonsin.",
+        say: "Och de som inte svarade direkt? Dem följer jag upp — dag tre, dag sju, dag fjorton. Mjukt, naturligt, utan att kännas som spam. Mer än hälften bokar till slut.",
         closeConv: true,
-        panels: [{ kind: "list", title: "AUTOMATISKA UPPFÖLJNINGAR", rows: [{ primary: "Leads återaktiverade denna vecka", secondary: "6" }, { primary: "Ombokade no-shows", secondary: "4" }, { primary: "Påminnelser skickade idag", secondary: "18" }, { primary: "Avhopp räddade denna månad", secondary: "11" }] }],
+        panels: [{ kind: "list", title: "AUTOMATISKA UPPFÖLJNINGAR", rows: [{ primary: "Leads återaktiverade denna vecka", secondary: "8" }, { primary: "Ombokade efter no-show", secondary: "3" }, { primary: "Påminnelser skickade idag", secondary: "21" }, { primary: "Kunder räddade denna månad", secondary: "13" }] }],
         hold: 800,
       },
       {
-        say: "Och jag lär mig hela tiden. Jag analyserar varje konversation och visar exakt var du tappar kunder — och vad som stänger dem. Inga gissningar.",
-        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens oro till resultatet INNAN priset nämns. De som misslyckas hoppar direkt till pris.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "71% av avhopp sker direkt efter att priset nämns — utan att först bygga förtroende." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens mål och oro innan budget nämns.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }],
+        say: "Jag lär mig också av varje konversation. Jag ser exakt vilka behandlingar som är lättast att sälja in via DM, vilka frågor som stoppar upp och vad som faktiskt leder till bokning.",
+        panels: [{ kind: "report", title: "KONVERSATIONSANALYS", summary: "Kunder som frågar om pris tidigt bokar sällan. De som får frågor om sitt önskade resultat först — bokar nästan alltid.", sections: [{ h: "DÄR DU TAPPAR DEM", body: "68% av avhopp sker när priset nämns utan att kunden förstår värdet av behandlingen." }], fixes: [{ n: 1, title: "Prata resultat före pris", body: "Låt kunden beskriva vad de vill uppnå innan du nämner kostnad.", why: "De flesta bokningar i systemet följer precis detta mönster.", impact: "+24% bokningsfrekvens", confidence: "high" }] }],
         hold: 800,
       },
       {
-        say: "Alla kanaler, all data — i realtid. Instagram, stories, reels. Du ser exakt vad som genererar intäkt och kan dubbla ner på det som funkar.",
+        say: "Du ser allt i realtid — vilka behandlingar som säljer bäst via Instagram, var i flödet kunder fastnar, och hur mycket intäkt Aura har genererat totalt.",
         rings: true,
         panels: [
-          { kind: "bars", title: "LEADS PER KÄLLA · 30 DAGAR", rows: [{ label: "Instagram DMs", value: 181 }, { label: "Stories", value: 64 }, { label: "Reels", value: 39 }] },
-          { kind: "stats", title: "RESULTAT", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "ROI", value: "11x" }] },
+          { kind: "bars", title: "BEHANDLINGAR VIA DM · 30 DAGAR", rows: [{ label: "Lip fillers", value: 94 }, { label: "Botox panna", value: 81 }, { label: "Kindben", value: 47 }, { label: "Ansiktsbehandling", value: 25 }] },
+          { kind: "stats", title: "NYCKELTAL", items: [{ label: "Närvaro på möte", value: "79%" }, { label: "Konvertering", value: "41%" }, { label: "Intäkt / bokning", value: "4 520 kr" }, { label: "ROI", value: "14x" }] },
         ],
         hold: 800,
       },
       {
-        say: "Din konkurrent som redan har det här — den vaknar till fullt schema varje dag medan du fortfarande svarar DMs manuellt klockan elva på kvällen. Det är det här det handlar om.",
-        panels: [{ kind: "metric", title: "SKILLNADEN", value: "+47 800 kr", sub: "per månad · automatiskt · utan extra personal", accent: true }],
+        say: "Kliniken som redan har det här vaknar till ett fullt schema varje dag. Medan du fortfarande svarar DMs manuellt klockan elva på kvällen efter en lång dag av behandlingar.",
+        panels: [{ kind: "metric", title: "SKILLNADEN", value: "+63 000 kr", sub: "per månad · automatiskt · utan extra personal", accent: true }],
         hold: 1000,
       },
       {
-        say: "Jag är Aura. Från första DM till bokat möte — helt automatiskt. Du sköter det du är bäst på. Jag sköter resten. Dygnet runt.",
+        say: "Jag är Aura — från kliniken Svea AI Partners. Från första DM till bokat möte, helt automatiskt. Du fokuserar på behandlingarna. Jag fyller kalendern. Dygnet runt.",
         rings: true,
-        panels: [{ kind: "metric", title: "AURA · SVEA AI", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid på", accent: true }],
+        panels: [{ kind: "metric", title: "AURA · SVEA AI PARTNERS", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid redo", accent: true }],
         hold: 600,
       },
     ];
@@ -1382,7 +1390,7 @@ gl_FragColor=vec4(col,a);}`;
   useEffect(() => {
     if (!dealClose) return;
     if (orbRef.current === "idle") {
-      const m = "$" + Math.round(dealClose.amount).toLocaleString("en-US");
+      const m = Math.round(dealClose.amount).toLocaleString("sv-SE") + " kr";
       speak(`Boom. ${m} just landed. Keep it coming, boss.`);
     }
     const t = setTimeout(() => setDealClose(null), 6500);
@@ -1395,7 +1403,7 @@ gl_FragColor=vec4(col,a);}`;
     setTimeout(() => setPanels((ps) => ps.filter((p) => p.id !== id)), 520);
   };
   const asleep = orb === "asleep";
-  const dcAmount = dealClose ? "$" + Math.round(dealClose.amount).toLocaleString("en-US") : "";
+  const dcAmount = dealClose ? Math.round(dealClose.amount).toLocaleString("sv-SE") + " kr" : "";
 
   return (
     <div className={`hq-root tab-${tab} ${asleep ? "asleep" : ""} ${!online ? "off" : ""} ${cinema ? "cinema" : ""}`} onPointerDown={fxMode === "boot" ? skipBoot : undefined}>
@@ -1419,7 +1427,9 @@ gl_FragColor=vec4(col,a);}`;
       <HudStatus online={online} asleep={asleep} ringRef={ringRef} />
 
       <header className="hq-top">
-        <span className="hq-wm">AURA<span className="g"> HQ</span></span>
+        <span className="hq-wm">
+          <img src="/logo.svg" alt="Svea AI Partners" style={{ height: 38, display: "block" }} />
+        </span>
         <nav className="hq-tabs">
           <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>

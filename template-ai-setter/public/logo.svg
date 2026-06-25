@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <defs>
+    <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a84c"/>
+      <stop offset="45%" stop-color="#7eb8d4"/>
+      <stop offset="100%" stop-color="#7eb8d4"/>
+    </linearGradient>
+  </defs>
+  <text x="160" y="62" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="400" fill="white" text-anchor="middle" letter-spacing="1">Svea AI</text>
+  <rect x="60" y="72" width="200" height="2" fill="url(#lg)" rx="1"/>
+  <text x="160" y="94" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa3c0" text-anchor="middle" letter-spacing="4">PARTNERS</text>
+</svg>
