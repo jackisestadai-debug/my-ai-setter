@@ -1051,20 +1051,21 @@ gl_FragColor=vec4(col,a);}`;
     setCinema(true);
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
-      { role: "lead",   text: "Hej! Jag undrar om ni gör lip fillers?" },
-      { role: "setter", text: "Hej! Ja absolut 😊" },
-      { role: "setter", text: "Vi gör lip fillers och det är faktiskt en av våra mest populära behandlingar just nu." },
-      { role: "setter", text: "Är det mer volym du är ute efter, eller vill du mest forma och definiera?" },
-      { role: "lead",   text: "Mest forma, läpparna känns lite ojämna och jag vill ha ett mer naturligt resultat" },
-      { role: "setter", text: "Det låter som ett perfekt case för oss!" },
-      { role: "setter", text: "Naturlig formning är precis vad vi specialiserar oss på. Resultatet ska se ut som du bara är dig — fast lite bättre." },
-      { role: "setter", text: "Behandlingen tar ca 30 min och du kan gå tillbaka till jobbet direkt efteråt 🙌" },
-      { role: "setter", text: "Har du någon dag denna vecka eller nästa som kan funka?" },
-      { role: "lead",   text: "Nästa vecka är bättre, helst torsdag eller fredag" },
-      { role: "setter", text: "Fredag funkar utmärkt!" },
-      { role: "setter", text: "Jag bokar in dig kl 11.00 på fredag ✅ Du får en bekräftelse via SMS med all info." },
-      { role: "lead",   text: "Perfekt, tack så jättemycket!" },
-      { role: "setter", text: "Vi ses på fredag 🎉 Hör av dig om du har några frågor innan dess!" },
+      { role: "lead",   text: "Hej! Såg era reels, gör ni lip fillers?" },
+      { role: "setter", text: "Hej! Ja det gör vi 😊" },
+      { role: "setter", text: "Vad är det du vill uppnå med behandlingen?" },
+      { role: "lead",   text: "Läpparna känns lite tunna och ojämna, vill ha något naturligt. Lite nervös för att det ska bli för mycket" },
+      { role: "setter", text: "Det förstår jag!" },
+      { role: "setter", text: "Naturligt är precis vad vi siktar på. Målet är att det ska se ut som du alltid sett ut så — fast lite bättre." },
+      { role: "setter", text: "Många av våra kunder var oroliga för exakt det innan sin första gång. Efteråt ångrar ingen sig 🙏" },
+      { role: "setter", text: "Behandlingen tar ca 30 min och resultatet syns direkt." },
+      { role: "setter", text: "Passar det bättre denna vecka eller nästa?" },
+      { role: "lead",   text: "Nästa vecka, gärna på eftermiddagen" },
+      { role: "setter", text: "Toppen!" },
+      { role: "setter", text: "Jag bokar in dig tisdag 14.00 ✅" },
+      { role: "setter", text: "Du får en bekräftelse via SMS med adress och all info. Vi ses!" },
+      { role: "lead",   text: "Perfekt tack!" },
+      { role: "setter", text: "Välkommen 🎉 Hör av dig om du har frågor innan dess!" },
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
@@ -1097,28 +1098,33 @@ gl_FragColor=vec4(col,a);}`;
         hold: 800,
       },
       {
-        say: "Jag lär mig också av varje konversation. Jag ser exakt vilka behandlingar som är lättast att sälja in via DM, vilka frågor som stoppar upp och vad som faktiskt leder till bokning.",
-        panels: [{ kind: "report", title: "KONVERSATIONSANALYS", summary: "Kunder som frågar om pris tidigt bokar sällan. De som får frågor om sitt önskade resultat först — bokar nästan alltid.", sections: [{ h: "DÄR DU TAPPAR DEM", body: "68% av avhopp sker när priset nämns utan att kunden förstår värdet av behandlingen." }], fixes: [{ n: 1, title: "Prata resultat före pris", body: "Låt kunden beskriva vad de vill uppnå innan du nämner kostnad.", why: "De flesta bokningar i systemet följer precis detta mönster.", impact: "+24% bokningsfrekvens", confidence: "high" }] }],
+        say: "Systemet hanterar också vanliga frågor automatiskt — priser, vad som ingår, hur man förbereder sig, vad som gäller efter behandlingen. Kunden känner sig omhändertagen redan innan de kliver in genom dörren.",
+        panels: [{ kind: "list", title: "HANTERAS AUTOMATISKT", rows: [{ primary: "Prisinformation", secondary: "✓ auto" }, { primary: "Förberedelse inför behandling", secondary: "✓ auto" }, { primary: "Eftervårdsinstruktioner", secondary: "✓ auto" }, { primary: "Påminnelse dagen innan", secondary: "✓ auto" }, { primary: "Ombokning vid avhopp", secondary: "✓ auto" }] }],
         hold: 800,
       },
       {
-        say: "Du ser allt i realtid — vilka behandlingar som säljer bäst via Instagram, var i flödet kunder fastnar, och hur mycket intäkt Aura har genererat totalt.",
+        say: "Du ser allt i realtid — vilka behandlingar som bokas mest via Instagram, var leads fastnar, och exakt hur mycket intäkt systemet har genererat.",
         rings: true,
         panels: [
-          { kind: "bars", title: "BEHANDLINGAR VIA DM · 30 DAGAR", rows: [{ label: "Lip fillers", value: 94 }, { label: "Botox panna", value: 81 }, { label: "Kindben", value: 47 }, { label: "Ansiktsbehandling", value: 25 }] },
-          { kind: "stats", title: "NYCKELTAL", items: [{ label: "Närvaro på möte", value: "79%" }, { label: "Konvertering", value: "41%" }, { label: "Intäkt / bokning", value: "4 520 kr" }, { label: "ROI", value: "14x" }] },
+          { kind: "bars", title: "BOKNINGAR VIA DM · 30 DAGAR", rows: [{ label: "Lip fillers", value: 94 }, { label: "Botox panna", value: 81 }, { label: "Kindben", value: 47 }, { label: "Ansiktsbehandling", value: 25 }] },
+          { kind: "stats", title: "NYCKELTAL", items: [{ label: "Svarstid", value: "9s" }, { label: "Konvertering", value: "41%" }, { label: "Intäkt / bokning", value: "4 520 kr" }, { label: "ROI", value: "14x" }] },
         ],
         hold: 800,
       },
       {
-        say: "Kliniken som redan har det här vaknar till ett fullt schema varje dag. Medan du fortfarande svarar DMs manuellt klockan elva på kvällen efter en lång dag av behandlingar.",
+        say: "Kliniken som redan har det här vaknar till ett fullt schema varje dag. Utan att ha svarat ett enda DM kvällen innan.",
         panels: [{ kind: "metric", title: "SKILLNADEN", value: "+63 000 kr", sub: "per månad · automatiskt · utan extra personal", accent: true }],
         hold: 1000,
       },
       {
-        say: "Jag är Aura — från kliniken Svea AI Partners. Från första DM till bokat möte, helt automatiskt. Du fokuserar på behandlingarna. Jag fyller kalendern. Dygnet runt.",
+        say: "Du kan testa det helt gratis i sju dagar. Ingen bindning, ingen installation, inget krångel. Vi sätter upp allt åt dig och du ser resultaten direkt.",
+        panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
+        hold: 800,
+      },
+      {
+        say: "Boka ett kort möte med Maher så visar vi hur det ser ut för just din klinik — vad du missar idag och vad du kan tjäna. Länken finns i beskrivningen. Vi ses snart.",
         rings: true,
-        panels: [{ kind: "metric", title: "AURA · SVEA AI PARTNERS", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid redo", accent: true }],
+        panels: [{ kind: "metric", title: "NÄSTA STEG", value: "BOKA MÖTE", sub: "15 min · gratis · ingen säljpitch", accent: true }],
         hold: 600,
       },
     ];
@@ -1156,7 +1162,7 @@ gl_FragColor=vec4(col,a);}`;
     setCinema(false);
     setDemoChatOpen(false);
     setAutoConvMsgs([]);
-    setSaid("Det är mig. Säg 'avsluta demo' för att gå tillbaka till riktiga siffror.");
+    setSaid("Det var demot. Säg 'avsluta demo' för att gå tillbaka till riktiga siffror.");
     startMic();
   }, [speak, replacePanels, startMic, runAutoConv]);
 
