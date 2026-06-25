@@ -286,7 +286,7 @@ function Hq() {
 
   useEffect(() => {
     const k = KEY(); keyRef.current = k; setSrSupported(getSR() !== null);
-    if (isDemo()) { demoRef.current = true; setDemo(true); ringRef.current = { leads7: 47, engaged: 13, booked7: 11, cash7: "$18.4K" }; }
+    if (isDemo()) { demoRef.current = true; setDemo(true); ringRef.current = { leads7: 47, engaged: 19, booked7: 11, cash7: "38 500 kr" }; }
   }, []);
 
   // ── room depth: the whole HQ leans with the mouse (parallax) ──
@@ -307,7 +307,7 @@ function Hq() {
     demoRef.current = on; setDemo(on);
     if (on) {
       // freeze the rings to believable fake numbers so nothing real shows
-      ringRef.current = { leads7: 47 + ((Math.random() * 12) | 0), engaged: 12 + ((Math.random() * 6) | 0), booked7: 9 + ((Math.random() * 5) | 0), cash7: `$${(14 + ((Math.random() * 10) | 0))}.${(Math.random() * 9) | 0}K` };
+      ringRef.current = { leads7: 38 + ((Math.random() * 18) | 0), engaged: 16 + ((Math.random() * 8) | 0), booked7: 8 + ((Math.random() * 6) | 0), cash7: `${(28 + ((Math.random() * 18) | 0)) * 1000} kr` };
     }
   }, []);
 

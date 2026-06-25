@@ -180,51 +180,69 @@ function Kpi({ label, value }: { label: string; value: string }) {
 
 // ── DEMO data: a believable, impressive snapshot built fresh each load ──
 function fakeDashboard(start: string, end: string, source: string, funnel: string): Dashboard {
+  // Realistic numbers for a Swedish beauty clinic (botox/fillers, ~150-300 followers/mån, IG-fokus)
   const R = (a: number, b: number) => a + Math.floor(Math.random() * (b - a));
-  const leads = R(420, 680), reps = R(180, 320), icp = R(90, 160), qual = R(48, 90);
-  const pitched = R(30, 55), booked = R(22, 40), showed = Math.round(booked * 0.72), closed = Math.round(showed * 0.42);
-  const aiBooked = Math.round(booked * 0.64);
-  const cash = R(38, 72) * 1000, signed = cash + R(20, 60) * 1000;
-  const srcs = ["YouTube", "IG", "Referrals", "Ads", "TikTok"];
+  // Leads: ca 180-280 DMs per månad från Instagram
+  const leads = R(180, 280), reps = R(80, 140), icp = R(55, 90), qual = R(35, 60);
+  const pitched = R(22, 38), booked = R(16, 28), showed = Math.round(booked * 0.78), closed = Math.round(showed * 0.68);
+  const aiBooked = Math.round(booked * 0.72);
+  // Priser: botox ~2 500 kr, fillers ~3 500 kr, snitt ~3 000 kr per behandling
+  const avgDeal = R(2800, 3800);
+  const cash = closed * avgDeal + R(5, 15) * 1000;
+  const signed = cash + R(8, 20) * 1000;
+  const srcs = ["Instagram DMs", "Stories", "Reels", "Taggar", "Rekommendationer"];
   return {
-    period: { start, end, source: source || "all sources", funnel },
+    period: { start, end, source: source || "alla kanaler", funnel },
     outbound: {
-      new_followers: R(800, 1600), outreaches: reps + R(120, 260), replies: reps, followups_outreach: R(60, 140),
-      followups_convo: R(40, 90), icp, qualified: qual, call_pitched: pitched, followups_pitched: R(10, 30),
-      booked, pickup_rate: R(38, 62), qualified_to_pitched: R(55, 78), pitched_to_booked: R(60, 82),
+      new_followers: R(150, 320), outreaches: reps + R(40, 90), replies: reps, followups_outreach: R(25, 60),
+      followups_convo: R(18, 40), icp, qualified: qual, call_pitched: pitched, followups_pitched: R(5, 15),
+      booked, pickup_rate: R(55, 78), qualified_to_pitched: R(60, 82), pitched_to_booked: R(68, 88),
     },
     inbound: {
-      new_leads: R(120, 260), dials: R(80, 180), followups_dials: R(30, 70), pickups: R(40, 90), icp: R(40, 80),
-      qualified: R(30, 60), call_pitched: R(20, 40), booked: R(10, 22), dial_coverage: R(70, 95),
-      pickup_connect_rate: R(35, 60), pitched_to_booked: R(55, 80),
+      new_leads: R(60, 120), dials: R(30, 70), followups_dials: R(10, 30), pickups: R(20, 50), icp: R(20, 45),
+      qualified: R(15, 35), call_pitched: R(10, 22), booked: R(6, 14), dial_coverage: R(75, 95),
+      pickup_connect_rate: R(45, 68), pitched_to_booked: R(60, 82),
     },
     sales: {
       booked, showed, offer_pitched: showed, closed, no_shows: booked - showed, losts: showed - closed,
-      avg_call_minutes_on_close: R(34, 52), show_rate: Math.round((showed / booked) * 100),
+      avg_call_minutes_on_close: R(18, 32), show_rate: Math.round((showed / booked) * 100),
       close_rate: Math.round((closed / showed) * 100), booked_to_close: Math.round((closed / booked) * 100),
-      cash_collected: cash, revenue_signed: signed, ltv_cash: R(2400, 4200), ltv_contract: R(4200, 7200),
-      outstanding: signed - cash, average_deal_size: Math.round(signed / Math.max(1, closed)),
-      average_first_payment: R(1500, 3200), cash_per_booked_call: Math.round(cash / Math.max(1, booked)),
-      cash_per_outreach: Math.round((cash / Math.max(1, reps)) * 100) / 100, pif_rate: R(30, 55),
-      disputes: R(0, 2), money_lost_to_disputes: R(0, 1) * 1500, dispute_rate: R(0, 3),
+      cash_collected: cash, revenue_signed: signed, ltv_cash: R(8500, 14000), ltv_contract: R(12000, 22000),
+      outstanding: signed - cash, average_deal_size: avgDeal,
+      average_first_payment: R(2200, 3800), cash_per_booked_call: Math.round(cash / Math.max(1, booked)),
+      cash_per_outreach: Math.round((cash / Math.max(1, reps)) * 100) / 100, pif_rate: R(55, 80),
+      disputes: 0, money_lost_to_disputes: 0, dispute_rate: 0,
       ai_booked: aiBooked, ai_booked_pct: Math.round((aiBooked / booked) * 100),
     },
-    by_source: srcs.map((s) => ({ source: s, leads: R(40, 180), booked: R(3, 14), won: R(1, 6) })),
-    revenue_by_source: srcs.map((s) => ({ source: s, clients: R(1, 6), signed: R(8, 30) * 1000, cash: R(5, 22) * 1000 })),
-    revenue_by_campaign: [{ campaign: "Q2 Push", clients: R(2, 8), signed: R(20, 50) * 1000, cash: R(14, 36) * 1000 }],
-    revenue_by_placement: [{ placement: "Reels", clients: R(2, 7), signed: R(16, 44) * 1000, cash: R(10, 30) * 1000 }],
-    revenue_by_booking_method: [
-      { method: "ai_dm", clients: R(3, 8), signed: R(24, 52) * 1000, cash: R(16, 38) * 1000 },
-      { method: "manual_dm", clients: R(1, 4), signed: R(8, 20) * 1000, cash: R(5, 14) * 1000 },
+    by_source: [
+      { source: "Instagram DMs", leads: R(90, 150), booked: R(8, 16), won: R(5, 12) },
+      { source: "Stories", leads: R(40, 80), booked: R(4, 9), won: R(2, 6) },
+      { source: "Reels", leads: R(25, 55), booked: R(2, 6), won: R(1, 4) },
+      { source: "Taggar", leads: R(10, 25), booked: R(1, 4), won: R(1, 3) },
+      { source: "Rekommendationer", leads: R(8, 18), booked: R(2, 5), won: R(1, 4) },
     ],
-    by_placement: [{ placement: "Reels", leads: R(120, 300) }, { placement: "Stories", leads: R(60, 160) }],
-    by_campaign: [{ campaign: "Q2 Push", leads: R(150, 380) }],
+    revenue_by_source: srcs.map((s, i) => ({ source: s, clients: R(2, 8), signed: R(i === 0 ? 25 : 8, i === 0 ? 55 : 22) * 1000, cash: R(i === 0 ? 18 : 5, i === 0 ? 42 : 16) * 1000 })),
+    revenue_by_campaign: [{ campaign: "Instagram Organiskt", clients: R(4, 10), signed: R(35, 70) * 1000, cash: R(25, 52) * 1000 }],
+    revenue_by_placement: [
+      { placement: "Reels", clients: R(3, 7), signed: R(18, 38) * 1000, cash: R(12, 28) * 1000 },
+      { placement: "Stories", clients: R(2, 5), signed: R(10, 24) * 1000, cash: R(7, 18) * 1000 },
+    ],
+    revenue_by_booking_method: [
+      { method: "ai_dm", clients: R(5, 12), signed: R(28, 58) * 1000, cash: R(20, 44) * 1000 },
+      { method: "manual_dm", clients: R(1, 4), signed: R(5, 14) * 1000, cash: R(3, 10) * 1000 },
+    ],
+    by_placement: [
+      { placement: "Reels", leads: R(60, 130) },
+      { placement: "Stories", leads: R(35, 85) },
+      { placement: "Feed", leads: R(15, 40) },
+    ],
+    by_campaign: [{ campaign: "Instagram Organiskt", leads: R(100, 200) }],
     by_booking_method: [{ method: "ai_dm", booked: aiBooked }, { method: "manual_dm", booked: booked - aiBooked }],
-    reasons_no_close: [{ reason: "Needs to talk to partner", name: "Demo Lead", date: end }],
-    reasons_no_pitch: [{ reason: "Not qualified yet", name: "Demo Lead", date: end }],
+    reasons_no_close: [{ reason: "Vill tänka på det", name: "Anna S.", date: end }],
+    reasons_no_pitch: [{ reason: "Ej kvalificerad ännu", name: "Demo Lead", date: end }],
     speed: {
-      median_first_reply_seconds: R(8, 45), leads_gone_quiet: R(10, 40),
-      median_days_lead_to_booked: R(1, 4), median_booked_to_call_days: R(1, 3), median_sales_cycle_days: R(3, 9),
+      median_first_reply_seconds: R(6, 18), leads_gone_quiet: R(5, 18),
+      median_days_lead_to_booked: R(1, 3), median_booked_to_call_days: R(1, 2), median_sales_cycle_days: R(2, 5),
     },
   };
 }
