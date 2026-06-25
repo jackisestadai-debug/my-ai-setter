@@ -1045,15 +1045,14 @@ gl_FragColor=vec4(col,a);}`;
     setCinema(true);
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
-      { role: "setter", text: "Hej! Såg att du kollade in våra resultat på Instagram 👀 — är det botox eller fillers du funderar på?" },
-      { role: "lead",   text: "Hej! Botox mest, har velat göra det ett tag men vet inte riktigt var jag ska börja" },
-      { role: "setter", text: "Förstår! Många känner så — det är mycket information där ute. Vad är det du vill åt framförallt, är det pannan, runt ögonen eller något annat?" },
-      { role: "lead",   text: "Mest pannan tror jag, och lite runt ögonen" },
-      { role: "setter", text: "Perfekt kombination faktiskt! De flesta av våra kunder gör precis det — det ger ett väldigt naturligt och fräscht resultat utan att se «gjord» ut 😊 Har du testat botox förut?" },
-      { role: "lead",   text: "Nej aldrig, lite nervös faktiskt" },
-      { role: "setter", text: "Det är helt normalt! Våra kunder brukar säga att oron försvinner direkt när de träffar oss — behandlingen tar 20 minuter och är nästan smärtfri. Vi har lediga tider redan denna vecka. Vad passar dig bäst, förmiddag eller eftermiddag?" },
-      { role: "lead",   text: "Förmiddag funkar bra" },
-      { role: "setter", text: "Toppen! 🎉 Jag bokar in dig på torsdag kl 10.00 — du får en bekräftelse på SMS om en stund. Vi ses då! 😊" },
+      { role: "lead",   text: "Hej! Har ni några lediga tider för botox nästa vecka?" },
+      { role: "setter", text: "Hej! Ja absolut, vi har flera tider tillgängliga 😊 Är det något specifikt område du vill behandla — pannan, runt ögonen, eller något annat?" },
+      { role: "lead",   text: "Mest pannan, har haft rynkor där ett tag och vill testa. Har aldrig gjort det förut" },
+      { role: "setter", text: "Perfekt ställe att börja på! Pannan är en av våra vanligaste behandlingar och ger ett väldigt naturligt resultat. Tar ca 20 minuter och är nästan smärtfri 🙌 Har du någon dag som passar bättre — förmiddag eller eftermiddag?" },
+      { role: "lead",   text: "Förmiddag helst, typ tisdag eller onsdag?" },
+      { role: "setter", text: "Onsdag förmiddag funkar perfekt! Jag bokar in dig kl 10.00 ✅ Du får en bekräftelse via SMS inom kort med all info. Är det något du undrar innan dess?" },
+      { role: "lead",   text: "Nej det låter bra, tack!" },
+      { role: "setter", text: "Toppen, vi ses på onsdag! 🎉 Hör av dig om något dyker upp 😊" },
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
