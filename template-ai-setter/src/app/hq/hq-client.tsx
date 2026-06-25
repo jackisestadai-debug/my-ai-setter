@@ -1055,7 +1055,7 @@ gl_FragColor=vec4(col,a);}`;
       { role: "setter", text: "Hej! Ja det gör vi 😊 Vad vill du uppnå?" },
       { role: "lead",   text: "Vill ha fylligare läppar men är rädd att det ser konstigt ut..." },
       { role: "setter", text: "Den oron hör vi ofta! Målet är alltid att det ska se naturligt ut — ingen ska kunna se att du gjort något, bara att du ser bra ut." },
-      { role: "lead",   text: "Okej men hur mycket gör det ont?" },
+      { role: "lead",   text: "Gör det ont?" },
       { role: "setter", text: "Vi använder bedövningskräm så det är väldigt lite. De flesta tycker det går bra 🙏" },
       { role: "setter", text: "Passar det dig denna vecka eller nästa?" },
       { role: "lead",   text: "Nästa vecka, gärna eftermiddag" },
