@@ -1052,20 +1052,16 @@ gl_FragColor=vec4(col,a);}`;
 
     const CONV: { role: "lead" | "setter"; text: string }[] = [
       { role: "lead",   text: "Hej! Såg era reels, gör ni lip fillers?" },
-      { role: "setter", text: "Hej! Ja det gör vi 😊" },
-      { role: "setter", text: "Vad är det du vill uppnå med behandlingen?" },
-      { role: "lead",   text: "Läpparna känns lite tunna och ojämna, vill ha något naturligt. Lite nervös för att det ska bli för mycket" },
-      { role: "setter", text: "Det förstår jag!" },
-      { role: "setter", text: "Naturligt är precis vad vi siktar på. Målet är att det ska se ut som du alltid sett ut så — fast lite bättre." },
-      { role: "setter", text: "Många av våra kunder var oroliga för exakt det innan sin första gång. Efteråt ångrar ingen sig 🙏" },
-      { role: "setter", text: "Behandlingen tar ca 30 min och resultatet syns direkt." },
-      { role: "setter", text: "Passar det bättre denna vecka eller nästa?" },
-      { role: "lead",   text: "Nästa vecka, gärna på eftermiddagen" },
-      { role: "setter", text: "Toppen!" },
-      { role: "setter", text: "Jag bokar in dig tisdag 14.00 ✅" },
-      { role: "setter", text: "Du får en bekräftelse via SMS med adress och all info. Vi ses!" },
-      { role: "lead",   text: "Perfekt tack!" },
-      { role: "setter", text: "Välkommen 🎉 Hör av dig om du har frågor innan dess!" },
+      { role: "setter", text: "Hej! Ja det gör vi 😊 Vad vill du uppnå?" },
+      { role: "lead",   text: "Vill ha fylligare läppar men är rädd att det ser konstigt ut..." },
+      { role: "setter", text: "Den oron hör vi ofta! Målet är alltid att det ska se naturligt ut — ingen ska kunna se att du gjort något, bara att du ser bra ut." },
+      { role: "lead",   text: "Okej men hur mycket gör det ont?" },
+      { role: "setter", text: "Vi använder bedövningskräm så det är väldigt lite. De flesta tycker det går bra 🙏" },
+      { role: "setter", text: "Passar det dig denna vecka eller nästa?" },
+      { role: "lead",   text: "Nästa vecka, gärna eftermiddag" },
+      { role: "setter", text: "Perfekt — jag bokar in dig tisdag 14.00 ✅" },
+      { role: "setter", text: "Du får en SMS-bekräftelse med all info. Vi ses!" },
+      { role: "lead",   text: "Toppen, tack!" },
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
