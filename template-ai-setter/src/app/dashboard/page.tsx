@@ -84,13 +84,13 @@ function computeRange(period: string, sp: { start?: string; end?: string }): { s
 
 // ── formatters ──
 const dash = "—";
-const money = (n: number | null | undefined) => (n == null ? dash : "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 }));
-const money2 = (n: number | null | undefined) => (n == null ? dash : "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-const num = (n: number | null | undefined) => (n == null ? dash : Number(n).toLocaleString("en-US"));
+const money = (n: number | null | undefined) => (n == null ? dash : Number(n).toLocaleString("sv-SE", { maximumFractionDigits: 0 }) + " kr");
+const money2 = (n: number | null | undefined) => (n == null ? dash : Number(n).toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kr");
+const num = (n: number | null | undefined) => (n == null ? dash : Number(n).toLocaleString("sv-SE"));
 const pct = (n: number | null | undefined) => (n == null ? dash : `${Math.round(Number(n))}%`);
 const step = (a: number | null | undefined, b: number | null | undefined) =>
   a == null || b == null || !b ? dash : `${Math.round((a / b) * 100)}%`;
-const dec = (n: number | null | undefined, digits = 1) => (n == null ? dash : Number(n).toLocaleString("en-US", { maximumFractionDigits: digits }));
+const dec = (n: number | null | undefined, digits = 1) => (n == null ? dash : Number(n).toLocaleString("sv-SE", { maximumFractionDigits: digits }));
 const speedFmt = (s: number | null | undefined) => {
   if (s == null) return dash;
   const x = Math.round(Number(s));
@@ -100,11 +100,11 @@ const daysFmt = (n: number | null | undefined) => {
   if (n == null) return dash;
   const x = Number(n);
   const r = x < 10 ? Math.round(x * 10) / 10 : Math.round(x);
-  return `${r} ${r === 1 ? "day" : "days"}`;
+  return `${r} ${r === 1 ? "dag" : "dagar"}`;
 };
 const dateOnly = (d: string | null) => (d ? d.slice(0, 10) : "");
 
-const METHOD_LABELS: Record<string, string> = { manual_dm: "Manual DM", ai_dm: "AI DM", self_serve: "Self-serve", dialing: "Dialing" };
+const METHOD_LABELS: Record<string, string> = { manual_dm: "Manuell DM", ai_dm: "AI DM", self_serve: "Självbetjäning", dialing: "Samtal" };
 function methodLabel(m: string | null): string {
   if (!m) return "Unknown";
   if (m === "(none)") return "(none)";
@@ -288,8 +288,8 @@ export default async function DashboardPage({
   // Follow-up engine performance + the leak map (where leads stall in the DMs).
   const FUNNEL_SEQ = ["opener", "transition_main_reason", "goals", "current_situation", "timeline", "problem", "pitch_help", "book"];
   const STAGE_LABELS: Record<string, string> = {
-    opener: "Opener", transition_main_reason: "Main reason", goals: "Goals", current_situation: "Situation",
-    timeline: "Timeline", problem: "Problem", pitch_help: "Pitch", book: "Booking", post_book: "Post-book", proof: "Proof", nurture: "Nurture",
+    opener: "Öppning", transition_main_reason: "Huvudorsak", goals: "Mål", current_situation: "Situation",
+    timeline: "Tidslinje", problem: "Problem", pitch_help: "Pitch", book: "Bokning", post_book: "Efter bokning", proof: "Bevis", nurture: "Nurturing",
   };
   let fu = { sent_7d: 0, sent_30d: 0, sent_total: 0, revived_7d: 0, revived_total: 0, rebooked_total: 0 };
   let leak: { funnel_stage: string; stalled: number }[] = [];
@@ -318,7 +318,7 @@ export default async function DashboardPage({
     return (
       <main className="hud-main" style={pageStyle}>
         <div className="hud-card" style={{ maxWidth: 640, margin: "40px auto", color: "#ef6a6a", animationDelay: "0ms" }}>
-          Couldn&apos;t load the dashboard{error ? `: ${error.message}` : "."}
+          Kunde inte ladda dashboarden{error ? `: ${error.message}` : "."}
         </div>
         <style>{HUD_CSS}</style>
       </main>
@@ -335,26 +335,26 @@ export default async function DashboardPage({
   const noCalls = !s.showed; // 0 or null → flag that figures are all zero this period
 
   const outboundRows: FunnelRow[] = [
-    { label: "New followers", value: ob.new_followers },
-    { label: "Outreaches", value: ob.outreaches, prev: ob.new_followers },
-    { label: "Follow-ups on outreaches", value: ob.followups_outreach, sub: true },
-    { label: "Replies", value: ob.replies, prev: ob.outreaches },
-    { label: "Follow-ups on conversations", value: ob.followups_convo, sub: true },
+    { label: "Nya följare", value: ob.new_followers },
+    { label: "Kontakter", value: ob.outreaches, prev: ob.new_followers },
+    { label: "Uppföljningar på kontakter", value: ob.followups_outreach, sub: true },
+    { label: "Svar", value: ob.replies, prev: ob.outreaches },
+    { label: "Uppföljningar på konversationer", value: ob.followups_convo, sub: true },
     { label: "ICP", value: ob.icp, prev: ob.replies },
-    { label: "Qualified", value: ob.qualified, prev: ob.icp },
-    { label: "Call pitched", value: ob.call_pitched, prev: ob.qualified },
-    { label: "Follow-ups on calls pitched", value: ob.followups_pitched, sub: true },
-    { label: "Booked", value: ob.booked, prev: ob.call_pitched },
+    { label: "Kvalificerade", value: ob.qualified, prev: ob.icp },
+    { label: "Möte pitchat", value: ob.call_pitched, prev: ob.qualified },
+    { label: "Uppföljningar på pitchade möten", value: ob.followups_pitched, sub: true },
+    { label: "Bokade", value: ob.booked, prev: ob.call_pitched },
   ];
   const inboundRows: FunnelRow[] = [
-    { label: "New leads", value: ib.new_leads },
-    { label: "Dials", value: ib.dials, prev: ib.new_leads },
-    { label: "Follow-ups on dials", value: ib.followups_dials, sub: true },
-    { label: "Pickups", value: ib.pickups, prev: ib.dials },
+    { label: "Nya leads", value: ib.new_leads },
+    { label: "Samtal", value: ib.dials, prev: ib.new_leads },
+    { label: "Uppföljningar på samtal", value: ib.followups_dials, sub: true },
+    { label: "Svarade", value: ib.pickups, prev: ib.dials },
     { label: "ICP", value: ib.icp, prev: ib.pickups },
-    { label: "Qualified", value: ib.qualified, prev: ib.icp },
-    { label: "Call pitched", value: ib.call_pitched, prev: ib.qualified },
-    { label: "Booked", value: ib.booked, prev: ib.call_pitched },
+    { label: "Kvalificerade", value: ib.qualified, prev: ib.icp },
+    { label: "Möte pitchat", value: ib.call_pitched, prev: ib.qualified },
+    { label: "Bokade", value: ib.booked, prev: ib.call_pitched },
   ];
 
   return (
@@ -374,20 +374,20 @@ export default async function DashboardPage({
         {/* TWO FUNNELS */}
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Card
-            titleText="Outbound — IG DMs"
+            titleText="Utgående — IG DMs"
             delay={60}
-            headerRight={<Kpi label="Pickup rate" value={pct(ob.pickup_rate)} />}
+            headerRight={<Kpi label="Svarsfrekvens" value={pct(ob.pickup_rate)} />}
           >
             <Funnel rows={outboundRows} />
           </Card>
 
           <Card
-            titleText="Inbound — opt-ins + dials"
+            titleText="Inkommande — opt-ins + samtal"
             delay={110}
             headerRight={
               <span style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <Kpi label="Dial coverage" value={pct(ib.dial_coverage)} />
-                <Kpi label="Pickup connect" value={pct(ib.pickup_connect_rate)} />
+                <Kpi label="Samtalstäckning" value={pct(ib.dial_coverage)} />
+                <Kpi label="Svarade" value={pct(ib.pickup_connect_rate)} />
               </span>
             }
           >
@@ -397,36 +397,36 @@ export default async function DashboardPage({
 
         {/* MONEY FLOW — purely-visual pipeline → cash strip. Reads numbers
             already computed above; runs no queries, changes no data/logging. */}
-        <Card titleText="Money flow — DMs → cash" delay={140}>
+        <Card titleText="Pengaflöde — DMs → intäkt" delay={140}>
           <MoneyFlow nodes={[
-            { label: "Outreaches", value: ob.outreaches },
-            { label: "Replies", value: ob.replies },
-            { label: "Booked", value: s.booked },
-            { label: "Closed", value: s.closed },
-            { label: "Cash collected", value: s.cash_collected, kind: "cash" },
+            { label: "Kontakter", value: ob.outreaches },
+            { label: "Svar", value: ob.replies },
+            { label: "Bokade", value: s.booked },
+            { label: "Stängda", value: s.closed },
+            { label: "Intäkt insamlad", value: s.cash_collected, kind: "cash" },
           ]} />
         </Card>
 
         {/* FOLLOW-UPS — re-engagement performance + where leads die */}
-        <Card titleText="Follow-ups — re-engaging quiet leads" delay={150}
-          headerRight={<Kpi label="Sent · 7d" value={num(fu.sent_7d)} />}>
+        <Card titleText="Uppföljningar — återaktivera tysta leads" delay={150}
+          headerRight={<Kpi label="Skickade · 7d" value={num(fu.sent_7d)} />}>
           <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1.25fr", gap: 22 }}>
             <div>
               <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
-                <Stat big label="Leads revived" value={num(fu.revived_total)} />
-                <Stat big label="Rebooked from follow-ups" value={num(fu.rebooked_total)} />
+                <Stat big label="Leads återaktiverade" value={num(fu.revived_total)} />
+                <Stat big label="Ombokade via uppföljning" value={num(fu.rebooked_total)} />
               </div>
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                <Stat label="Follow-ups sent · 7d" value={num(fu.sent_7d)} />
-                <Stat label="Follow-ups sent · 30d" value={num(fu.sent_30d)} />
-                <Stat label="Revived · 7d" value={num(fu.revived_7d)} />
+                <Stat label="Uppföljningar · 7d" value={num(fu.sent_7d)} />
+                <Stat label="Uppföljningar · 30d" value={num(fu.sent_30d)} />
+                <Stat label="Återaktiverade · 7d" value={num(fu.revived_7d)} />
               </div>
             </div>
             <div>
-              <span className="cap" style={{ color: GOLD2 }}>Where leads die (stalled 24h+ by stage)</span>
+              <span className="cap" style={{ color: GOLD2 }}>Var leads fastnar (24h+ utan aktivitet per steg)</span>
               <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
                 {leak.length === 0 ? (
-                  <span style={{ color: MUTED, fontSize: 13 }}>No stalled leads right now.</span>
+                  <span style={{ color: MUTED, fontSize: 13 }}>Inga fastnade leads just nu.</span>
                 ) : leak.map((l) => (
                   <div key={l.funnel_stage} style={{ display: "grid", gridTemplateColumns: "92px 1fr 32px", alignItems: "center", gap: 8, fontSize: 13 }}>
                     <span style={{ color: "#cfc8b4", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{STAGE_LABELS[l.funnel_stage] || l.funnel_stage}</span>
@@ -443,7 +443,7 @@ export default async function DashboardPage({
 
         {/* SALES (full width, own funnel dropdown) */}
         <Card
-          titleText={`Sales — ${funnel === "all" ? "all funnels" : funnel}`}
+          titleText={`Försäljning — ${funnel === "all" ? "alla funnlar" : funnel}`}
           delay={160}
           headerRight={<SalesFunnelSelect funnel={funnel} />}
         >
@@ -451,30 +451,30 @@ export default async function DashboardPage({
             {/* money */}
             <div>
               <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
-                <Stat big label="Cash collected" value={money(s.cash_collected)} />
-                <Stat big label="Revenue contracted" value={money(s.revenue_signed)} />
+                <Stat big label="Intäkt insamlad" value={money(s.cash_collected)} />
+                <Stat big label="Kontrakterat värde" value={money(s.revenue_signed)} />
               </div>
               {/* deal economics */}
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                <Stat label="Avg deal size" value={money(s.average_deal_size)} />
-                <Stat label="Avg first payment" value={money(s.average_first_payment)} />
-                <Stat label="PIF rate (paid in full)" value={pct(s.pif_rate)} />
+                <Stat label="Snitt per affär" value={money(s.average_deal_size)} />
+                <Stat label="Snitt första betalning" value={money(s.average_first_payment)} />
+                <Stat label="Betalt i sin helhet" value={pct(s.pif_rate)} />
               </div>
               {/* cash efficiency */}
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                <Stat label="Cash / booked call" value={money(s.cash_per_booked_call)} />
-                <Stat label="Cash / outreach" value={money2(s.cash_per_outreach)} />
+                <Stat label="Intäkt / bokat möte" value={money(s.cash_per_booked_call)} />
+                <Stat label="Intäkt / kontakt" value={money2(s.cash_per_outreach)} />
               </div>
               {/* lifetime value */}
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                <Stat label="Avg LTV / customer (cash)" value={money(s.ltv_cash)} />
-                <Stat label="Avg LTV / customer (contract)" value={money(s.ltv_contract)} />
-                <Stat label="Outstanding (contracted − collected)" value={money(s.outstanding)} />
+                <Stat label="Snitt LTV / kund (insamlat)" value={money(s.ltv_cash)} />
+                <Stat label="Snitt LTV / kund (kontrakt)" value={money(s.ltv_contract)} />
+                <Stat label="Utestående (kontrakt − insamlat)" value={money(s.outstanding)} />
               </div>
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                <Stat label="Disputes" value={num(s.disputes)} />
-                <Stat label="Lost to disputes" value={money(s.money_lost_to_disputes)} />
-                <Stat label="Dispute rate" value={pct(s.dispute_rate)} />
+                <Stat label="Tvister" value={num(s.disputes)} />
+                <Stat label="Förlorat i tvister" value={money(s.money_lost_to_disputes)} />
+                <Stat label="Tvistfrekvens" value={pct(s.dispute_rate)} />
               </div>
             </div>
 
@@ -482,40 +482,40 @@ export default async function DashboardPage({
             <div>
               {/* Booked by AI — hero metric, per the selected funnel filter */}
               <div className="kpi-badge" style={{ display: "flex", gap: 14, alignItems: "baseline", padding: "12px 16px", marginBottom: 10 }}>
-                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Booked by Jarvis</span>
+                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Bokade av Jarvis</span>
                 <span className="metric metric-lg" style={{ color: GOLD2, textShadow: "0 0 22px rgba(201,168,76,.6)" }}>{num(s.ai_booked)}</span>
-                <span className="cap" style={{ marginTop: 0 }}>({pct(s.ai_booked_pct)} of bookings)</span>
+                <span className="cap" style={{ marginTop: 0 }}>({pct(s.ai_booked_pct)} av bokningar)</span>
               </div>
               {/* Jarvis-booked deals that turned into MONEY (all time) */}
               <div className="kpi-badge" style={{ display: "flex", gap: 14, alignItems: "baseline", padding: "12px 16px", marginBottom: 14 }}>
-                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Jarvis → cash</span>
+                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Jarvis → intäkt</span>
                 <span className="metric metric-lg" style={{ color: GOLD2, textShadow: "0 0 22px rgba(201,168,76,.6)" }}>{money(aiCash)}</span>
-                <span className="cap" style={{ marginTop: 0 }}>collected · {money(aiSigned)} signed · all time</span>
+                <span className="cap" style={{ marginTop: 0 }}>insamlat · {money(aiSigned)} signerat · totalt</span>
               </div>
               {/* call-quality counts — always shown (0s are real data, not "missing") */}
               <div style={{ display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
-                <Stat label="Booked" value={num(s.booked)} />
-                <Stat label="Showed" value={num(s.showed)} />
+                <Stat label="Bokade" value={num(s.booked)} />
+                <Stat label="Dök upp" value={num(s.showed)} />
                 <Stat label="No-shows" value={num(s.no_shows)} />
-                <Stat label="Pitched" value={num(s.offer_pitched)} />
-                <Stat label="Not pitched" value={num(notPitched)} />
-                <Stat label="Closed" value={num(s.closed)} />
-                <Stat label="Not closed" value={num(notClosed)} />
-                <Stat label="Losts" value={num(s.losts)} />
+                <Stat label="Pitchade" value={num(s.offer_pitched)} />
+                <Stat label="Ej pitchade" value={num(notPitched)} />
+                <Stat label="Stängda" value={num(s.closed)} />
+                <Stat label="Ej stängda" value={num(notClosed)} />
+                <Stat label="Förlorade" value={num(s.losts)} />
               </div>
               <div style={{ marginTop: 13, paddingTop: 12, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
-                <Stat label="Show rate" value={pct(s.show_rate)} />
-                <Stat label="Pitch rate" value={step(s.offer_pitched, s.showed)} />
-                <Stat label="Close rate" value={pct(s.close_rate)} />
-                <Stat label="Booked → close" value={pct(s.booked_to_close)} />
+                <Stat label="Närvaro" value={pct(s.show_rate)} />
+                <Stat label="Pitchfrekvens" value={step(s.offer_pitched, s.showed)} />
+                <Stat label="Stängningsfrekvens" value={pct(s.close_rate)} />
+                <Stat label="Bokad → stängd" value={pct(s.booked_to_close)} />
               </div>
               {noCalls && (
                 <div style={{ color: MUTED, fontSize: 12.5, marginTop: 10 }}>
-                  No calls have shown up in this period yet — every figure above is a real zero.
+                  Inga möten har dykt upp under denna period ännu — alla siffror ovan är verkliga nollor.
                 </div>
               )}
               <div style={{ marginTop: 13, paddingTop: 12, borderTop: "1px solid rgba(168,137,46,.18)" }}>
-                <Stat label="Avg call length (closes)" value={s.avg_call_minutes_on_close == null ? dash : `${dec(s.avg_call_minutes_on_close)} min`} />
+                <Stat label="Snitt samtalslängd (stängda)" value={s.avg_call_minutes_on_close == null ? dash : `${dec(s.avg_call_minutes_on_close)} min`} />
               </div>
             </div>
           </div>
@@ -523,21 +523,21 @@ export default async function DashboardPage({
 
         {/* BREAKDOWNS — lead acquisition (counts of people, from tracked leads) */}
         <div style={grid(4)}>
-          <Card titleText="By source" delay={220}
-            subtitle="Leads we tracked, by where they came from. Counts of people — not money.">
-            <Table head={["Source", "Leads", "Booked", "Won"]} align={["l", "r", "r", "r"]}
-              rows={[...d.by_source].sort((a, b) => b.leads - a.leads).map((x) => [x.source ?? "Unknown", num(x.leads), num(x.booked), num(x.won)])} />
+          <Card titleText="Per källa" delay={220}
+            subtitle="Leads vi spårat, per ursprung. Antal personer — inte pengar.">
+            <Table head={["Källa", "Leads", "Bokade", "Vunna"]} align={["l", "r", "r", "r"]}
+              rows={[...d.by_source].sort((a, b) => b.leads - a.leads).map((x) => [x.source ?? "Okänd", num(x.leads), num(x.booked), num(x.won)])} />
           </Card>
-          <Card titleText="By placement" delay={260}>
-            <Table head={["Placement", "Leads"]} align={["l", "r"]}
-              rows={[...d.by_placement].sort((a, b) => b.leads - a.leads).map((x) => [x.placement ?? "Unknown", num(x.leads)])} />
+          <Card titleText="Per placering" delay={260}>
+            <Table head={["Placering", "Leads"]} align={["l", "r"]}
+              rows={[...d.by_placement].sort((a, b) => b.leads - a.leads).map((x) => [x.placement ?? "Okänd", num(x.leads)])} />
           </Card>
-          <Card titleText="By campaign" delay={300}>
-            <Table head={["Campaign", "Leads"]} align={["l", "r"]}
-              rows={[...d.by_campaign].sort((a, b) => b.leads - a.leads).map((x) => [x.campaign ?? "Unknown", num(x.leads)])} />
+          <Card titleText="Per kampanj" delay={300}>
+            <Table head={["Kampanj", "Leads"]} align={["l", "r"]}
+              rows={[...d.by_campaign].sort((a, b) => b.leads - a.leads).map((x) => [x.campaign ?? "Okänd", num(x.leads)])} />
           </Card>
-          <Card titleText="By booking method" delay={340}>
-            <Table head={["Method", "Booked"]} align={["l", "r"]}
+          <Card titleText="Per bokningsmetod" delay={340}>
+            <Table head={["Metod", "Bokade"]} align={["l", "r"]}
               rows={[...d.by_booking_method].sort((a, b) => b.booked - a.booked).map((x) => [methodLabel(x.method), num(x.booked)])} />
           </Card>
         </div>
@@ -545,52 +545,52 @@ export default async function DashboardPage({
         {/* REVENUE BREAKDOWNS — money (clients closed + $, from the customer records).
             2-up so the wide $ figures never overflow the card. */}
         <div style={grid(2)}>
-          <Card titleText="Revenue by source" delay={360}
-            subtitle="Paying clients and their money, by source. Signed = total deal value · Cash = collected so far.">
-            <Table head={["Source", "Clients", "Signed", "Cash"]} align={["l", "r", "r", "r"]} empty={dash}
+          <Card titleText="Intäkt per källa" delay={360}
+            subtitle="Betalande kunder och deras pengar, per källa. Signerat = totalt affärsvärde · Insamlat = hittills.">
+            <Table head={["Källa", "Kunder", "Signerat", "Insamlat"]} align={["l", "r", "r", "r"]} empty={dash}
               rows={[...(d.revenue_by_source ?? [])].sort((a, b) => Number(b.cash || 0) - Number(a.cash || 0))
-                .map((x) => [x.source ?? "Unknown", num(x.clients), money(x.signed), money(x.cash)])} />
+                .map((x) => [x.source ?? "Okänd", num(x.clients), money(x.signed), money(x.cash)])} />
           </Card>
-          <Card titleText="Revenue by campaign" delay={380}
-            subtitle="Paying clients and their money, by campaign.">
-            <Table head={["Campaign", "Clients", "Signed", "Cash"]} align={["l", "r", "r", "r"]} empty={dash}
+          <Card titleText="Intäkt per kampanj" delay={380}
+            subtitle="Betalande kunder och deras pengar, per kampanj.">
+            <Table head={["Kampanj", "Kunder", "Signerat", "Insamlat"]} align={["l", "r", "r", "r"]} empty={dash}
               rows={[...(d.revenue_by_campaign ?? [])].sort((a, b) => Number(b.cash || 0) - Number(a.cash || 0))
-                .map((x) => [x.campaign ?? "Unknown", num(x.clients), money(x.signed), money(x.cash)])} />
+                .map((x) => [x.campaign ?? "Okänd", num(x.clients), money(x.signed), money(x.cash)])} />
           </Card>
-          <Card titleText="Revenue by placement" delay={400}
-            subtitle="Paying clients and their money, by placement.">
-            <Table head={["Placement", "Clients", "Signed", "Cash"]} align={["l", "r", "r", "r"]} empty={dash}
+          <Card titleText="Intäkt per placering" delay={400}
+            subtitle="Betalande kunder och deras pengar, per placering.">
+            <Table head={["Placering", "Kunder", "Signerat", "Insamlat"]} align={["l", "r", "r", "r"]} empty={dash}
               rows={[...(d.revenue_by_placement ?? [])].sort((a, b) => Number(b.cash || 0) - Number(a.cash || 0))
-                .map((x) => [x.placement ?? "Unknown", num(x.clients), money(x.signed), money(x.cash)])} />
+                .map((x) => [x.placement ?? "Okänd", num(x.clients), money(x.signed), money(x.cash)])} />
           </Card>
-          <Card titleText="Revenue by booking method" delay={420}
-            subtitle="Paying clients and their money, by how the call was booked.">
-            <Table head={["Method", "Clients", "Signed", "Cash"]} align={["l", "r", "r", "r"]} empty={dash}
+          <Card titleText="Intäkt per bokningsmetod" delay={420}
+            subtitle="Betalande kunder och deras pengar, per bokningsmetod.">
+            <Table head={["Metod", "Kunder", "Signerat", "Insamlat"]} align={["l", "r", "r", "r"]} empty={dash}
               rows={[...(d.revenue_by_booking_method ?? [])].sort((a, b) => Number(b.cash || 0) - Number(a.cash || 0))
                 .map((x) => [methodLabel(x.method), num(x.clients), money(x.signed), money(x.cash)])} />
           </Card>
         </div>
 
         {/* SPEED */}
-        <Card titleText="Speed" delay={380}
-          subtitle="How fast leads move through the machine. Medians (the typical lead), not averages.">
+        <Card titleText="Hastighet" delay={380}
+          subtitle="Hur snabbt leads rör sig genom systemet. Medianer (det typiska leadet), inte snitt.">
           <div style={{ display: "flex", gap: 26, rowGap: 16, flexWrap: "wrap" }}>
-            <Stat label="Time to first reply" value={speedFmt(d.speed.median_first_reply_seconds)} />
-            <Stat label="Lead → booked" value={daysFmt(d.speed.median_days_lead_to_booked)} />
-            <Stat label="Booked → call" value={daysFmt(d.speed.median_booked_to_call_days)} />
-            <Stat label="Sales cycle (1st contact → close)" value={daysFmt(d.speed.median_sales_cycle_days)} />
-            <Stat label="Leads gone quiet" value={num(d.speed.leads_gone_quiet)} />
+            <Stat label="Tid till första svar" value={speedFmt(d.speed.median_first_reply_seconds)} />
+            <Stat label="Lead → bokad" value={daysFmt(d.speed.median_days_lead_to_booked)} />
+            <Stat label="Bokad → möte" value={daysFmt(d.speed.median_booked_to_call_days)} />
+            <Stat label="Säljcykel (1:a kontakt → stängd)" value={daysFmt(d.speed.median_sales_cycle_days)} />
+            <Stat label="Leads som tystnat" value={num(d.speed.leads_gone_quiet)} />
           </div>
         </Card>
 
         {/* REASONS */}
         <div style={grid(2)}>
-          <Card titleText="Why calls aren't closing" delay={420}><Reasons rows={d.reasons_no_close} /></Card>
-          <Card titleText="Why leads weren't pitched" delay={460}><Reasons rows={d.reasons_no_pitch} /></Card>
+          <Card titleText="Varför möten inte stängs" delay={420}><Reasons rows={d.reasons_no_close} /></Card>
+          <Card titleText="Varför leads inte pitchades" delay={460}><Reasons rows={d.reasons_no_pitch} /></Card>
         </div>
 
         <div style={{ textAlign: "center", color: "#454d63", fontSize: 11, padding: "6px 0 28px", fontFamily: "var(--mono)", letterSpacing: 0.5 }}>
-          ALL FIGURES FROM get_dashboard · READ-ONLY
+          ALLA SIFFROR FRÅN get_dashboard · SKRIVSKYDDAD
         </div>
       </div>
 
