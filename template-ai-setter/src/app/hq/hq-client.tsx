@@ -1227,7 +1227,7 @@ gl_FragColor=vec4(col,a);}`;
     setOrb("listening"); setHeard(""); bump();
     const sr = getSR();
     if (!sr) { setSrSupported(false); micState.current = "off"; setOrb("idle"); startMic(); return; }
-    sr.continuous = true; sr.interimResults = true; sr.lang = "en-US";
+    sr.continuous = true; sr.interimResults = true; sr.lang = "sv-SE";
     sr.onresult = (e) => {
       let full = ""; let lastFinal = false;
       for (let i = 0; i < e.results.length; i++) { full += e.results[i][0].transcript + " "; lastFinal = e.results[i].isFinal; }
