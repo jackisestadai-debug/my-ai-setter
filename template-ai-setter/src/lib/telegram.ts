@@ -1,13 +1,13 @@
 /**
  * TELEGRAM PING
  * -------------
- * Pings Maher on the EXISTING Aura Telegram bot when the setter hands a lead
+ * Pings Jack on the EXISTING Aura Telegram bot when the setter hands a lead
  * off to a human (business owner, friend, or unclear/needs-review).
  *
  * We do NOT create a new bot — we reuse the same bot token. Token + chat id come
  * from environment variables (set in Vercel in production):
  *   TELEGRAM_BOT_TOKEN  — the existing Aura bot token
- *   TELEGRAM_CHAT_ID    — Maher's chat id (falls back to TELEGRAM_AUTHORIZED_USER_ID)
+ *   TELEGRAM_CHAT_ID    — Jack's chat id (falls back to TELEGRAM_AUTHORIZED_USER_ID)
  *
  * Send: POST https://api.telegram.org/bot{TOKEN}/sendMessage
  *       body {"chat_id": <id>, "text": "<msg>"}
@@ -24,7 +24,7 @@ function getChatId(): string | undefined {
 }
 
 /**
- * Send a plain-text message to Maher. Best-effort: never throws — on any
+ * Send a plain-text message to Jack. Best-effort: never throws — on any
  * failure (missing env, network, API error) it logs and returns success:false
  * so the caller's handoff still completes (tag + pause already happened).
  */

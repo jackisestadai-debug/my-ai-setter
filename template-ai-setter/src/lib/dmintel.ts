@@ -264,7 +264,7 @@ export async function runDmIntelMonthly(): Promise<void> {
     const { data } = await supabase.from("clients").select("id, name").eq("dm_intel_enabled", true);
     for (const c of (data ?? []) as { id: string; name: string }[]) {
       const r = await runDmIntel(c.id, "monthly");
-      // ALWAYS ping — Maher wants to hear from it every month, even when there's
+      // ALWAYS ping — Jack wants to hear from it every month, even when there's
       // nothing to chew on, so he knows the timer is alive and working.
       let msg: string;
       if (r.ok && r.summary) {

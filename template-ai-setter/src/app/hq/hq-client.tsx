@@ -159,7 +159,7 @@ function themeCss(base: RGB): string {
 }
 
 /**
- * Smart endpointing — how long to wait after Maher stops talking before
+ * Smart endpointing — how long to wait after Jack stops talking before
  * firing the command. Not one hardcoded window: the wait adapts to whether
  * the sentence SOUNDS finished. A trailing connector, filler, or dangling
  * verb ("and", "umm", "show me", "what about") means he's mid-thought —
@@ -1122,9 +1122,9 @@ gl_FragColor=vec4(col,a);}`;
         hold: 800,
       },
       {
-        say: "Boka ett kort möte med Maher så visar vi hur det ser ut för just din klinik — vad du missar idag och vad du kan tjäna. Länken finns i beskrivningen. Vi ses snart.",
+        say: "Boka ett kort möte med Jack så visar vi hur det ser ut för just din klinik — vad du missar idag och vad du kan tjäna. Länken finns i beskrivningen. Vi ses snart.",
         rings: true,
-        panels: [{ kind: "metric", title: "NÄSTA STEG", value: "BOKA MÖTE", sub: "15 min · gratis · ingen säljpitch", accent: true }],
+        panels: [{ kind: "metric", title: "NÄSTA STEG", value: "BOKA MÖTE", sub: "30 min · gratis · ingen säljpitch", accent: true }],
         hold: 600,
       },
     ];
@@ -1530,7 +1530,7 @@ function HudStatus({ online, asleep, ringRef }: { online: boolean; asleep: boole
   );
 }
 
-/** LIVE DEMO SETTER — a draggable IG-style chat. Maher (or a prospect) types
+/** LIVE DEMO SETTER — a draggable IG-style chat. Jack (or a prospect) types
  *  as the lead; the real AI setter persona replies. Pure showcase. */
 function DemoDM({ accessKey, onClose, onTick, autoMsgs }: { accessKey: string; onClose: () => void; onTick?: () => void; autoMsgs?: { role: "lead" | "setter"; text: string }[] }) {
   const [msgs, setMsgs] = useState<{ role: "lead" | "setter"; text: string }[]>([]);

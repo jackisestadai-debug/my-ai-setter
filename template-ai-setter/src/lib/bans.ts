@@ -1,7 +1,7 @@
 /**
  * BAN LIST (enforcement side)
  * ---------------------------
- * A banned contact is one Maher has explicitly told Aura to erase and keep
+ * A banned contact is one Jack has explicitly told Aura to erase and keep
  * out forever (e.g. a slow-burn pitcher only unmasked after several messages).
  * Bans are issued from the Telegram side (see telegram_bot/setter_control.py),
  * which deletes the contact from GHL + the DB and writes a row into the
@@ -59,7 +59,7 @@ function safe(value: string): boolean {
  * Return the matching ACTIVE ban row for an inbound contact, or null if the
  * contact is not banned. Best-effort: on a query error we FAIL OPEN (return
  * null) so a transient DB blip never silently drops a legitimate lead — a
- * missed ban is recoverable (Maher can re-ban), a dropped real lead is not.
+ * missed ban is recoverable (Jack can re-ban), a dropped real lead is not.
  */
 export async function findActiveBan(
   client_id: string,

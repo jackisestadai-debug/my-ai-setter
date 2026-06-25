@@ -56,7 +56,7 @@ export function normalizeForSpeech(text: string): string {
 
 /** The standing instruction injected into the reply when voice is live. Shared
  *  by the live webhook and the Test Chat so both decide voice identically.
- *  The beat list below is Maher's agreed voice policy (still a default — read
+ *  The beat list below is Jack's agreed voice policy (still a default — read
  *  the moment). Same in English and Swedish. */
 export const VOICE_INSTRUCTION = `VOICE NOTES: you can send a message as a VOICE NOTE in your real voice instead of text by putting [[VOICE]] at the very START of that message. Rules:
 - Write voice lines in FULL, correctly-spelled words with normal punctuation, because they are SPOKEN OUT LOUD ("are you with me" — never "r u w me") — but keep your natural casual spoken tone. (Same in Swedish: spell properly even though you'd text in shorthand.)

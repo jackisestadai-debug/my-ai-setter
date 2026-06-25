@@ -8,7 +8,7 @@
  *      meet — what day & time is it saying on your end?" (kicks off the
  *      confirm → proof reel → training-video sequence, which is reactive).
  *   2. nurture_takeaway  — 30 MIN AFTER the training video link is sent:
- *      "what was your main takeaway from that video?" (per Maher's SOP).
+ *      "what was your main takeaway from that video?" (per Jack's SOP).
  *   3. nurture_precall   — 24h before the call (or day-of, 8-12h before, if the
  *      call is <48h out): "do you have the link for the google meet btw?".
  *

@@ -8,7 +8,7 @@
  * flip-flopping). The chosen language is stored on the lead
  * (leads.conversation_language) so it survives across messages and restarts.
  *
- * The rule Maher asked for:
+ * The rule Jack asked for:
  *   - If a lead has LITERALLY said they speak Swedish -> switch straight to
  *     Swedish.
  *   - If we only SUSPECT Swedish (they wrote a Swedish phrase, or said they're

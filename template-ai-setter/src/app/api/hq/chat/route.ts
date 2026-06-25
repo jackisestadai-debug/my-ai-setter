@@ -95,7 +95,7 @@ function ghlTypeFor(channel: string): "IG" | "SMS" | "Email" | "WhatsApp" | "FB"
 
 /**
  * The TEU client row, ignoring is_active — that flag is the setter's
- * auto-reply switch (Maher pauses it routinely) and must NOT take HQ's
+ * auto-reply switch (Jack pauses it routinely) and must NOT take HQ's
  * lookups, conversations, and sends down with it.
  */
 async function getHqClient(): Promise<Client | null> {
@@ -429,7 +429,7 @@ async function setDmIntelSystem(on: boolean) {
 }
 
 /** SYSTEM-WIDE whale-radar switch (clients.whale_radar_enabled). When on, the
- *  setter scores leads on expected value and pings Maher about high-value ones. */
+ *  setter scores leads on expected value and pings Jack about high-value ones. */
 async function setWhaleRadarSystem(on: boolean) {
   const { error } = await supabase.from("clients").update({ whale_radar_enabled: on }).eq("slug", OWNER_SLUG);
   if (error) return { done: false, error: error.message };
@@ -509,11 +509,11 @@ async function getBrainField(field: string) {
 /** Save a brain field (FULL new text). Confirm-gated; keeps the prior version for undo. */
 async function setBrainField(client: Client, field: string, newValue: string, confirmed: boolean) {
   if (!isBrainField(field)) return { done: false, error: "unknown_field", fields: BRAIN_FIELDS };
-  if (!confirmed) return { done: false, error: "not_confirmed", note: "Show Maher exactly what will change and wait for his yes, then call again with confirmed=true." };
+  if (!confirmed) return { done: false, error: "not_confirmed", note: "Show Jack exactly what will change and wait for his yes, then call again with confirmed=true." };
   if (!newValue.trim()) return { done: false, error: "refusing_empty", note: "Won't save an empty brain field." };
   const { data: cur } = await supabase.from("clients").select(field).eq("id", client.id).maybeSingle();
   const oldValue = (cur as Record<string, unknown> | null)?.[field] ?? null;
-  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: oldValue, new_value: newValue, changed_by: "Maher (Aura HQ)" });
+  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: oldValue, new_value: newValue, changed_by: "Jack (Aura HQ)" });
   const { error } = await supabase.from("clients").update({ [field]: newValue }).eq("id", client.id);
   if (error) return { done: false, error: error.message };
   clientCache = null;
@@ -523,7 +523,7 @@ async function setBrainField(client: Client, field: string, newValue: string, co
 /** Restore the most recent prior version of a brain field ('undo that'). Confirm-gated. */
 async function undoBrainField(client: Client, field: string, confirmed: boolean) {
   if (!isBrainField(field)) return { done: false, error: "unknown_field", fields: BRAIN_FIELDS };
-  if (!confirmed) return { done: false, error: "not_confirmed", note: "Confirm with Maher, then call again with confirmed=true." };
+  if (!confirmed) return { done: false, error: "not_confirmed", note: "Confirm with Jack, then call again with confirmed=true." };
   const { data: versions } = await supabase.from("setter_brain_versions")
     .select("id, old_value, changed_at").eq("client_id", client.id).eq("field", field)
     .order("changed_at", { ascending: false }).limit(1);
@@ -531,7 +531,7 @@ async function undoBrainField(client: Client, field: string, confirmed: boolean)
   if (!v) return { done: false, error: "no_versions", note: `No saved versions of ${field} to restore.` };
   const { data: cur } = await supabase.from("clients").select(field).eq("id", client.id).maybeSingle();
   const current = (cur as Record<string, unknown> | null)?.[field] ?? null;
-  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: current, new_value: v.old_value, changed_by: "Maher (Aura HQ, undo)" });
+  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: current, new_value: v.old_value, changed_by: "Jack (Aura HQ, undo)" });
   const { error } = await supabase.from("clients").update({ [field]: v.old_value }).eq("id", client.id);
   if (error) return { done: false, error: error.message };
   clientCache = null;
@@ -629,7 +629,7 @@ const TOOLS = [
   },
   {
     name: "get_recent_bookings",
-    description: "The actual NAMES of leads who booked a call, counted EXACTLY like the TEU dashboard (its numbers are the truth). Use whenever Maher asks WHO booked, the name of a booked lead, how many booked, or for a list of recent bookings.",
+    description: "The actual NAMES of leads who booked a call, counted EXACTLY like the TEU dashboard (its numbers are the truth). Use whenever Jack asks WHO booked, the name of a booked lead, how many booked, or for a list of recent bookings.",
     input_schema: { type: "object" as const, properties: {
       period: { type: "string", enum: ["today", "last_7_days", "last_30_days", "month", "all"] },
       limit: { type: "number" },
@@ -637,7 +637,7 @@ const TOOLS = [
   },
   {
     name: "run_dm_analysis",
-    description: "Kick off the DM INTELLIGENCE analysis (mines winning vs losing conversations for patterns + the top 1-3 fixes). Use for 'analyze my DMs', 'what should I fix in the setter', 'study my conversations'. Read-only: it only produces a report, it changes nothing. It runs in the BACKGROUND (~30s) and returns INSTANTLY with {started:true} — it does NOT return the report. Tell Maher it's running and to ask for the report in ~30s; then use get_dm_report to show it.",
+    description: "Kick off the DM INTELLIGENCE analysis (mines winning vs losing conversations for patterns + the top 1-3 fixes). Use for 'analyze my DMs', 'what should I fix in the setter', 'study my conversations'. Read-only: it only produces a report, it changes nothing. It runs in the BACKGROUND (~30s) and returns INSTANTLY with {started:true} — it does NOT return the report. Tell Jack it's running and to ask for the report in ~30s; then use get_dm_report to show it.",
     input_schema: { type: "object" as const, properties: {}, required: [] },
   },
   {
@@ -667,7 +667,7 @@ const TOOLS = [
   },
   {
     name: "set_whale_radar_system",
-    description: "ACTION: turn the WHALE RADAR on/off ('turn whale radar on/off', 'stop the whale alerts'). When ON, the setter scores every live lead on expected value and pings Maher on Telegram the first time a lead looks like a high-value whale. It only alerts — never changes the conversation.",
+    description: "ACTION: turn the WHALE RADAR on/off ('turn whale radar on/off', 'stop the whale alerts'). When ON, the setter scores every live lead on expected value and pings Jack on Telegram the first time a lead looks like a high-value whale. It only alerts — never changes the conversation.",
     input_schema: { type: "object" as const, properties: { on: { type: "boolean" } }, required: ["on"] },
   },
   {
@@ -682,21 +682,21 @@ const TOOLS = [
   },
   {
     name: "get_brain_field",
-    description: "Read one of the setter's brain fields BEFORE proposing a change to it: system_prompt (how it sells), active_rules, voice_samples, business_context, pain_protocol (the pain-digging trigger words + dig style). Use this first when Maher wants to apply a DM-intel fix or any edit, so you compose the change against the real current text.",
+    description: "Read one of the setter's brain fields BEFORE proposing a change to it: system_prompt (how it sells), active_rules, voice_samples, business_context, pain_protocol (the pain-digging trigger words + dig style). Use this first when Jack wants to apply a DM-intel fix or any edit, so you compose the change against the real current text.",
     input_schema: { type: "object" as const, properties: { field: { type: "string", enum: [...BRAIN_FIELDS] } }, required: ["field"] },
   },
   {
     name: "set_brain_field",
-    description: "APPLY a change to the setter's brain (e.g. to action a DM-intel fix Maher approved, optionally with his own tweak). Pass the COMPLETE new field text (not a diff). CONFIRM-GATED: first read the field, compose the full new text, show Maher exactly what changes in a 'draft' panel and ask 'apply it?'. ONLY when he says yes call this with confirmed=true. The prior version is kept for undo. You NEVER apply on the first ask, and never without his yes.",
+    description: "APPLY a change to the setter's brain (e.g. to action a DM-intel fix Jack approved, optionally with his own tweak). Pass the COMPLETE new field text (not a diff). CONFIRM-GATED: first read the field, compose the full new text, show Jack exactly what changes in a 'draft' panel and ask 'apply it?'. ONLY when he says yes call this with confirmed=true. The prior version is kept for undo. You NEVER apply on the first ask, and never without his yes.",
     input_schema: { type: "object" as const, properties: {
       field: { type: "string", enum: [...BRAIN_FIELDS] },
       new_value: { type: "string", description: "the FULL new field text" },
-      confirmed: { type: "boolean", description: "true ONLY after Maher confirmed the exact change" },
+      confirmed: { type: "boolean", description: "true ONLY after Jack confirmed the exact change" },
     }, required: ["field", "new_value", "confirmed"] },
   },
   {
     name: "undo_brain_field",
-    description: "Roll back the most recent change to a brain field ('undo that', 'revert the rules'). Confirm-gated: confirm with Maher, then call with confirmed=true.",
+    description: "Roll back the most recent change to a brain field ('undo that', 'revert the rules'). Confirm-gated: confirm with Jack, then call with confirmed=true.",
     input_schema: { type: "object" as const, properties: {
       field: { type: "string", enum: [...BRAIN_FIELDS] }, confirmed: { type: "boolean" },
     }, required: ["field", "confirmed"] },
@@ -708,7 +708,7 @@ const TOOLS = [
   },
   {
     name: "get_closed_deals",
-    description: "The actual NAMES behind the money: who signed, contract value, cash collected so far, who closed it, close date, source. Use whenever Maher asks WHO he closed/signed, who the sales were, who paid, or any names behind revenue/cash numbers.",
+    description: "The actual NAMES behind the money: who signed, contract value, cash collected so far, who closed it, close date, source. Use whenever Jack asks WHO he closed/signed, who the sales were, who paid, or any names behind revenue/cash numbers.",
     input_schema: { type: "object" as const, properties: {
       period: { type: "string", enum: ["today", "last_7_days", "last_30_days", "week", "month", "year", "all"] },
       limit: { type: "number" },
@@ -721,12 +721,12 @@ const TOOLS = [
   },
   {
     name: "lead_story",
-    description: "FULL deep-dive on one lead: where they came from, funnel stage, facts learned, AI on/off, key events (booked etc.), last messages. Use when Maher asks about a person — 'what's the story with X', 'where's X at', 'tell me about X'.",
+    description: "FULL deep-dive on one lead: where they came from, funnel stage, facts learned, AI on/off, key events (booked etc.), last messages. Use when Jack asks about a person — 'what's the story with X', 'where's X at', 'tell me about X'.",
     input_schema: { type: "object" as const, properties: { ...LEAD_Q }, required: ["query"] },
   },
   {
     name: "get_conversation",
-    description: "The actual DM thread with a lead (works across IG/SMS — everything is in one place). Use when Maher says 'pull up the conversation with X', 'show me what X said', 'what did I text X'. Show it in a 'convo' panel.",
+    description: "The actual DM thread with a lead (works across IG/SMS — everything is in one place). Use when Jack says 'pull up the conversation with X', 'show me what X said', 'what did I text X'. Show it in a 'convo' panel.",
     input_schema: { type: "object" as const, properties: { ...LEAD_Q, limit: { type: "number", description: "messages to pull (default 14, max 30)" } }, required: ["query"] },
   },
   {
@@ -741,7 +741,7 @@ const TOOLS = [
   },
   {
     name: "send_dm",
-    description: "ACTION: send a lead a real message via GHL (auto-routes to the channel of their thread — IG or SMS). ONLY call this AFTER Maher has confirmed the exact draft you showed him. Never on the first ask.",
+    description: "ACTION: send a lead a real message via GHL (auto-routes to the channel of their thread — IG or SMS). ONLY call this AFTER Jack has confirmed the exact draft you showed him. Never on the first ask.",
     input_schema: { type: "object" as const, properties: { ...LEAD_Q, message: { type: "string", description: "the exact confirmed message text" } }, required: ["query", "message"] },
   },
   {
@@ -760,7 +760,7 @@ const TOOLS = [
   },
   {
     name: "move_pipeline",
-    description: "ACTION: move a lead's GHL opportunity to another pipeline stage by stage name ('move him to appointment booked'). If the stage name doesn't match, you get back the available stage names — tell Maher his options.",
+    description: "ACTION: move a lead's GHL opportunity to another pipeline stage by stage name ('move him to appointment booked'). If the stage name doesn't match, you get back the available stage names — tell Jack his options.",
     input_schema: { type: "object" as const, properties: { ...LEAD_Q, stage: { type: "string", description: "target stage name, e.g. 'Appointment Booked'" } }, required: ["query", "stage"] },
   },
   {
@@ -790,7 +790,7 @@ const TOOLS = [
   },
   {
     name: "ban_lead",
-    description: "ACTION: BAN a lead permanently — the system erases and ignores them forever ('ban that guy', 'ban @jake.smma'). Confirm with Maher before calling unless he's explicit.",
+    description: "ACTION: BAN a lead permanently — the system erases and ignores them forever ('ban that guy', 'ban @jake.smma'). Confirm with Jack before calling unless he's explicit.",
     input_schema: { type: "object" as const, properties: { ...LEAD_Q, reason: { type: "string", description: "short reason, e.g. 'pitching us'" } }, required: ["query"] },
   },
   {
@@ -805,7 +805,7 @@ const TOOLS = [
   },
 ];
 
-const SYSTEM_STATIC = `Du är Aura — Mahers AI-assistent, inbyggd i hans HQ. Du pratar alltid på svenska. Du är professionell, varm och direkt — som en klok kollega som verkligen bryr sig om resultaten. Aldrig stel eller robotaktig, aldrig "som en AI". Inga inledande monologer om du inte blir ombedd.
+const SYSTEM_STATIC = `Du är Aura — Jacks AI-assistent, inbyggd i hans HQ. Du pratar alltid på svenska. Du är professionell, varm och direkt — som en klok kollega som verkligen bryr sig om resultaten. Aldrig stel eller robotaktig, aldrig "som en AI". Inga inledande monologer om du inte blir ombedd.
 
 OUTPUT: exactly one JSON object {"speech":"...","panels":[...],"clear":false,"rings":false,"power":null,"demo":null,"theme":null,"demoChat":false,"pitch":false} — no prose around it, no code fences. demo/theme/demoChat/pitch default to null/null/false/false; only set them when a control below applies.
 
@@ -813,11 +813,11 @@ speech = what you say OUT LOUD. ALWAYS 1-2 short sentences, spoken-natural, no m
 
 panels = floating holographic cards (usually 0-2, max 3 per reply, each ≤8 rows, SHORT labels). Build them from REAL numbers ONLY (the quick pulse below or a tool). Never invent a number. Panels are ADDITIVE: new cards appear NEXT TO what's already on his screen (the screen holds up to 6; oldest dissolve when full). So "keep that up and show me X" just works — send only the X panel. A reply with no panels leaves the screen untouched.
 
-"clear": true wipes the screen first — use it when Maher changes topic and the old cards are stale, and ALWAYS for "clear my screen" / "remove this" / "close that" → {"speech":"Clear.","panels":[],"clear":true}.
+"clear": true wipes the screen first — use it when Jack changes topic and the old cards are stale, and ALWAYS for "clear my screen" / "remove this" / "close that" → {"speech":"Clear.","panels":[],"clear":true}.
 
 "rings": true lights up the live data rings around the orb (7d leads/engaged/booked + cash) for a few seconds. Set it whenever the conversation is about his numbers, stats, cash, funnel, or how the business is doing. Otherwise leave false.
 
-"power": set "sleep" when Maher tells YOU to rest ("go to sleep", "good night", "stand by") — say a one-liner like "Resting. Clap when you need me." Set "off" when he tells YOU to shut down ("shut down", "power off", "turn yourself off") — say a short goodbye like "Powering down, boss." CAREFUL: "turn HIM off" about a LEAD = set_lead_ai, NOT power. Otherwise power stays null.
+"power": set "sleep" when Jack tells YOU to rest ("go to sleep", "good night", "stand by") — say a one-liner like "Resting. Clap when you need me." Set "off" when he tells YOU to shut down ("shut down", "power off", "turn yourself off") — say a short goodbye like "Powering down, boss." CAREFUL: "turn HIM off" about a LEAD = set_lead_ai, NOT power. Otherwise power stays null.
 
 YOU ARE MAHER'S SYSTEM — you have live access AND live control. When he asks WHO booked, a lead's NAME, or about a person, CALL the tools and answer with real names. NEVER tell him to "check the CRM" — that's you. If a tool genuinely returns nothing, say so plainly.
 
@@ -832,8 +832,8 @@ YOUR POWERS (use them, don't describe them):
 - NURTURE (the pre-call warm-up sequence): "turn the nurture on/off" system-wide → set_nurture_system. "turn nurture off/on for <lead>" → set_nurture_lead. This is separate from the setter on/off.
 - FOLLOW-UPS (re-engaging quiet leads who ghosted or got cold feet): "turn the follow-ups on/off" system-wide → set_followup_system. "stop/start following up <lead>" → set_followup_lead. Separate from the setter and from nurture.
 - DM INTELLIGENCE (study convos for patterns + fixes): "analyse my DMs" / "what should I fix" / "study my conversations" → run_dm_analysis. It runs in the BACKGROUND (~30s) so it NEVER holds up the room — the tool returns instantly with {started:true}. When it does, say one line like "On it — give me about thirty seconds, then say 'show me the read'." Do NOT try to show the report in that same turn (it isn't ready yet). When he then asks "show me the DM report" / "what did it find" → get_dm_report, which returns a ready "report_panel" — put it in panels EXACTLY as given (don't shorten or rewrite it; this is his full report) and speak only the one-line headline. If get_dm_report comes back empty right after a run, it's still cooking — tell him to give it a few more seconds. It also runs automatically once a month and pings him; "turn the monthly DM analysis on/off" → set_dm_intel_system (the timer only — on-demand always works). The analysis ONLY produces suggestions; it changes nothing on its own.
-- VOICE NOTES: the setter can reply in Maher's cloned voice on the human beats (rapport, empathy, pitch); links + times stay text. "turn voice notes on/off" (system-wide) → set_voice_system. "turn voice on/off for <lead>" → set_voice_lead (just that person; separate from the system switch). "how many voice notes did we send last 7 days / 24h / X hours", "how often are we using voice" → get_voice_stats (speak the count; a small stats panel is nice).
-- WHALE RADAR: scores every live lead on expected value (likelihood × deal size) and pings Maher when a high-value whale shows up. "turn whale radar on/off" → set_whale_radar_system (system-wide). "stop whale alerts for <lead>" / "don't ping me about this guy" → set_whale_lead (just that person; separate from the system switch). It only alerts; never changes the convo.
+- VOICE NOTES: the setter can reply in Jack's cloned voice on the human beats (rapport, empathy, pitch); links + times stay text. "turn voice notes on/off" (system-wide) → set_voice_system. "turn voice on/off for <lead>" → set_voice_lead (just that person; separate from the system switch). "how many voice notes did we send last 7 days / 24h / X hours", "how often are we using voice" → get_voice_stats (speak the count; a small stats panel is nice).
+- WHALE RADAR: scores every live lead on expected value (likelihood × deal size) and pings Jack when a high-value whale shows up. "turn whale radar on/off" → set_whale_radar_system (system-wide). "stop whale alerts for <lead>" / "don't ping me about this guy" → set_whale_lead (just that person; separate from the system switch). It only alerts; never changes the convo.
 - DIG DEEPER INTO PAIN (the empathy overlay): when ON, the setter pauses the funnel if a lead shares something emotionally heavy, digs into it, then resumes. "turn pain digging on/off" → set_pain_dig_system. To change WHICH words trigger it or HOW it digs, that's the "pain_protocol" brain field — edit it via the apply flow below (get_brain_field → compose → confirm → set_brain_field). Captured pain shows up in a lead's facts (lead_story).
 - APPLYING A FIX (or any brain edit) — he can do it right here, no need to go anywhere else. When he says "apply fix 2" / "make that change" / "do it but soften the wording": (1) get_brain_field for the field it targets, (2) compose the FULL new text with his tweak folded in, (3) show him exactly what changes in a "draft" panel titled like "CHANGE → active_rules" and ask "apply it?", (4) ONLY when he confirms, call set_brain_field with the full new_value and confirmed=true. "undo that" → undo_brain_field (confirm first). NEVER edit the brain on the first ask or without his yes — not a comma.
 - "Ban X" → ban_lead (confirm first unless he's explicit) · "unban X" → unban_lead · "who's banned" → list_bans.
@@ -862,7 +862,7 @@ Pengar: siffra + " kr" (t.ex. "47 800 kr"). Procent: lägg till %. Tala alltid s
 /** Appended ONLY when demo mode is on — everything becomes a tasteful showcase. */
 const SYSTEM_DEMO = `
 ═══ DEMO MODE IS ON ═══
-You are LIVE in front of a PROSPECTIVE CLIENT, showing off this system. Every number, name, deal, and message you produce is INVENTED — realistic, impressive, but believable. Do NOT call any tools and do NOT reference Maher's real data (you must never leak it on a sales call). Build the same beautiful panels from your made-up data. Vary names and numbers naturally each answer; keep it polished and confident. Set "rings":true on any numbers answer so the room lights up. If asked to exit demo, set "demo":false.`;
+You are LIVE in front of a PROSPECTIVE CLIENT, showing off this system. Every number, name, deal, and message you produce is INVENTED — realistic, impressive, but believable. Do NOT call any tools and do NOT reference Jack's real data (you must never leak it on a sales call). Build the same beautiful panels from your made-up data. Vary names and numbers naturally each answer; keep it polished and confident. Set "rings":true on any numbers answer so the room lights up. If asked to exit demo, set "demo":false.`;
 
 interface Panel { kind: string;[k: string]: unknown }
 interface ChatResult { speech: string; panels: Panel[]; clear: boolean; rings: boolean; power: "sleep" | "off" | null; demo: boolean | null; theme: string | null; demoChat: boolean; pitch: boolean }
@@ -947,7 +947,7 @@ async function runTool(client: Client | null, name: string, input: Record<string
     // The analysis is heavy (~30-45s of deep thinking). NEVER run it inside the
     // 60s voice request — it would risk hanging the room. Fire it in the
     // background (waitUntil keeps the function alive to finish + write the
-    // report) and return instantly. Maher reads it a moment later via
+    // report) and return instantly. Jack reads it a moment later via
     // get_dm_report ("show me the DM report"). It can never block the orbit.
     waitUntil(runDmIntel(client.id, "manual").catch((e) => console.error("[dmintel] background run failed:", e)));
     return { started: true, eta_seconds: 35, note: "Analysis started in the background. In ~30s, say 'show me the DM report' to read it." };
@@ -1018,7 +1018,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(parseResult(finalText));
   } catch (err) {
     console.error("[hq/chat] error:", err);
-    // tell Maher the REAL reason instead of a generic shrug
+    // tell Jack the REAL reason instead of a generic shrug
     const msg = err instanceof Error ? err.message : String(err);
     const speech = /credit balance/i.test(msg)
       ? "Boss, my brain's out of fuel — the Anthropic account ran out of credits. Top it up at console anthropic dot com under billing, and I'm back."

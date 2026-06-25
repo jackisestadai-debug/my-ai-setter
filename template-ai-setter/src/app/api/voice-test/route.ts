@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Browser-triggerable variant so Maher can fire a test from a URL (the agent is
+ * Browser-triggerable variant so Jack can fire a test from a URL (the agent is
  * network-blocked from calling it). Lets us iterate on HOW the audio is sent:
  *   /api/voice-test?contactId=XXX                  → audio only (empty text)
  *   /api/voice-test?contactId=XXX&caption=1        → audio + a short caption

@@ -404,7 +404,7 @@ export async function updateLeadLanguage(
  * Permanently DELETE a lead and ALL of its child rows from the database.
  *
  * Used to erase unsolicited service-pitch spammers caught at first contact:
- * Maher wants them to "not exist", so we remove the messages, AI decisions,
+ * Jack wants them to "not exist", so we remove the messages, AI decisions,
  * and the lead row itself (child rows first to satisfy FK constraints even if
  * no ON DELETE CASCADE is configured). Best-effort — each delete is logged on
  * failure but never throws, so a partial DB hiccup can't crash the background

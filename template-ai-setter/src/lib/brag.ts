@@ -1,6 +1,6 @@
 /**
  * AURA BRAGS IN REAL TIME — new bookings and payments → Telegram ping to
- * Maher, in Aura's voice. Deduped via 'aura_brag' rows in the events
+ * Jack, in Aura's voice. Deduped via 'aura_brag' rows in the events
  * table (metadata.ref = b:<event_id> | p:<payment_id>).
  *
  * Called fire-and-forget from the HQ pulse (near-real-time while the HQ is

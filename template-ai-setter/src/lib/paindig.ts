@@ -27,7 +27,7 @@
 
 /**
  * The default trigger words + dig style. A client may override this with
- * clients.pain_protocol (edited by Maher just by talking to Aura). Both the
+ * clients.pain_protocol (edited by Jack just by talking to Aura). Both the
  * detector and the reply read the SAME protocol, so there's one source of truth.
  */
 export const DEFAULT_PAIN_PROTOCOL = `TRIGGERS — treat the lead's MOST RECENT message as an emotional-pain moment when they share something genuinely heavy about THEMSELVES, either with words like:

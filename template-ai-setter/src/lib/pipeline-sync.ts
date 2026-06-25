@@ -249,7 +249,7 @@ export async function syncPipelineFunnel(params: {
 
 /**
  * Disqualify milestone → move the card to "Disqualified" from any setter-owned
- * stage. Booked/won/lost cards are left untouched (Maher is already pinged by
+ * stage. Booked/won/lost cards are left untouched (Jack is already pinged by
  * the disqualify branch and handles those by hand).
  */
 export async function syncPipelineDisqualified(params: {

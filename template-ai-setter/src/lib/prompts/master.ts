@@ -15,7 +15,7 @@
  *   5. AI must follow the operator's voice, not its own
  *
  * IMPORTANT: This file contains ZERO sales logic. No qualifying questions,
- * no objection handling, no opening lines. The operator (Maher) trains all
+ * no objection handling, no opening lines. The operator (Jack) trains all
  * of that via the Supabase `clients` row.
  * ============================================================================
  */
@@ -410,7 +410,7 @@ export function buildSystemPrompt(
  * 'lead' messages become 'user', 'ai' and 'human' become 'assistant'.
  *
  * Why both 'ai' and 'human' map to 'assistant'?
- * Because if Maher manually replies to a lead (which he will sometimes),
+ * Because if Jack manually replies to a lead (which he will sometimes),
  * we want Claude to learn from those replies as if it had sent them.
  */
 export function buildMessageHistory(messages: Message[]) {

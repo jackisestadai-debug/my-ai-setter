@@ -489,7 +489,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // --- Ban gate: a contact Maher has banned must NEVER exist in the system. ---
+  // --- Ban gate: a contact Jack has banned must NEVER exist in the system. ---
   // GHL re-creates the contact (new contactId) the moment a banned person DMs
   // again, so we match on the durable Instagram handle / sender id too. This
   // runs BEFORE we create any lead or save any message: we delete the freshly
@@ -655,7 +655,7 @@ export async function POST(req: NextRequest) {
   // NOTE: Swedish is NO LONGER a disengage signal. A Swedish-speaking LEAD is
   // engaged in Swedish: the reply pipeline detects the language, asks "snackar
   // du svenska?" once, then locks the whole thread to Swedish and remembers it
-  // (see lib/language.ts + generateAndSendReply below). Maher's actual
+  // (see lib/language.ts + generateAndSendReply below). Jack's actual
   // friends/family are kept out by the screener's friend detection and the
   // ban/stop-tag gates — not by language.
 
@@ -969,7 +969,7 @@ async function runReplyGeneration(params: {
     }
 
     // Disqualify branch (e.g. 3rd-world location per the operator's rules):
-    // pause the AI (pauseLead pings Maher), and do NOT reply.
+    // pause the AI (pauseLead pings Jack), and do NOT reply.
     if (resolution.disqualify) {
       await pauseLead({ client, lead, notify: { label: "Disqualified lead (auto-paused)", reason: resolution.reason } });
       await logEvent({

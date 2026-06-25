@@ -10,15 +10,15 @@
  *     - No prior history        -> engage, tag `icp`, screened = true
  *     - Has prior history       -> fetch full GHL thread, ONE Claude verdict:
  *         engage      -> tag `icp`, continue the reply seamlessly
- *         skip_owner  -> tag `biz owner`, PAUSE, ping Maher, no reply
- *         skip_friend -> tag `friend`,    PAUSE, ping Maher, no reply
- *         hold        -> tag `needs review`, PAUSE, ping Maher, no reply
+ *         skip_owner  -> tag `biz owner`, PAUSE, ping Jack, no reply
+ *         skip_friend -> tag `friend`,    PAUSE, ping Jack, no reply
+ *         hold        -> tag `needs review`, PAUSE, ping Jack, no reply
  *       FAIL-CLOSED: any screener error on a lead WITH history => hold.
  *
  *   PART B — ongoing tagging (each inbound from a screened, non-paused lead):
  *     - qualified (operator's OWN criteria) -> add `qualified` (once)
  *     - biz_owner (established online biz ~$3k+/mo) -> remove `icp`+`qualified`,
- *       add `biz owner`, PAUSE, ping Maher (mid-conversation handoff)
+ *       add `biz owner`, PAUSE, ping Jack (mid-conversation handoff)
  *     Runs alongside the reply; never blocks it. On error: log + skip.
  *
  * PAUSE ALWAYS MEANS BOTH: leads.ai_paused = true AND the GHL "ai off" tag.
@@ -128,7 +128,7 @@ async function markScreened(lead: Lead): Promise<void> {
  *   2. add the GHL "ai off" tag
  * Both are attempted; either failure is logged but never thrown.
  *
- * ALWAYS pings Maher. pauseLead is the SINGLE choke point for AUTONOMOUS pauses
+ * ALWAYS pings Jack. pauseLead is the SINGLE choke point for AUTONOMOUS pauses
  * (screener handoffs, disqualifies, stand-bys), so routing the ping here
  * guarantees he's notified 10/10 on every auto pause — including pre-existing
  * contacts — with no duplicate pings. Manual on/off (from Aura/Telegram) uses
@@ -166,7 +166,7 @@ export async function pauseLead(params: {
 
   await Promise.all([dbUpdate, tagAdd]);
 
-  // ALWAYS notify Maher (best-effort — never throws into the caller).
+  // ALWAYS notify Jack (best-effort — never throws into the caller).
   try {
     const label = notify?.label || "AI auto-paused";
     const reasonLine = notify?.reason ? ` - ${notify.reason}` : "";
@@ -430,7 +430,7 @@ async function detectUnsolicitedPitch(lead: Lead): Promise<string | null> {
 }
 
 /**
- * Erase an unsolicited pitcher caught at first contact. Per Maher's rule they
+ * Erase an unsolicited pitcher caught at first contact. Per Jack's rule they
  * must "not exist": no reply, no Telegram ping, removed from GHL and the DB.
  * We snapshot a tiny audit record (with lead_id = null, since the lead row is
  * being deleted) so a wrongly-purged real lead can still be traced. Each step
