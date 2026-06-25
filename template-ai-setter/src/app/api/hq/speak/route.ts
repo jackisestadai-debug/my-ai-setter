@@ -79,7 +79,7 @@ async function synthesize(req: NextRequest, rawText: string) {
         body: JSON.stringify({
           text,
           model_id: TTS_MODEL,
-          voice_settings: { stability: 0.4, similarity_boost: 0.75, style: 0.35 },
+          voice_settings: { stability: 0.75, similarity_boost: 0.85, style: 0.15, speed: 0.88 },
         }),
       }
     );
