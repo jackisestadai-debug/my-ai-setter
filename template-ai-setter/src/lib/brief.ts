@@ -1,5 +1,5 @@
 /**
- * PRE-CALL BRIEFINGS FOR THE CLOSER (Ethan) — Jarvis preps him on Telegram:
+ * PRE-CALL BRIEFINGS FOR THE CLOSER (Ethan) — Aura preps him on Telegram:
  *   - briefCheck(): a deep brief ~30 min before each upcoming call
  *     (piggybacks on the HQ pulse + the daily cron, deduped per appointment)
  *   - dailyCallSheet(): the next 24h of calls with mini-briefs, once a day
@@ -68,7 +68,7 @@ export async function briefCheck(): Promise<void> {
     const { data: clientRow } = await supabase.from("clients").select("id").eq("slug", OWNER_SLUG).maybeSingle();
     if (!clientRow) return;
     const { data: sent } = await supabase
-      .from("events").select("metadata").eq("event_type", "jarvis_brief")
+      .from("events").select("metadata").eq("event_type", "aura_brief")
       .gte("created_at", new Date(now - 24 * 3600_000).toISOString());
     const done = new Set((sent ?? []).map((s) => String((s.metadata as Record<string, unknown> | null)?.ref ?? "")));
     const chats = await closerChatIds();
@@ -77,9 +77,9 @@ export async function briefCheck(): Promise<void> {
       const ref = `c:${call.ghl_appointment_id}`;
       if (done.has(ref)) continue;
       const mins = Math.max(1, Math.round((new Date(call.call_at).getTime() - now) / 60_000));
-      const text = `📞 CALL IN ~${mins} MIN\n\n${await leadBriefText(call.lead_id)}\n\n— Jarvis`;
+      const text = `📞 CALL IN ~${mins} MIN\n\n${await leadBriefText(call.lead_id)}\n\n— Aura`;
       for (const chat of chats) await sendTo(chat, text.slice(0, 4000));
-      await logEvent({ client_id: clientRow.id, lead_id: call.lead_id ?? undefined, event_type: "jarvis_brief", metadata: { ref } });
+      await logEvent({ client_id: clientRow.id, lead_id: call.lead_id ?? undefined, event_type: "aura_brief", metadata: { ref } });
     }
   } catch (err) {
     console.error("[brief] check failed:", err);
@@ -104,7 +104,7 @@ export async function dailyCallSheet(): Promise<void> {
       const hhmm = new Date(call.call_at).toISOString().slice(11, 16);
       blocks.push(`🕐 ${hhmm} UTC\n${await leadBriefText(call.lead_id)}`);
     }
-    const text = `📋 CALL SHEET — next 24h (${calls.length})\n\n${blocks.join("\n\n")}\n\n— Jarvis`;
+    const text = `📋 CALL SHEET — next 24h (${calls.length})\n\n${blocks.join("\n\n")}\n\n— Aura`;
     for (const chat of chats) await sendTo(chat, text.slice(0, 4000));
   } catch (err) {
     console.error("[brief] call sheet failed:", err);

@@ -1,5 +1,5 @@
 /**
- * JARVIS HQ — live business metrics for the dashboard.
+ * AURA HQ — live business metrics for the dashboard.
  * Key-gated (same access key as the prompter). Read-only.
  *
  * GET /api/hq/summary?k=<key> → { pulse, pipeline, team, content, generatedAt }

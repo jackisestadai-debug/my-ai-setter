@@ -5,7 +5,7 @@
  * THE GAP THIS CLOSES: the setter works a lead through its own funnel
  * (clients.stages → leads.funnel_stage) but never moved the lead's CARD in the
  * GHL "AI Sales Pipeline". So setter-driven leads sat at "New Lead" on the board
- * forever, and the Jarvis pipeline watcher (which logs milestone events when a
+ * forever, and the Aura pipeline watcher (which logs milestone events when a
  * GHL stage CHANGES) had nothing to react to. Result: an understated funnel.
  *
  * THE FIX: at two setter milestones we nudge the GHL card forward —
@@ -14,7 +14,7 @@
  * and on a disqualify we move it to "Disqualified". We write NOTHING else: we do
  * NOT touch leads.stage. The watcher then sees the GHL change on its next pass
  * and logs the milestone event exactly as if a human had dragged the card. So
- * the dashboard, reporting views, and Jarvis HQ need zero changes — they already
+ * the dashboard, reporting views, and Aura HQ need zero changes — they already
  * consume the watcher's output.
  *
  * SAFETY (why this can't corrupt the board or fight the booking workflow):

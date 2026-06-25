@@ -1,5 +1,5 @@
 /**
- * JARVIS HQ — LIVE DEMO SETTER. Powers the interactive "fake DM" panel: Maher
+ * AURA HQ — LIVE DEMO SETTER. Powers the interactive "fake DM" panel: Maher
  * (or a prospect) types AS THE LEAD, and the REAL TEU AI setter replies — same
  * brain the production setter uses (generateReply → the client's own SOP,
  * voice samples, and rules from the DB). No GHL, no DB writes, no real lead —

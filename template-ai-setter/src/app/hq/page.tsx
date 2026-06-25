@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import HqClient from "./hq-client";
 
 export const metadata = {
-  title: "Jarvis HQ",
+  title: "Aura HQ",
   description: "Mission control",
 };
 

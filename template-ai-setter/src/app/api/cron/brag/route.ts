@@ -1,5 +1,5 @@
 /**
- * Daily catch-up for Jarvis's real-time brags (the HQ pulse covers the
+ * Daily catch-up for Aura's real-time brags (the HQ pulse covers the
  * near-real-time path while the HQ is open; this sweeps anything missed).
  * GET /api/cron/brag — Vercel cron; optional CRON_SECRET bearer auth.
  */

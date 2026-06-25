@@ -1,5 +1,5 @@
 /**
- * JARVIS HQ — voice. Proxies text to ElevenLabs Text-to-Speech and streams
+ * AURA HQ — voice. Proxies text to ElevenLabs Text-to-Speech and streams
  * back MP3 audio. Key-gated. The ElevenLabs key stays server-side (env
  * ELEVENLABS_API_KEY) — the browser never sees it.
  *

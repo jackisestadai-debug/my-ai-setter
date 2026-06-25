@@ -260,7 +260,7 @@ export default async function DashboardPage({
   const funnel = ["all", "outbound", "inbound"].includes(sp.funnel || "") ? (sp.funnel as string) : "all";
   const { start, end } = computeRange(period, sp);
 
-  // DEMO VIEW (?demo=1, driven by Jarvis HQ): fabricated impressive numbers,
+  // DEMO VIEW (?demo=1, driven by Aura HQ): fabricated impressive numbers,
   // zero real data — safe to show on a sales call.
   const demoView = sp.demo === "1" || sp.demo === "true";
 
@@ -271,7 +271,7 @@ export default async function DashboardPage({
       p_start: start, p_end: end, p_source: source || null, p_funnel: funnel,
     });
 
-  // Jarvis-booked money — deals whose booking came from the AI setter (all time).
+  // Aura-booked money — deals whose booking came from the AI setter (all time).
   let aiCash = 0, aiSigned = 0;
   if (demoView) {
     aiCash = 41200; aiSigned = 78500;
@@ -482,13 +482,13 @@ export default async function DashboardPage({
             <div>
               {/* Booked by AI — hero metric, per the selected funnel filter */}
               <div className="kpi-badge" style={{ display: "flex", gap: 14, alignItems: "baseline", padding: "12px 16px", marginBottom: 10 }}>
-                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Bokade av Jarvis</span>
+                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Bokade av Aura</span>
                 <span className="metric metric-lg" style={{ color: GOLD2, textShadow: "0 0 22px rgba(201,168,76,.6)" }}>{num(s.ai_booked)}</span>
                 <span className="cap" style={{ marginTop: 0 }}>({pct(s.ai_booked_pct)} av bokningar)</span>
               </div>
-              {/* Jarvis-booked deals that turned into MONEY (all time) */}
+              {/* Aura-booked deals that turned into MONEY (all time) */}
               <div className="kpi-badge" style={{ display: "flex", gap: 14, alignItems: "baseline", padding: "12px 16px", marginBottom: 14 }}>
-                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Jarvis → intäkt</span>
+                <span className="cap" style={{ color: GOLD2, marginTop: 0 }}>Aura → intäkt</span>
                 <span className="metric metric-lg" style={{ color: GOLD2, textShadow: "0 0 22px rgba(201,168,76,.6)" }}>{money(aiCash)}</span>
                 <span className="cap" style={{ marginTop: 0 }}>insamlat · {money(aiSigned)} signerat · totalt</span>
               </div>

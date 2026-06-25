@@ -269,13 +269,13 @@ export async function runDmIntelMonthly(): Promise<void> {
       let msg: string;
       if (r.ok && r.summary) {
         const tail = r.suggestions
-          ? `${r.suggestions} fix${r.suggestions === 1 ? "" : "es"} are waiting. Say "show me the DM report" — here or to Jarvis in the orbit — to read the full thing. Nothing changes until you approve it.`
+          ? `${r.suggestions} fix${r.suggestions === 1 ? "" : "es"} are waiting. Say "show me the DM report" — here or to Aura in the orbit — to read the full thing. Nothing changes until you approve it.`
           : "No strong fixes this month.";
-        msg = `📊 DM Intelligence — your monthly read is in.\n\n${r.summary}\n\n${tail}\n— Jarvis`;
+        msg = `📊 DM Intelligence — your monthly read is in.\n\n${r.summary}\n\n${tail}\n— Aura`;
       } else if (r.reason === "no_conversations_to_analyse") {
-        msg = `📊 DM Intelligence — monthly check ran fine, but there aren't enough conversations to analyse yet. Nothing's broken — I'll run it again next month, and you can ask me to analyse any time you've got more DMs flowing.\n— Jarvis`;
+        msg = `📊 DM Intelligence — monthly check ran fine, but there aren't enough conversations to analyse yet. Nothing's broken — I'll run it again next month, and you can ask me to analyse any time you've got more DMs flowing.\n— Aura`;
       } else {
-        msg = `📊 DM Intelligence — monthly check ran but couldn't finish a full read this time (${r.reason || "technical hiccup"}). Nothing's broken and nothing changed; I'll try again next month, or you can ask me to analyse on demand.\n— Jarvis`;
+        msg = `📊 DM Intelligence — monthly check ran but couldn't finish a full read this time (${r.reason || "technical hiccup"}). Nothing's broken and nothing changed; I'll try again next month, or you can ask me to analyse on demand.\n— Aura`;
       }
       await sendTelegramPing(msg);
     }

@@ -40,7 +40,7 @@ export type Client = {
   business_context: string;
   is_active: boolean;
   timezone: string;
-  // Owner-configured reply delay range (seconds) set from Jarvis ("wait 20s
+  // Owner-configured reply delay range (seconds) set from Aura ("wait 20s
   // before replying"). When null, the default fixed debounce applies.
   reply_delay_min_seconds: number | null;
   reply_delay_max_seconds: number | null;
@@ -88,8 +88,8 @@ export type Lead = {
   whale_paused?: boolean;
   screened: boolean;
   // GHL OPPORTUNITY pipeline stage NAME ("New Lead", "Lead Lost", "Appointment
-  // Booked", ...). Owned EXCLUSIVELY by the Jarvis pipeline watcher
-  // (intelligence/ghl/pipeline_watcher.py) and read by Jarvis reporting. The
+  // Booked", ...). Owned EXCLUSIVELY by the Aura pipeline watcher
+  // (intelligence/ghl/pipeline_watcher.py) and read by Aura reporting. The
   // setter must NOT read or write this — it uses `funnel_stage` instead.
   stage: string | null;
   // The setter's own conversation state machine (see lib/stages.ts).
@@ -322,7 +322,7 @@ export async function saveMessage(params: {
  * Persist the lead's current funnel stage + accumulated facts. Best-effort:
  * a failure here must never block or break the reply, so we log and move on.
  *
- * Writes the setter's OWN `funnel_stage` column — NOT `stage` (which the Jarvis
+ * Writes the setter's OWN `funnel_stage` column — NOT `stage` (which the Aura
  * pipeline watcher owns as the GHL pipeline stage). Keeping these separate is
  * what stops the watcher from wiping the setter's funnel memory on every sync.
  */

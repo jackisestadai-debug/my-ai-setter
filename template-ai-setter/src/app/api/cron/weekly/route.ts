@@ -1,5 +1,5 @@
 /**
- * JARVIS WEEKLY INTELLIGENCE REPORT — Monday morning Telegram drop: the
+ * AURA WEEKLY INTELLIGENCE REPORT — Monday morning Telegram drop: the
  * week's cash, deals (with names), funnel, and what's going cold.
  * GET /api/cron/weekly — Vercel cron; optional CRON_SECRET bearer auth.
  */
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     const names = dealRows.map((c) => `${c.name}${c.booking_method === "ai_dm" ? " ⚡" : ""} (${money(Number(c.contract_value) || 0)})`).join(", ") || "none this week";
     const s = d.sales ?? {};
     const msg = [
-      "📊 JARVIS WEEKLY REPORT",
+      "📊 AURA WEEKLY REPORT",
       `${iso(startD)} → ${iso(now)}`,
       "",
       `💰 Cash collected: ${money(cash)}`,
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       "",
       `🥶 ${cold.count ?? 0} engaged leads going quiet 2+ days — say "who's going cold" in HQ and I'll line up the revival messages.`,
       "",
-      "— Jarvis",
+      "— Aura",
     ].join("\n");
     const r = await sendTelegramPing(msg);
     return NextResponse.json({ ok: r.success });

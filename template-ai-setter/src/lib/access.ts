@@ -1,5 +1,5 @@
 /**
- * Shared access-key check for the Jarvis HQ endpoints.
+ * Shared access-key check for the Aura HQ endpoints.
  * The key lives in the prompter_config table (single row); the Telegram bot
  * reads the same row to build links and authenticate proxy calls.
  */

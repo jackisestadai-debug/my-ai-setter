@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * JARVIS HQ — the Iron Man experience.
+ * AURA HQ — the Iron Man experience.
  *
  * POWER MODEL:
- *   - Page load: if the mic permission is already granted, Jarvis AUTO-BOOTS —
+ *   - Page load: if the mic permission is already granted, Aura AUTO-BOOTS —
  *     two-act cinematic synced to BOOT_IGNITE: energy GATHERS (streaks pulled
  *     in from the room's edges, arc rings drawing in, radar sweep, tick
  *     reticle charging) then the core IGNITES (round flash, shockwaves, room
@@ -24,12 +24,12 @@
  *     asleep. It is fully stopped before speech recognition starts, because on
  *     Mac Chrome an open mic stream steals audio from webkitSpeechRecognition.
  *   - SpeechRecognition runs ONLY inside a capture window (after clap/tap or
- *     after Jarvis finishes speaking).
+ *     after Aura finishes speaking).
  *   - The TTS <audio> element's MediaElementSource drives the speaking orb.
  *   - Sound effects are synthesized with WebAudio oscillators — no files.
  *
  * Panels: every reply REPLACES what's on screen (no stacking); "keep that up"
- * makes Jarvis resend one. The data rings around the orb are ON DEMAND — they
+ * makes Aura resend one. The data rings around the orb are ON DEMAND — they
  * light up when the convo is about numbers (or a booking lands), then fade.
  *
  * No login — bookmarked ?k=<key> link. Palette: #0d0d0d / #7eb8d4 / #4a90b8 (cream & gold).
@@ -54,7 +54,7 @@ function getSR(): SR | null {
 /** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
 const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "AI SETTER";
 
-type Tab = "jarvis" | "dashboard";
+type Tab = "aura" | "dashboard";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
 type FxMode = "" | "boot" | "wake" | "down" | "off";
 
@@ -76,7 +76,7 @@ const RING_SHOW_MS = 12_000;
 const PANEL_SLOTS = [{ x: 62, y: 14 }, { x: 5, y: 14 }, { x: 62, y: 50 }, { x: 5, y: 50 }, { x: 33.5, y: 14 }, { x: 33.5, y: 50 }];
 const CINE_SLOTS = [{ x: 2.5, y: 26 }, { x: 35, y: 26 }, { x: 67.5, y: 26 }]; // cinema: big row under the raised orb
 const CONVO_HOLD_MS = 90_000; // after an exchange the mic stays HOT this long — no clap mid-conversation
-const ACK_AFTER_MS = 900;     // brain slower than this → Jarvis acknowledges out loud while he works
+const ACK_AFTER_MS = 900;     // brain slower than this → Aura acknowledges out loud while he works
 // Context-aware acks: a question/lookup gets a "checking" line, an action gets
 // a "doing it" line, and control commands (sleep/shutdown/theme/demo/clear) or
 // small talk get NO ack (they'd sound wrong, or he just answers instantly).
@@ -101,7 +101,7 @@ function ackCategory(text: string): AckCat {
 
 const isDemo = (): boolean => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("demo");
 
-// ── THEME: Jarvis recolors the whole room on command ("make it blue") ──
+// ── THEME: Aura recolors the whole room on command ("make it blue") ──
 type RGB = [number, number, number];
 const THEMES: Record<string, RGB> = {
   gold: [126, 184, 212], amber: [245, 180, 70], orange: [242, 150, 66], red: [240, 86, 86],
@@ -204,7 +204,7 @@ class Boundary extends Component<{ children: ReactNode }, { broken: boolean }> {
 export default function HqClient() { return <Boundary><Hq /><HqStyles /></Boundary>; }
 
 function Hq() {
-  const [tab, setTab] = useState<Tab>("jarvis");
+  const [tab, setTab] = useState<Tab>("aura");
   const [online, setOnline] = useState(false);
   const [orb, setOrb] = useState<OrbState>("idle");
   const [heard, setHeard] = useState("");
@@ -301,7 +301,7 @@ function Hq() {
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
-  // ── theme + demo runtime switches (Jarvis flips these by voice) ──
+  // ── theme + demo runtime switches (Aura flips these by voice) ──
   const applyTheme = useCallback((base: RGB) => { themeRef.current = base; setThemeRgb(base); }, []);
   const applyDemo = useCallback((on: boolean) => {
     demoRef.current = on; setDemo(on);
@@ -661,11 +661,11 @@ function Hq() {
   }, []);
 
   // ── orb (+ ignition FX, on-demand data rings, cash flash) ──
-  // depends on `tab`: the canvases unmount when leaving the JARVIS tab, so the
+  // depends on `tab`: the canvases unmount when leaving the AURA tab, so the
   // draw loop must re-bind to the NEW canvas when it comes back (this was the
   // "orb disappeared after switching tabs" bug)
   useEffect(() => {
-    if (tab !== "jarvis") return;
+    if (tab !== "aura") return;
     const c = orbCanvas.current; if (!c) return; const ctx = c.getContext("2d"); if (!ctx) return;
     let t = 0; const freq = new Uint8Array(64);
     const ease3 = (p: number) => 1 - Math.pow(1 - p, 3);
@@ -883,7 +883,7 @@ function Hq() {
   // sphere, fresnel rim, breathing glow) driven by the same amp/tint/power
   // the 2D layer computes. The 2D canvas keeps rings/reticle/FX on top. ──
   useEffect(() => {
-    if (tab !== "jarvis") return; // re-bind to the fresh canvas on tab return
+    if (tab !== "aura") return; // re-bind to the fresh canvas on tab return
     const c = glCanvas.current; if (!c) return;
     const gl = c.getContext("webgl", { alpha: true, premultipliedAlpha: false });
     if (!gl) return;
@@ -1016,7 +1016,7 @@ gl_FragColor=vec4(col,a);}`;
     a.play().catch(() => { /* ack is a bonus */ });
   }, []);
 
-  // ── PITCH MODE: a ~75s self-running showcase reel. Jarvis speaks + materializes
+  // ── PITCH MODE: a ~75s self-running showcase reel. Aura speaks + materializes
   //    the panels + cinematics on its own, beat by beat, using showcase data only.
   //    Forced into demo mode by the caller so it can never run on real numbers. ──
   const pitchRef = useRef(false);
@@ -1108,9 +1108,9 @@ gl_FragColor=vec4(col,a);}`;
         hold: 1000,
       },
       {
-        say: "Jag är Jarvis. Från första DM till bokat möte — helt automatiskt. Du sköter det du är bäst på. Jag sköter resten. Dygnet runt.",
+        say: "Jag är Aura. Från första DM till bokat möte — helt automatiskt. Du sköter det du är bäst på. Jag sköter resten. Dygnet runt.",
         rings: true,
-        panels: [{ kind: "metric", title: "JARVIS · SVEA AI", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid på", accent: true }],
+        panels: [{ kind: "metric", title: "AURA · SVEA AI", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid på", accent: true }],
         hold: 600,
       },
     ];
@@ -1378,7 +1378,7 @@ gl_FragColor=vec4(col,a);}`;
     labelTimers.current.forEach(clearTimeout);
   }, [teardownSR, stopMic]);
 
-  // Deal-closed takeover: announce it out loud if Jarvis is idle, then auto-clear.
+  // Deal-closed takeover: announce it out loud if Aura is idle, then auto-clear.
   useEffect(() => {
     if (!dealClose) return;
     if (orbRef.current === "idle") {
@@ -1400,7 +1400,7 @@ gl_FragColor=vec4(col,a);}`;
   return (
     <div className={`hq-root tab-${tab} ${asleep ? "asleep" : ""} ${!online ? "off" : ""} ${cinema ? "cinema" : ""}`} onPointerDown={fxMode === "boot" ? skipBoot : undefined}>
       <canvas ref={bgCanvas} className="hq-bg" />
-      <div className="hq-veil" data-on={asleep && tab === "jarvis"} />
+      <div className="hq-veil" data-on={asleep && tab === "aura"} />
       {fxMode === "boot" && <div className="hq-flash" />}
       <span className="hq-corner tl" /><span className="hq-corner tr" /><span className="hq-corner bl" /><span className="hq-corner br" />
       <style>{themeCss(themeRgb)}</style>
@@ -1419,15 +1419,15 @@ gl_FragColor=vec4(col,a);}`;
       <HudStatus online={online} asleep={asleep} ringRef={ringRef} />
 
       <header className="hq-top">
-        <span className="hq-wm">JARVIS<span className="g"> HQ</span></span>
+        <span className="hq-wm">AURA<span className="g"> HQ</span></span>
         <nav className="hq-tabs">
-          <button className={`hq-tab ${tab === "jarvis" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("jarvis")}>JARVIS</button>
+          <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>
 
-      {tab === "jarvis" && (
+      {tab === "aura" && (
         <div className={`hq-stage ${fxMode === "boot" ? "shake" : ""}`}>
           {fxMode === "boot" && <BootChecks />}
           {fxLabel && <div className={`hq-fxlabel ${fxMode === "boot" || fxLabel === "SYSTEMS ONLINE" ? "big" : ""}`}>{fxLabel}</div>}
@@ -1702,11 +1702,11 @@ function HqStyles() {
   return (
     <style>{`
       .hq-root { position: fixed; inset: 0; overflow: hidden; color: #f5f0e1; background: radial-gradient(1300px 700px at 50% -8%, #141414 0%, #0d0d0d 55%, #080808 100%); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: filter 1.2s ease; }
-      /* Sleep / power-down dimming is scoped to the Jarvis tab only — the
-         Dashboard tab stays in full light even while Jarvis is asleep or shut
-         down, so you can showcase it with Jarvis powered off. */
-      .hq-root.tab-jarvis.asleep { filter: brightness(0.55) saturate(0.7); }
-      .hq-root.tab-jarvis.off { filter: brightness(0.42) saturate(0.5); }
+      /* Sleep / power-down dimming is scoped to the Aura tab only — the
+         Dashboard tab stays in full light even while Aura is asleep or shut
+         down, so you can showcase it with Aura powered off. */
+      .hq-root.tab-aura.asleep { filter: brightness(0.55) saturate(0.7); }
+      .hq-root.tab-aura.off { filter: brightness(0.42) saturate(0.5); }
       .hq-center { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d0d0d; color: #f5f0e1; text-align: center; }
       .hq-bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
       .hq-veil { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 45%, rgba(6,9,18,0) 30%, rgba(4,6,12,0.78) 100%); transition: opacity 1.2s ease; }

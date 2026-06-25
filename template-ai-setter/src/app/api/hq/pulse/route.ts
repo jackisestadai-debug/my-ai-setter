@@ -1,5 +1,5 @@
 /**
- * JARVIS HQ — live pulse. Feeds two visuals on the HQ:
+ * AURA HQ — live pulse. Feeds two visuals on the HQ:
  *   - the data RINGS around the orb (7d funnel + cash, same DB the dashboard uses)
  *   - the incoming RIPPLES (new leads / inbound DMs / bookings since last poll)
  *
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     const accessKey = await getAccessKey();
     if (!accessKey || k !== accessKey) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-    // piggyback: while the HQ is open, Jarvis brags about fresh bookings /
+    // piggyback: while the HQ is open, Aura brags about fresh bookings /
     // payments AND briefs the closer before upcoming calls (after response)
     waitUntil(Promise.all([bragCheck(), briefCheck(), flushNurtureDue(), runFollowups()]));
 

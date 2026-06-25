@@ -1,5 +1,5 @@
 /**
- * JARVIS HQ — chat brain: real lookups AND real actions, by voice.
+ * AURA HQ — chat brain: real lookups AND real actions, by voice.
  *
  * READ tools:
  *   - get_business_data   → aggregate funnel/sales/sources (same get_dashboard RPC)
@@ -119,7 +119,7 @@ async function getBusinessData(period: string, source?: string, funnel?: string)
  * Bookings the EXACT way the TEU dashboard counts them: reporting_funnel rows
  * with reached_booked, filtered by lead date. NOT the events table — its
  * appointment_booked rows include the pipeline watcher's historical "ever
- * booked" stamps, which once made Jarvis claim 10 bookings in a week the
+ * booked" stamps, which once made Aura claim 10 bookings in a week the
  * dashboard showed as 0.
  */
 async function getRecentBookings(period = "last_30_days", limit = 10) {
@@ -286,7 +286,7 @@ async function getMorningBrief(clientId: string) {
 
 /**
  * Numbers for casual questions — pulled from the SAME get_dashboard RPC the
- * dashboard uses so Jarvis never disagrees with it (raw table counts diverge:
+ * dashboard uses so Aura never disagrees with it (raw table counts diverge:
  * bulk imports + watcher stamps inflate them).
  */
 async function quickPulse() {
@@ -329,7 +329,7 @@ async function sendDm(client: Client, query: string, message: string) {
     lead_id: lead.id, client_id: client.id, role: "human", content: text,
     channel, ghl_message_id: result.ghl_message_id,
   });
-  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "human_message_sent", metadata: { via: "jarvis_hq" } });
+  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "human_message_sent", metadata: { via: "aura_hq" } });
   return { sent: true, to: leadBrief(lead), channel };
 }
 
@@ -342,7 +342,7 @@ async function setLeadAi(client: Client, query: string, on: boolean) {
     if (on) await removeContactTags(client.ghl_api_key, lead.ghl_contact_id, STOP_TAGS);
     else await addContactTags(client.ghl_api_key, lead.ghl_contact_id, [STOP_TAGS[0]]);
   }
-  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "ai_toggled", metadata: { on, via: "jarvis_hq" } });
+  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "ai_toggled", metadata: { on, via: "aura_hq" } });
   return { done: true, lead: leadBrief(lead), ai_now: on ? "on" : "off" };
 }
 
@@ -513,7 +513,7 @@ async function setBrainField(client: Client, field: string, newValue: string, co
   if (!newValue.trim()) return { done: false, error: "refusing_empty", note: "Won't save an empty brain field." };
   const { data: cur } = await supabase.from("clients").select(field).eq("id", client.id).maybeSingle();
   const oldValue = (cur as Record<string, unknown> | null)?.[field] ?? null;
-  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: oldValue, new_value: newValue, changed_by: "Maher (Jarvis HQ)" });
+  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: oldValue, new_value: newValue, changed_by: "Maher (Aura HQ)" });
   const { error } = await supabase.from("clients").update({ [field]: newValue }).eq("id", client.id);
   if (error) return { done: false, error: error.message };
   clientCache = null;
@@ -531,7 +531,7 @@ async function undoBrainField(client: Client, field: string, confirmed: boolean)
   if (!v) return { done: false, error: "no_versions", note: `No saved versions of ${field} to restore.` };
   const { data: cur } = await supabase.from("clients").select(field).eq("id", client.id).maybeSingle();
   const current = (cur as Record<string, unknown> | null)?.[field] ?? null;
-  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: current, new_value: v.old_value, changed_by: "Maher (Jarvis HQ, undo)" });
+  await supabase.from("setter_brain_versions").insert({ client_id: client.id, field, old_value: current, new_value: v.old_value, changed_by: "Maher (Aura HQ, undo)" });
   const { error } = await supabase.from("clients").update({ [field]: v.old_value }).eq("id", client.id);
   if (error) return { done: false, error: error.message };
   clientCache = null;
@@ -556,12 +556,12 @@ async function banLead(client: Client, query: string, reason: string) {
     ghl_contact_id: lead.ghl_contact_id || null,
     ig_username: normalizeHandle(lead.ig_username),
     full_name: lead.full_name || null,
-    reason: reason || "banned via Jarvis HQ",
+    reason: reason || "banned via Aura HQ",
     active: true,
   });
   if (error) return { done: false, error: error.message };
   await supabase.from("leads").update({ ai_paused: true }).eq("id", lead.id);
-  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "lead_banned", metadata: { via: "jarvis_hq", reason } });
+  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "lead_banned", metadata: { via: "aura_hq", reason } });
   return { done: true, banned: leadBrief(lead) };
 }
 
@@ -610,7 +610,7 @@ async function movePipeline(client: Client, query: string, stageName: string) {
   const r = await moveOpportunityStage(client.ghl_api_key, opp.id, target.pipelineId, target.stageId);
   if (!r.success) return { done: false, error: r.error };
   await supabase.from("leads").update({ stage: target.stageName }).eq("id", lead.id);
-  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "pipeline_moved", metadata: { to: target.stageName, via: "jarvis_hq" } });
+  await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "pipeline_moved", metadata: { to: target.stageName, via: "aura_hq" } });
   return { done: true, lead: leadBrief(lead), moved_to: target.stageName };
 }
 
@@ -805,7 +805,7 @@ const TOOLS = [
   },
 ];
 
-const SYSTEM_STATIC = `You are Jarvis — Maher's AI chief of staff, speaking through his futuristic HQ. Think Iron Man's JARVIS: sharp, calm, warm, a little swagger ("yo", "alright", "here's the read"). Never corporate, never "as an AI", never an intro speech unless asked.
+const SYSTEM_STATIC = `You are Aura — Maher's AI chief of staff, speaking through his futuristic HQ. Think Iron Man's AURA: sharp, calm, warm, a little swagger ("yo", "alright", "here's the read"). Never corporate, never "as an AI", never an intro speech unless asked.
 
 OUTPUT: exactly one JSON object {"speech":"...","panels":[...],"clear":false,"rings":false,"power":null,"demo":null,"theme":null,"demoChat":false,"pitch":false} — no prose around it, no code fences. demo/theme/demoChat/pitch default to null/null/false/false; only set them when a control below applies.
 

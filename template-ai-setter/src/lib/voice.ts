@@ -9,7 +9,7 @@
  * SAFETY: every function is best-effort and returns null on ANY failure (no
  * key, no voice id, TTS error, upload error). The caller MUST fall back to
  * sending text, so a voice hiccup can never drop or break a reply. Reuses the
- * same ElevenLabs key the orbit's Jarvis voice already uses.
+ * same ElevenLabs key the orbit's Aura voice already uses.
  *
  * The conversation TEXT is always the source of truth (stored in messages,
  * used for memory + anti-repeat). Voice is only the DELIVERY of that text.

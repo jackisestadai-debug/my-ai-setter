@@ -43,7 +43,7 @@ export default function Filters({
 
   // Preserve the Sales block's funnel selection across period/source changes.
   const funnel = searchParams.get("funnel") || "";
-  // Preserve demo mode (?demo=1, driven by Jarvis HQ) so switching the timeline
+  // Preserve demo mode (?demo=1, driven by Aura HQ) so switching the timeline
   // or source never knocks the dashboard back onto real numbers mid-showcase.
   const demo = searchParams.get("demo") || "";
 

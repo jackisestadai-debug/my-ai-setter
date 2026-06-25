@@ -126,7 +126,7 @@ interface GHLWebhookPayload {
     lastAttributionSource?: GHLAttributionSource; // LAST touch
   };
 
-  // Comma-separated GHL contact tags (e.g. "jarvis, lead"). Used as an
+  // Comma-separated GHL contact tags (e.g. "aura, lead"). Used as an
   // operator-controlled on/off switch: remove the trigger tag to disengage.
   tags?: string;
 
@@ -145,7 +145,7 @@ interface GHLWebhookPayload {
 
 // Tags that mean "the AI must NOT handle this contact". You ADD one of these
 // to a contact in GHL to disengage the AI (remove it to re-engage). We use an
-// opt-OUT tag (not an opt-in one) because the workflow re-adds the "jarvis"
+// opt-OUT tag (not an opt-in one) because the workflow re-adds the "aura"
 // tag on every inbound message, so a tag you remove would just come back.
 const STOP_TAGS = [
   "ai off", "ai-off", "aioff", "stop ai", "stop-ai", "stopai",
@@ -166,7 +166,7 @@ function hasStopTag(tags: string | undefined): boolean {
 // reply once they pause. Set to 12s so normal "texting in bursts" (messages a
 // few seconds apart) is gathered into one answer; a genuinely separate message
 // minutes later still gets its own reply. The owner can override this with
-// clients.reply_delay_min/max_seconds (set from Jarvis); see replyDelayMs().
+// clients.reply_delay_min/max_seconds (set from Aura); see replyDelayMs().
 const QUIET_WINDOW_MS = 6_000;
 
 // How long a per-lead reply lock stays valid before it's considered stale and
@@ -875,7 +875,7 @@ async function runReplyGeneration(params: {
     const resolution = await resolveStage({
       stages,
       // The setter's OWN funnel position — NOT lead.stage (the GHL pipeline
-      // stage, owned by the Jarvis watcher). Reading lead.stage here is what
+      // stage, owned by the Aura watcher). Reading lead.stage here is what
       // used to corrupt the funnel ("New Lead" => reset to opener => re-ask).
       currentStageId: lead.funnel_stage ?? null,
       stageData: lead.stage_data ?? {},
@@ -1321,7 +1321,7 @@ async function runReplyGeneration(params: {
   //     lead's CARD forward to match where the setter's funnel landed (active
   //     conversation → "Waiting For Reply", pitch reached → "Call Pitched").
   //     Forward-only + move-only-never-create + booked/closed cards untouched.
-  //     The Jarvis watcher logs the milestone event on its next pass, so the
+  //     The Aura watcher logs the milestone event on its next pass, so the
   //     dashboard/HQ need no changes. Best-effort: never blocks anything. ---
   if (anySent) {
     await syncPipelineFunnel({ client, lead, funnelStageId: resolvedFunnelStageId });

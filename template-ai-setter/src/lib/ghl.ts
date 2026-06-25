@@ -579,7 +579,7 @@ export async function getLatestInboundAttachment(
 }
 
 // ===========================================================================
-// OPPORTUNITIES (used by Jarvis HQ voice actions — "move him in the pipeline")
+// OPPORTUNITIES (used by Aura HQ voice actions — "move him in the pipeline")
 // ---------------------------------------------------------------------------
 //   GET /opportunities/search?location_id={loc}&contact_id={id}
 //   GET /opportunities/pipelines?locationId={loc}

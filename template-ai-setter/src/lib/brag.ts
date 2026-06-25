@@ -1,6 +1,6 @@
 /**
- * JARVIS BRAGS IN REAL TIME — new bookings and payments → Telegram ping to
- * Maher, in Jarvis's voice. Deduped via 'jarvis_brag' rows in the events
+ * AURA BRAGS IN REAL TIME — new bookings and payments → Telegram ping to
+ * Maher, in Aura's voice. Deduped via 'aura_brag' rows in the events
  * table (metadata.ref = b:<event_id> | p:<payment_id>).
  *
  * Called fire-and-forget from the HQ pulse (near-real-time while the HQ is
@@ -18,7 +18,7 @@ export async function bragCheck(): Promise<void> {
     const [booked, pays, brags, clientRow] = await Promise.all([
       supabase.from("events").select("id, lead_id").eq("event_type", "appointment_booked").gte("created_at", sinceIso),
       supabase.from("payments").select("id, amount, customer_id").gte("created_at", sinceIso),
-      supabase.from("events").select("metadata").eq("event_type", "jarvis_brag").gte("created_at", new Date(Date.now() - 6 * 3600_000).toISOString()),
+      supabase.from("events").select("metadata").eq("event_type", "aura_brag").gte("created_at", new Date(Date.now() - 6 * 3600_000).toISOString()),
       supabase.from("clients").select("id").eq("slug", OWNER_SLUG).maybeSingle(),
     ]);
     const clientId = (clientRow.data as { id: string } | null)?.id;
@@ -35,8 +35,8 @@ export async function bragCheck(): Promise<void> {
       const { count } = await supabase
         .from("reporting_funnel").select("id", { count: "exact", head: true })
         .eq("reached_booked", true).gte("lead_date", new Date(Date.now() - 7 * 86400_000).toISOString());
-      await sendTelegramPing(`⚡ Yo — just booked ${name}. That's ${count ?? "another one"} this week. — Jarvis`);
-      await logEvent({ client_id: clientId, lead_id: b.lead_id ?? undefined, event_type: "jarvis_brag", metadata: { ref: `b:${b.id}` } });
+      await sendTelegramPing(`⚡ Yo — just booked ${name}. That's ${count ?? "another one"} this week. — Aura`);
+      await logEvent({ client_id: clientId, lead_id: b.lead_id ?? undefined, event_type: "aura_brag", metadata: { ref: `b:${b.id}` } });
     }
 
     for (const p of pays.data ?? []) {
@@ -47,8 +47,8 @@ export async function bragCheck(): Promise<void> {
         name = c?.name || name;
       }
       const amt = Number(p.amount) || 0;
-      await sendTelegramPing(`💰 ${name} just paid $${amt.toLocaleString("en-US")}. Cash in. — Jarvis`);
-      await logEvent({ client_id: clientId, event_type: "jarvis_brag", metadata: { ref: `p:${p.id}` } });
+      await sendTelegramPing(`💰 ${name} just paid $${amt.toLocaleString("en-US")}. Cash in. — Aura`);
+      await logEvent({ client_id: clientId, event_type: "aura_brag", metadata: { ref: `p:${p.id}` } });
     }
   } catch (err) {
     console.error("[brag] check failed:", err);

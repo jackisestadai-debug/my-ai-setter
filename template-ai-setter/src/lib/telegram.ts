@@ -1,12 +1,12 @@
 /**
  * TELEGRAM PING
  * -------------
- * Pings Maher on the EXISTING Jarvis Telegram bot when the setter hands a lead
+ * Pings Maher on the EXISTING Aura Telegram bot when the setter hands a lead
  * off to a human (business owner, friend, or unclear/needs-review).
  *
  * We do NOT create a new bot — we reuse the same bot token. Token + chat id come
  * from environment variables (set in Vercel in production):
- *   TELEGRAM_BOT_TOKEN  — the existing Jarvis bot token
+ *   TELEGRAM_BOT_TOKEN  — the existing Aura bot token
  *   TELEGRAM_CHAT_ID    — Maher's chat id (falls back to TELEGRAM_AUTHORIZED_USER_ID)
  *
  * Send: POST https://api.telegram.org/bot{TOKEN}/sendMessage

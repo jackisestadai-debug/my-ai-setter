@@ -131,7 +131,7 @@ async function markScreened(lead: Lead): Promise<void> {
  * ALWAYS pings Maher. pauseLead is the SINGLE choke point for AUTONOMOUS pauses
  * (screener handoffs, disqualifies, stand-bys), so routing the ping here
  * guarantees he's notified 10/10 on every auto pause — including pre-existing
- * contacts — with no duplicate pings. Manual on/off (from Jarvis/Telegram) uses
+ * contacts — with no duplicate pings. Manual on/off (from Aura/Telegram) uses
  * a different code path and stays intentionally silent.
  */
 export async function pauseLead(params: {

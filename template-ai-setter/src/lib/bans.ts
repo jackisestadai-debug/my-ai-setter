@@ -1,7 +1,7 @@
 /**
  * BAN LIST (enforcement side)
  * ---------------------------
- * A banned contact is one Maher has explicitly told Jarvis to erase and keep
+ * A banned contact is one Maher has explicitly told Aura to erase and keep
  * out forever (e.g. a slow-burn pitcher only unmasked after several messages).
  * Bans are issued from the Telegram side (see telegram_bot/setter_control.py),
  * which deletes the contact from GHL + the DB and writes a row into the
