@@ -1034,7 +1034,7 @@ gl_FragColor=vec4(col,a);}`;
       setAutoConvMsgs((prev) => [...prev, msg]);
     }
     // linger on last message so viewer can read it
-    await new Promise<void>((r) => setTimeout(r, 3000));
+    await new Promise<void>((r) => setTimeout(r, 1800));
   }, []);
 
   const runPitch = useCallback(async (kickoff: string) => {
@@ -1062,41 +1062,53 @@ gl_FragColor=vec4(col,a);}`;
         say: kickoff || "Okej — låt mig visa dig exakt vad jag gör varje natt medan du sover.",
         rings: true,
         panels: [{ kind: "metric", title: "INTÄKT · 30 DAGAR", value: "47 800 kr", sub: "11 möten bokade automatiskt", accent: true }],
+        hold: 800,
       },
       {
-        say: "Varje gång en potentiell kund skickar ett DM — svarar jag inom nio sekunder. Automatiskt. Dygnet runt. Även när du är mitt i en behandling eller sover.",
-        panels: [{ kind: "stats", title: "REALTID", items: [{ label: "Svarstid", value: "9s" }, { label: "Svarar dygnet runt", value: "24/7" }, { label: "Uppföljningar", value: "Auto" }, { label: "Bokningar idag", value: "3" }] }],
+        say: "Tänk på alla DM som kommer in när du är mitt i en behandling. Du ser dem inte förrän kvällen — och då är kunden redan hos konkurrenten. Jag svarar inom nio sekunder. Alltid.",
+        panels: [{ kind: "stats", title: "MEDAN DU ARBETAR", items: [{ label: "Svarstid", value: "9s" }, { label: "Förlorade leads/mån utan AI", value: "~40" }, { label: "Intäkt du missar", value: "~28 000 kr" }, { label: "Bokningar idag", value: "3" }] }],
+        hold: 800,
       },
       {
-        say: "Jag kvalificerar varje lead — ställer rätt frågor, sållar bort de som inte passar och fokuserar energin på dem som faktiskt vill boka. Du ser bara bokade möten i din kalender.",
+        say: "Jag kvalificerar varje lead automatiskt. Ställer rätt frågor, sållar de som inte passar, och pushar de varma direkt mot bokning. Du öppnar kalendern på morgonen — den är full.",
         panels: [{ kind: "funnel", title: "SENASTE 30 DAGARNA", rows: [{ label: "Leads in", value: 284 }, { label: "Engagerade", value: 119 }, { label: "Kvalificerade", value: 52 }, { label: "Bokade möten", value: 31 }] }],
+        hold: 800,
       },
       {
-        say: "Titta här — en riktig konversation. Kunden var kall och nervös. Åtta meddelanden senare hade vi ett bokat möte. Ingen människa behövde lyfta ett finger.",
+        say: "Titta här — en riktig konversation. Kunden var kall och lite nervös. Åtta meddelanden senare: bokat möte. Noll manuellt arbete.",
         autoConv: true,
-        hold: 500,
+        hold: 400,
       },
       {
-        say: "Och det stannar inte där. De som inte svarar direkt — dem följer jag upp automatiskt. Påminnelser, erbjudanden, återaktivering. Ingen lead faller bort.",
+        say: "De som inte svarade direkt? Dem följer jag upp automatiskt — dag tre, dag sju, dag fjorton. Tre av fyra bokar till slut. Ingen lead försvinner någonsin.",
         closeConv: true,
-        panels: [{ kind: "list", title: "UPPFÖLJNINGAR · IDAG", rows: [{ primary: "Leads återaktiverade", secondary: "6" }, { primary: "Ombokade", secondary: "4" }, { primary: "Påminnelser skickade", secondary: "18" }, { primary: "Avhopp räddade", secondary: "3" }] }],
+        panels: [{ kind: "list", title: "AUTOMATISKA UPPFÖLJNINGAR", rows: [{ primary: "Leads återaktiverade denna vecka", secondary: "6" }, { primary: "Ombokade no-shows", secondary: "4" }, { primary: "Påminnelser skickade idag", secondary: "18" }, { primary: "Avhopp räddade denna månad", secondary: "11" }] }],
+        hold: 800,
       },
       {
-        say: "Varje konversation analyserar jag. Jag ser exakt var du tappar kunder, vad som funkar och hur du stänger fler möten. Inga gissningar — bara data.",
-        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens oro till resultatet INNAN priset nämns. Konversationer som dör hoppar direkt till pris utan att förankra värdet.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "71% av avhopp sker direkt efter att priset nämns — utan att first bygga förtroende och visa resultatet." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens oro och önskade resultat innan budget nämns.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }],
+        say: "Och jag lär mig hela tiden. Jag analyserar varje konversation och visar exakt var du tappar kunder — och vad som stänger dem. Inga gissningar.",
+        panels: [{ kind: "report", title: "DM-ANALYS", summary: "Dina bästa konversationer kopplar kundens oro till resultatet INNAN priset nämns. De som misslyckas hoppar direkt till pris.", sections: [{ h: "HÄR TAPPAR DU DEM", body: "71% av avhopp sker direkt efter att priset nämns — utan att först bygga förtroende." }], fixes: [{ n: 1, title: "Förankra värdet före priset", body: "Koppla mötet till kundens mål och oro innan budget nämns.", why: "Varje bokat möte i ditt konto gjorde exakt detta.", impact: "+21% bokningsfrekvens", confidence: "high" }] }],
+        hold: 800,
       },
       {
-        say: "Alla leads, alla kanaler — Instagram, stories, reels — spårat i realtid. Du ser exakt varifrån dina kunder kommer och vad som genererar mest intäkt.",
+        say: "Alla kanaler, all data — i realtid. Instagram, stories, reels. Du ser exakt vad som genererar intäkt och kan dubbla ner på det som funkar.",
         rings: true,
         panels: [
           { kind: "bars", title: "LEADS PER KÄLLA · 30 DAGAR", rows: [{ label: "Instagram DMs", value: 181 }, { label: "Stories", value: 64 }, { label: "Reels", value: 39 }] },
-          { kind: "stats", title: "KONVERTERING", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "ROI", value: "11x" }] },
+          { kind: "stats", title: "RESULTAT", items: [{ label: "Visar upp sig", value: "74%" }, { label: "Stänger mötet", value: "38%" }, { label: "Intäkt / möte", value: "4 350 kr" }, { label: "ROI", value: "11x" }] },
         ],
+        hold: 800,
       },
       {
-        say: "Jag är Jarvis. Jag sköter hela fronten av din klinik — svarar, kvalificerar, bokar, följer upp. Dygnet runt, sju dagar i veckan. Du vaknar till en fullbokad dag. Frågan är bara om du vill ha det så.",
+        say: "Din konkurrent som redan har det här — den vaknar till fullt schema varje dag medan du fortfarande svarar DMs manuellt klockan elva på kvällen. Det är det här det handlar om.",
+        panels: [{ kind: "metric", title: "SKILLNADEN", value: "+47 800 kr", sub: "per månad · automatiskt · utan extra personal", accent: true }],
+        hold: 1000,
+      },
+      {
+        say: "Jag är Jarvis. Från första DM till bokat möte — helt automatiskt. Du sköter det du är bäst på. Jag sköter resten. Dygnet runt.",
         rings: true,
         panels: [{ kind: "metric", title: "JARVIS · SVEA AI", value: "ONLINE", sub: "24 / 7 · aldrig offline · alltid på", accent: true }],
+        hold: 600,
       },
     ];
 
