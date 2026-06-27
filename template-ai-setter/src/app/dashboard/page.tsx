@@ -363,7 +363,7 @@ export default async function DashboardPage({
         {/* HEADER */}
         <header style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-            <span className="hud-brand">{process.env.NEXT_PUBLIC_BRAND_NAME || "AI SETTER"}</span>
+            <span className="hud-brand">{process.env.NEXT_PUBLIC_BRAND_NAME || "Rekvo"}</span>
             <span style={{ fontSize: 13, color: MUTED, fontFamily: "var(--mono)" }}>
               {d.period.start} → {d.period.end} · {d.period.source}
             </span>
