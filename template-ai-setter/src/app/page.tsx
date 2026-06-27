@@ -201,7 +201,7 @@ export default function Home() {
       <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
         <div className="nav__inner">
           <div className="nav__logo">
-            <Image src="/logo.svg" alt="Svea AI Partners" width={160} height={60} priority />
+            <Image src="/logo.svg" alt="Rekvo" width={160} height={60} priority />
           </div>
           <nav className={`nav__links ${menuOpen ? "nav__links--open" : ""}`}>
             <button className="nav__link" onClick={() => go(nicheRef)}>Välj bransch</button>
@@ -235,7 +235,7 @@ export default function Home() {
           <p className="hero__sub">
             {niche
               ? niche.heroSub
-              : "Svea AI Partners levererar en fullt tränad AI-assistent som hanterar Instagram-DMs, kvalificerar leads och bokar möten — helt automatiskt, på svenska, i din röst."}
+              : "Rekvo levererar en fullt tränad AI-assistent som hanterar Instagram-DMs, kvalificerar leads och bokar möten — helt automatiskt, på svenska, i din röst."}
           </p>
           <div className="hero__btns">
             <button className="btn btn--primary" onClick={() => go(niche ? demoRef : nicheRef)}>
@@ -398,7 +398,7 @@ export default function Home() {
               quote="Mina följare börjar en konversation och avslutar med en bokad konsultation — helt automatiskt."
               name="Johan K." role="Personlig tränare, Göteborg" icon="🏋️" />
             <TestimonialCard
-              quote="Svea AI satte upp systemet på en vecka. Nu hanterar AI:n all inbound och jag kan fokusera på jobbet."
+              quote="Rekvo satte upp systemet på en vecka. Nu hanterar AI:n all inbound och jag kan fokusera på jobbet."
               name="Anna S." role="Digital byrå, Malmö" icon="📈" />
           </div>
         </div>
@@ -418,14 +418,14 @@ export default function Home() {
           </p>
           <div className="calendly-wrap">
             <iframe
-              src="https://calendly.com/svea-ai-partners/demo"
+              src="https://calendly.com/rekvo/demo"
               className="calendly-iframe"
-              title="Boka möte med Svea AI Partners"
+              title="Boka möte med Rekvo"
             />
           </div>
           <p className="calendly-fallback">
             Fungerar inte inbäddningen?{" "}
-            <a href="https://calendly.com/svea-ai-partners/demo" target="_blank" rel="noopener noreferrer">
+            <a href="https://calendly.com/rekvo/demo" target="_blank" rel="noopener noreferrer">
               Öppna Calendly direkt →
             </a>
           </p>
@@ -435,14 +435,14 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="footer">
         <div className="container footer__inner">
-          <Image src="/logo.svg" alt="Svea AI Partners" width={120} height={45} />
+          <Image src="/logo.svg" alt="Rekvo" width={120} height={45} />
           <div className="footer__links">
             <button onClick={() => go(nicheRef)}>Välj bransch</button>
             <button onClick={() => go(demoRef)}>Demo</button>
             <button onClick={() => go(processRef)}>Process</button>
             <button onClick={() => go(contactRef)}>Kontakt</button>
           </div>
-          <p className="footer__copy">© {new Date().getFullYear()} Svea AI Partners · Alla rättigheter förbehålls</p>
+          <p className="footer__copy">© {new Date().getFullYear()} Rekvo · Alla rättigheter förbehålls</p>
         </div>
       </footer>
 
