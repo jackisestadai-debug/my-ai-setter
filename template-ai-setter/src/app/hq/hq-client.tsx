@@ -54,7 +54,7 @@ function getSR(): SR | null {
 /** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
 const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "REKVO";
 
-type Tab = "aura" | "dashboard";
+type Tab = "aura" | "dashboard" | "crm";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
 type FxMode = "" | "boot" | "wake" | "down" | "off";
 
@@ -1430,6 +1430,7 @@ gl_FragColor=vec4(col,a);}`;
         <nav className="hq-tabs">
           <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
+          <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>
@@ -1472,7 +1473,8 @@ gl_FragColor=vec4(col,a);}`;
         </div>
       )}
 
-      {tab === "dashboard" && <div className="hq-frame"><iframe src="/dashboard?demo=1" title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
+      {tab === "dashboard" && <div className="hq-frame"><iframe src="/dashboard" title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
+      {tab === "crm" && <div className="hq-frame"><iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" /></div>}
     </div>
   );
 }
