@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import HqClient from "./hq-client";
 
 export const metadata = {
-  title: "Aura HQ · Svea AI Partners",
+  title: "Aura HQ · Rekvo",
   description: "Mission control",
 };
 

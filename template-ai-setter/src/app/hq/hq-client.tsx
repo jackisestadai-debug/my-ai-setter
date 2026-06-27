@@ -52,7 +52,7 @@ function getSR(): SR | null {
 }
 
 /** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
-const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "SVEA AI";
+const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "REKVO";
 
 type Tab = "aura" | "dashboard";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
@@ -1425,7 +1425,7 @@ gl_FragColor=vec4(col,a);}`;
 
       <header className="hq-top">
         <span className="hq-wm">
-          <img src="/logo.svg" alt="Svea AI Partners" style={{ height: 56, display: "block" }} />
+          <img src="/logo.svg" alt="Rekvo" style={{ height: 56, display: "block" }} />
         </span>
         <nav className="hq-tabs">
           <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
