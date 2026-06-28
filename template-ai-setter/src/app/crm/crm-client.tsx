@@ -31,6 +31,8 @@ type Activity = {
   demos_booked: number;
   demos_done: number;
   deals_closed: number;
+  cash_collected: number;
+  contract_value: number;
 };
 
 type Stats = {
@@ -85,6 +87,7 @@ const EMPTY_ACTIVITY: Activity = {
   dials: 0, conversations: 0, pickups: 0, outreaches: 0,
   followups_outreach: 0, followups_dials: 0,
   demos_pitched: 0, demos_booked: 0, demos_done: 0, deals_closed: 0,
+  cash_collected: 0, contract_value: 0,
 };
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
@@ -278,10 +281,13 @@ export default function CrmClient() {
 
   const dmCounters: { key: keyof Activity; label: string }[] = [
     { key: "outreaches", label: "DM Skickade" },
-    { key: "followups_outreach", label: "Uppföljningar" },
+    { key: "pickups", label: "Svar Mottagna" },
+    { key: "conversations", label: "Konversation Startade" },
     { key: "demos_pitched", label: "Demo Pitchade" },
     { key: "demos_booked", label: "Demo Bokade" },
-    { key: "deals_closed", label: "Avslutade" },
+    { key: "demos_done", label: "Demo Genomförda" },
+    { key: "deals_closed", label: "Avslutade Affärer" },
+    { key: "followups_outreach", label: "Uppföljningar" },
   ];
 
   const counters = channel === "call" ? callCounters : dmCounters;
@@ -347,6 +353,57 @@ export default function CrmClient() {
             />
           ))}
         </div>
+
+        {channel === "dm" && (
+          <div style={S.financeRow}>
+            <div style={S.financeField}>
+              <div style={S.financeLabel}>Inkasserat Belopp (SEK)</div>
+              <input
+                type="number"
+                min={0}
+                style={S.financeInput}
+                value={activity.cash_collected || ""}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value) || 0;
+                  setActivity((prev) => ({ ...prev, cash_collected: v }));
+                }}
+                onBlur={() => {
+                  if (actSaveTimer.current) clearTimeout(actSaveTimer.current);
+                  setSavingActivity(true);
+                  api("/api/crm/activity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...activity, date: todayIso() }),
+                  }).finally(() => setSavingActivity(false));
+                }}
+                placeholder="0"
+              />
+            </div>
+            <div style={S.financeField}>
+              <div style={S.financeLabel}>Kontraktsvärde (SEK)</div>
+              <input
+                type="number"
+                min={0}
+                style={S.financeInput}
+                value={activity.contract_value || ""}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value) || 0;
+                  setActivity((prev) => ({ ...prev, contract_value: v }));
+                }}
+                onBlur={() => {
+                  if (actSaveTimer.current) clearTimeout(actSaveTimer.current);
+                  setSavingActivity(true);
+                  api("/api/crm/activity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...activity, date: todayIso() }),
+                  }).finally(() => setSavingActivity(false));
+                }}
+                placeholder="0"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* weekly view */}
@@ -891,6 +948,31 @@ const S: Record<string, React.CSSProperties> = {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
     gap: 8,
+  },
+  financeRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+    marginTop: 8,
+  },
+  financeField: {
+    background: CARD,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 8,
+    padding: "10px 12px",
+  },
+  financeLabel: { fontSize: 10, color: MUTED, letterSpacing: "0.06em", marginBottom: 6 },
+  financeInput: {
+    width: "100%",
+    background: "transparent",
+    border: "none",
+    borderBottom: `1px solid ${BORDER}`,
+    color: "#e8e0cc",
+    fontSize: 20,
+    fontWeight: 700,
+    outline: "none",
+    padding: "2px 0",
+    boxSizing: "border-box" as const,
   },
   counter: {
     background: CARD,
