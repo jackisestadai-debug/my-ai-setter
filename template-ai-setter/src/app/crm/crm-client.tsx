@@ -37,6 +37,8 @@ type Stats = {
   dials: number;
   conversations: number;
   pickups: number;
+  outreaches: number;
+  followups_outreach: number;
   demos_pitched: number;
   demos_booked: number;
   demos_done: number;
@@ -413,19 +415,34 @@ export default function CrmClient() {
           </button>
         </div>
         {showStats && stats && (
-          <div style={S.statsGrid}>
-            <StatBox label="Antal Samtal" value={stats.dials.toLocaleString("sv-SE")} />
-            <StatBox label="Samtal Startade" value={stats.conversations} />
-            <StatBox label="Demo Pitchade" value={stats.demos_pitched} />
-            <StatBox label="Demo Bokade" value={stats.demos_booked} />
-            <StatBox label="Demo Genomförda" value={stats.demos_done} />
-            <StatBox label="Avslutade Affärer" value={stats.deals_closed} />
-            <StatBox label="Inkasserat" value={`${stats.cash_collected.toLocaleString("sv-SE")} kr`} accent />
-            <StatBox label="Kontraktsvärde" value={`${stats.contract_value.toLocaleString("sv-SE")} kr`} accent />
-            <StatBox label="Svarsfrekvens" value={`${stats.abr}%`} accent />
-            <StatBox label="Bokningsfrekvens" value={`${stats.booking_rate}%`} accent />
-            <StatBox label="Show Rate" value={`${stats.show_rate}%`} accent />
-            <StatBox label="Close Rate" value={`${stats.close_rate}%`} accent />
+          <div>
+            {/* TELEFON */}
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: MUTED, marginBottom: 8, marginTop: 4 }}>TELEFON</div>
+            <div style={S.statsGrid}>
+              <StatBox label="Samtal Ringda" value={stats.dials.toLocaleString("sv-SE")} />
+              <StatBox label="Svar" value={stats.pickups} />
+              <StatBox label="Samtal Startade" value={stats.conversations} />
+              <StatBox label="Demo Pitchade" value={stats.demos_pitched} />
+              <StatBox label="Demo Bokade" value={stats.demos_booked} />
+              <StatBox label="Demo Genomförda" value={stats.demos_done} />
+              <StatBox label="Avslutade Affärer" value={stats.deals_closed} />
+              <StatBox label="Svarsfrekvens" value={`${stats.abr}%`} accent />
+              <StatBox label="Bokningsfrekvens" value={`${stats.booking_rate}%`} accent />
+              <StatBox label="Show Rate" value={`${stats.show_rate}%`} accent />
+              <StatBox label="Close Rate" value={`${stats.close_rate}%`} accent />
+            </div>
+            {/* INSTAGRAM DM */}
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: MUTED, marginBottom: 8, marginTop: 16 }}>INSTAGRAM DM</div>
+            <div style={S.statsGrid}>
+              <StatBox label="DMs Skickade" value={stats.outreaches} />
+              <StatBox label="Uppföljningar" value={stats.followups_outreach} />
+            </div>
+            {/* INTÄKT */}
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: MUTED, marginBottom: 8, marginTop: 16 }}>INTÄKT</div>
+            <div style={S.statsGrid}>
+              <StatBox label="Inkasserat" value={`${stats.cash_collected.toLocaleString("sv-SE")} kr`} accent />
+              <StatBox label="Kontraktsvärde" value={`${stats.contract_value.toLocaleString("sv-SE")} kr`} accent />
+            </div>
           </div>
         )}
       </div>

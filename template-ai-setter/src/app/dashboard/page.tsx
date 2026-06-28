@@ -314,6 +314,32 @@ export default async function DashboardPage({
   // Keep a non-list source (e.g. from an old URL) visible as the selection.
   if (source && !sourceOptions.includes(source)) sourceOptions.push(source);
 
+  // Activity tracker stats from team_activity (CRM manual logging)
+  let act = {
+    dials: 0, conversations: 0, pickups: 0,
+    outreaches: 0, followups_outreach: 0, followups_dials: 0,
+    demos_pitched: 0, demos_booked: 0, demos_done: 0,
+    deals_closed: 0, cash_collected: 0, contract_value: 0,
+  };
+  if (!demoView) {
+    const ownerSlug = process.env.OWNER_CLIENT_SLUG || "owner";
+    const { data: clientRow } = await supabase.from("clients").select("id").eq("slug", ownerSlug).maybeSingle();
+    if (clientRow) {
+      const { data: rows } = await supabase.from("team_activity").select("*").eq("client_id", clientRow.id);
+      if (rows) {
+        const sum = (k: string) => rows.reduce((a, r) => a + ((r as Record<string, number>)[k] ?? 0), 0);
+        act = {
+          dials: sum("dials"), conversations: sum("conversations"), pickups: sum("pickups"),
+          outreaches: sum("outreaches"), followups_outreach: sum("followups_outreach"), followups_dials: sum("followups_dials"),
+          demos_pitched: sum("demos_pitched"), demos_booked: sum("demos_booked"), demos_done: sum("demos_done"),
+          deals_closed: sum("deals_closed"), cash_collected: sum("cash_collected"), contract_value: sum("contract_value"),
+        };
+      }
+    }
+  } else {
+    act = { dials: 1912, conversations: 386, pickups: 18, outreaches: 340, followups_outreach: 88, followups_dials: 120, demos_pitched: 175, demos_booked: 18, demos_done: 14, deals_closed: 1, cash_collected: 3000, contract_value: 0 };
+  }
+
   if (error || !data) {
     return (
       <main className="hud-main" style={pageStyle}>
@@ -394,6 +420,49 @@ export default async function DashboardPage({
             <Funnel rows={inboundRows} />
           </Card>
         </div>
+
+        {/* AKTIVITET — manuellt loggad aktivitet från CRM-trackern */}
+        <Card titleText="Aktivitet — Samtal & DM (totalt loggat)" delay={130}
+          subtitle="Siffror du manuellt loggat i CRM-trackern. Samtal och DM är separata kanaler.">
+          <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 22 }}>
+            {/* TELEFON */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: GOLD2, marginBottom: 12 }}>TELEFON</div>
+              <div style={{ display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
+                <Stat label="Samtal ringda" value={num(act.dials)} />
+                <Stat label="Svar" value={num(act.pickups)} />
+                <Stat label="Samtal startade" value={num(act.conversations)} />
+                <Stat label="Uppföljningar" value={num(act.followups_dials)} />
+              </div>
+              <div style={{ marginTop: 13, paddingTop: 12, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
+                <Stat label="Demo pitchade" value={num(act.demos_pitched)} />
+                <Stat label="Demo bokade" value={num(act.demos_booked)} />
+                <Stat label="Demo genomförda" value={num(act.demos_done)} />
+                <Stat label="Avslutade" value={num(act.deals_closed)} />
+              </div>
+              {act.dials > 0 && (
+                <div style={{ marginTop: 13, paddingTop: 12, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
+                  <Stat label="Svarsfrekvens" value={pct(act.dials > 0 ? (act.pickups / act.dials) * 100 : null)} />
+                  <Stat label="Bokningsfrekvens" value={pct(act.dials > 0 ? (act.demos_booked / act.dials) * 100 : null)} />
+                  <Stat label="Show rate" value={pct(act.demos_booked > 0 ? (act.demos_done / act.demos_booked) * 100 : null)} />
+                  <Stat label="Close rate" value={pct(act.demos_pitched > 0 ? (act.deals_closed / act.demos_pitched) * 100 : null)} />
+                </div>
+              )}
+            </div>
+            {/* INSTAGRAM DM */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: GOLD2, marginBottom: 12 }}>INSTAGRAM DM</div>
+              <div style={{ display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
+                <Stat label="DMs skickade" value={num(act.outreaches)} />
+                <Stat label="Uppföljningar" value={num(act.followups_outreach)} />
+              </div>
+              <div style={{ marginTop: 13, paddingTop: 12, borderTop: "1px solid rgba(168,137,46,.18)", display: "flex", gap: 18, rowGap: 14, flexWrap: "wrap" }}>
+                <Stat big label="Inkasserat" value={act.cash_collected > 0 ? num(act.cash_collected) + " kr" : "—"} />
+                <Stat big label="Kontraktsvärde" value={act.contract_value > 0 ? num(act.contract_value) + " kr" : "—"} />
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* MONEY FLOW — purely-visual pipeline → cash strip. Reads numbers
             already computed above; runs no queries, changes no data/logging. */}
