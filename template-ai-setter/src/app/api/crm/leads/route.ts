@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from("leads")
-    .select("id,company_name,full_name,phone,email,ig_username,status,crm_channel,next_step,needs_followup,crm_notes,created_at,updated_at")
+    .select("id,company_name,full_name,phone,email,ig_username,status,crm_channel,next_step,needs_followup,crm_notes,demo_date,created_at,updated_at")
     .eq("client_id", client.id)
     .order("updated_at", { ascending: false })
     .limit(200);

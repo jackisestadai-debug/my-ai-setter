@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
   if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
 
   const body = await req.json();
-  const allowed = ["company_name","full_name","phone","email","ig_username","status","next_step","crm_notes","needs_followup","crm_channel"];
+  const allowed = ["company_name","full_name","phone","email","ig_username","status","next_step","crm_notes","needs_followup","crm_channel","demo_date"];
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const k of allowed) {
     if (k in body) update[k] = body[k];
