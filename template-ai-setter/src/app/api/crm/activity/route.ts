@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
     demos_booked: body.demos_booked ?? 0,
     demos_done: body.demos_done ?? 0,
     deals_closed: body.deals_closed ?? 0,
+    cash_collected: body.cash_collected ?? 0,
+    contract_value: body.contract_value ?? 0,
     note: body.note ?? null,
     logged_by: "owner",
   };

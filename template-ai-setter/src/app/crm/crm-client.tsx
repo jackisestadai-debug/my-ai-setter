@@ -41,10 +41,21 @@ type Stats = {
   demos_booked: number;
   demos_done: number;
   deals_closed: number;
+  cash_collected: number;
+  contract_value: number;
   abr: string;
   show_rate: string;
   close_rate: string;
   booking_rate: string;
+};
+
+type WeekDay = {
+  activity_date: string;
+  dials: number;
+  conversations: number;
+  demos_booked: number;
+  deals_closed: number;
+  cash_collected: number;
 };
 
 const DIAL_GOAL = 100;
@@ -63,6 +74,7 @@ type Lead = {
   next_step: string | null;
   needs_followup: boolean;
   crm_notes: string | null;
+  demo_date: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -98,7 +110,9 @@ export default function CrmClient() {
   const [channel, setChannel] = useState<Channel>("call");
   const [activity, setActivity] = useState<Activity>(EMPTY_ACTIVITY);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [week, setWeek] = useState<WeekDay[]>([]);
   const [showStats, setShowStats] = useState(false);
+  const [showWeek, setShowWeek] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "">("");
@@ -134,6 +148,13 @@ export default function CrmClient() {
     if (s) setStats(s);
   }, [api]);
 
+  const loadWeek = useCallback(async () => {
+    const r = await api("/api/crm/week");
+    if (!r.ok) return;
+    const { week: w } = await r.json();
+    if (w) setWeek(w);
+  }, [api]);
+
   const loadLeads = useCallback(async () => {
     const params = new URLSearchParams({ channel });
     if (statusFilter) params.set("status", statusFilter);
@@ -146,8 +167,8 @@ export default function CrmClient() {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([loadActivity(), loadLeads(), loadStats()]).finally(() => setLoading(false));
-  }, [loadActivity, loadLeads, loadStats]);
+    Promise.all([loadActivity(), loadLeads(), loadStats(), loadWeek()]).finally(() => setLoading(false));
+  }, [loadActivity, loadLeads, loadStats, loadWeek]);
 
   // ── activity counter: debounced save ─────────────────────────────────────
 
@@ -251,6 +272,8 @@ export default function CrmClient() {
     { key: "followups_dials", label: "Uppföljningar" },
   ];
 
+  const todayStr = todayIso();
+
   const dmCounters: { key: keyof Activity; label: string }[] = [
     { key: "outreaches", label: "DM Skickade" },
     { key: "followups_outreach", label: "Uppföljningar" },
@@ -324,6 +347,63 @@ export default function CrmClient() {
         </div>
       </div>
 
+      {/* weekly view */}
+      <div style={S.section}>
+        <div style={{ ...S.sectionTitle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>DENNA VECKA</span>
+          <button style={S.toggleBtn} onClick={() => setShowWeek((v) => !v)}>
+            {showWeek ? "Dölj" : "Visa"}
+          </button>
+        </div>
+        {showWeek && (
+          <div style={S.weekGrid}>
+            {["Mån","Tis","Ons","Tor","Fre","Lör","Sön"].map((dayName, i) => {
+              const date = new Date();
+              const diff = date.getUTCDay() === 0 ? -6 : 1 - date.getUTCDay();
+              const d = new Date(date);
+              d.setUTCDate(date.getUTCDate() + diff + i);
+              const iso = d.toISOString().slice(0, 10);
+              const row = week.find((w) => w.activity_date === iso);
+              const isToday = iso === todayStr;
+              return (
+                <div key={iso} style={{ ...S.weekDay, ...(isToday ? S.weekDayToday : {}) }}>
+                  <div style={S.weekDayName}>{dayName}</div>
+                  <div style={{ ...S.weekDials, color: (row?.dials ?? 0) >= DIAL_GOAL ? "#5ab87a" : row?.dials ? G : MUTED }}>
+                    {row?.dials ?? 0}
+                  </div>
+                  {(row?.demos_booked ?? 0) > 0 && (
+                    <div style={S.weekDemo}>+{row!.demos_booked} demo</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* demo pipeline */}
+      {leads.filter((l) => l.status === "booked").length > 0 && (
+        <div style={S.section}>
+          <div style={S.sectionTitle}>BOKADE DEMOS</div>
+          <div style={S.demoList}>
+            {leads
+              .filter((l) => l.status === "booked")
+              .sort((a, b) => (a.demo_date ?? "9999") < (b.demo_date ?? "9999") ? -1 : 1)
+              .map((lead) => (
+                <div key={lead.id} style={S.demoCard} onClick={() => setModal(lead)}>
+                  <div style={S.demoName}>{lead.company_name || lead.full_name || "Okänd"}</div>
+                  <div style={S.demoRight}>
+                    {lead.demo_date && (
+                      <span style={S.demoDate}>{new Date(lead.demo_date).toLocaleDateString("sv-SE", { day: "numeric", month: "short" })}</span>
+                    )}
+                    {lead.next_step && <span style={S.demoNext}>{lead.next_step}</span>}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* total stats section */}
       <div style={S.section}>
         <div style={{ ...S.sectionTitle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -334,12 +414,14 @@ export default function CrmClient() {
         </div>
         {showStats && stats && (
           <div style={S.statsGrid}>
-            <StatBox label="Antal Samtal" value={stats.dials} />
+            <StatBox label="Antal Samtal" value={stats.dials.toLocaleString("sv-SE")} />
             <StatBox label="Samtal Startade" value={stats.conversations} />
             <StatBox label="Demo Pitchade" value={stats.demos_pitched} />
             <StatBox label="Demo Bokade" value={stats.demos_booked} />
             <StatBox label="Demo Genomförda" value={stats.demos_done} />
             <StatBox label="Avslutade Affärer" value={stats.deals_closed} />
+            <StatBox label="Inkasserat" value={`${stats.cash_collected.toLocaleString("sv-SE")} kr`} accent />
+            <StatBox label="Kontraktsvärde" value={`${stats.contract_value.toLocaleString("sv-SE")} kr`} accent />
             <StatBox label="Svarsfrekvens" value={`${stats.abr}%`} accent />
             <StatBox label="Bokningsfrekvens" value={`${stats.booking_rate}%`} accent />
             <StatBox label="Show Rate" value={`${stats.show_rate}%`} accent />
@@ -500,6 +582,7 @@ function LeadModal({
     next_step: lead.next_step || "",
     crm_notes: lead.crm_notes || "",
     needs_followup: lead.needs_followup,
+    demo_date: lead.demo_date || "",
   });
   const [dirty, setDirty] = useState(false);
 
@@ -518,6 +601,7 @@ function LeadModal({
       next_step: form.next_step || null,
       crm_notes: form.crm_notes || null,
       needs_followup: form.needs_followup,
+      demo_date: form.demo_date || null,
     } as Partial<Lead>);
     setDirty(false);
   };
@@ -553,6 +637,14 @@ function LeadModal({
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
             ))}
           </select>
+
+          <Label>Demo-datum</Label>
+          <input
+            style={S.modalInput}
+            type="date"
+            value={form.demo_date}
+            onChange={(e) => { set("demo_date", e.target.value); }}
+          />
 
           <Label>Nästa steg</Label>
           <Input value={form.next_step} onChange={(v) => set("next_step", v)} placeholder="T.ex. Ring igen fredag" />
@@ -1040,6 +1132,44 @@ const S: Record<string, React.CSSProperties> = {
     borderRadius: 3,
     transition: "width 0.3s ease",
   },
+
+  // weekly view
+  weekGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(7, 1fr)",
+    gap: 4,
+  },
+  weekDay: {
+    background: CARD,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 6,
+    padding: "8px 4px",
+    textAlign: "center" as const,
+  },
+  weekDayToday: {
+    border: `1px solid ${G}`,
+    background: "rgba(201,168,76,0.07)",
+  },
+  weekDayName: { fontSize: 9, color: MUTED, letterSpacing: "0.06em", marginBottom: 4 },
+  weekDials: { fontSize: 16, fontWeight: 700 },
+  weekDemo: { fontSize: 9, color: "#5ab87a", marginTop: 2 },
+
+  // demo pipeline
+  demoList: { display: "flex", flexDirection: "column" as const, gap: 6 },
+  demoCard: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "10px 14px",
+    background: "rgba(90,184,122,0.07)",
+    border: "1px solid rgba(90,184,122,0.3)",
+    borderRadius: 8,
+    cursor: "pointer",
+  },
+  demoName: { fontWeight: 600, fontSize: 13, color: TEXT },
+  demoRight: { display: "flex", flexDirection: "column" as const, alignItems: "flex-end", gap: 2 },
+  demoDate: { fontSize: 11, color: "#5ab87a", fontWeight: 700 },
+  demoNext: { fontSize: 10, color: MUTED },
 
   // stats
   toggleBtn: {
