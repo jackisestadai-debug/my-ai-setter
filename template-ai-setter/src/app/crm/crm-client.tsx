@@ -33,6 +33,22 @@ type Activity = {
   deals_closed: number;
 };
 
+type Stats = {
+  dials: number;
+  conversations: number;
+  pickups: number;
+  demos_pitched: number;
+  demos_booked: number;
+  demos_done: number;
+  deals_closed: number;
+  abr: string;
+  show_rate: string;
+  close_rate: string;
+  booking_rate: string;
+};
+
+const DIAL_GOAL = 100;
+
 type LeadStatus = "new" | "engaged" | "booked" | "done" | "lost";
 
 type Lead = {
@@ -81,6 +97,8 @@ function displayDate(iso: string) {
 export default function CrmClient() {
   const [channel, setChannel] = useState<Channel>("call");
   const [activity, setActivity] = useState<Activity>(EMPTY_ACTIVITY);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [showStats, setShowStats] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "">("");
@@ -109,6 +127,13 @@ export default function CrmClient() {
     if (a) setActivity({ ...EMPTY_ACTIVITY, ...a });
   }, [api]);
 
+  const loadStats = useCallback(async () => {
+    const r = await api("/api/crm/stats");
+    if (!r.ok) return;
+    const { stats: s } = await r.json();
+    if (s) setStats(s);
+  }, [api]);
+
   const loadLeads = useCallback(async () => {
     const params = new URLSearchParams({ channel });
     if (statusFilter) params.set("status", statusFilter);
@@ -121,8 +146,8 @@ export default function CrmClient() {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([loadActivity(), loadLeads()]).finally(() => setLoading(false));
-  }, [loadActivity, loadLeads]);
+    Promise.all([loadActivity(), loadLeads(), loadStats()]).finally(() => setLoading(false));
+  }, [loadActivity, loadLeads, loadStats]);
 
   // ── activity counter: debounced save ─────────────────────────────────────
 
@@ -263,6 +288,29 @@ export default function CrmClient() {
       {/* daily tracker */}
       <div style={S.section}>
         <div style={S.sectionTitle}>IDAG</div>
+
+        {/* goal progress bar (only on TELEFON tab) */}
+        {channel === "call" && (
+          <div style={S.goalBox}>
+            <div style={S.goalRow}>
+              <span style={S.goalLabel}>Mål: Samtal Ringda</span>
+              <span style={S.goalCount}>
+                <span style={{ color: activity.dials >= DIAL_GOAL ? "#5ab87a" : G }}>{activity.dials}</span>
+                <span style={{ color: MUTED }}> / {DIAL_GOAL}</span>
+              </span>
+            </div>
+            <div style={S.progressTrack}>
+              <div style={{
+                ...S.progressFill,
+                width: `${Math.min(100, (activity.dials / DIAL_GOAL) * 100)}%`,
+                background: activity.dials >= DIAL_GOAL
+                  ? "linear-gradient(90deg, #5ab87a, #3d9e5e)"
+                  : `linear-gradient(90deg, ${G}, #a8892e)`,
+              }} />
+            </div>
+          </div>
+        )}
+
         <div style={S.counterGrid}>
           {counters.map(({ key, label }) => (
             <Counter
@@ -274,6 +322,30 @@ export default function CrmClient() {
             />
           ))}
         </div>
+      </div>
+
+      {/* total stats section */}
+      <div style={S.section}>
+        <div style={{ ...S.sectionTitle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>TOTAL STATISTIK</span>
+          <button style={S.toggleBtn} onClick={() => setShowStats((v) => !v)}>
+            {showStats ? "Dölj" : "Visa"}
+          </button>
+        </div>
+        {showStats && stats && (
+          <div style={S.statsGrid}>
+            <StatBox label="Antal Samtal" value={stats.dials} />
+            <StatBox label="Samtal Startade" value={stats.conversations} />
+            <StatBox label="Demo Pitchade" value={stats.demos_pitched} />
+            <StatBox label="Demo Bokade" value={stats.demos_booked} />
+            <StatBox label="Demo Genomförda" value={stats.demos_done} />
+            <StatBox label="Avslutade Affärer" value={stats.deals_closed} />
+            <StatBox label="Svarsfrekvens" value={`${stats.abr}%`} accent />
+            <StatBox label="Bokningsfrekvens" value={`${stats.booking_rate}%`} accent />
+            <StatBox label="Show Rate" value={`${stats.show_rate}%`} accent />
+            <StatBox label="Close Rate" value={`${stats.close_rate}%`} accent />
+          </div>
+        )}
       </div>
 
       {/* leads section */}
@@ -351,6 +423,17 @@ export default function CrmClient() {
       )}
 
       <CrmStyles />
+    </div>
+  );
+}
+
+// ── StatBox component ─────────────────────────────────────────────────────────
+
+function StatBox({ label, value, accent }: { label: string; value: number | string; accent?: boolean }) {
+  return (
+    <div style={S.statBox}>
+      <div style={S.statLabel}>{label}</div>
+      <div style={{ ...S.statVal, color: accent ? G : TEXT }}>{value}</div>
     </div>
   );
 }
@@ -928,6 +1011,62 @@ const S: Record<string, React.CSSProperties> = {
     textDecoration: "none",
     letterSpacing: "0.06em",
   },
+
+  // goal progress
+  goalBox: {
+    background: CARD,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 8,
+    padding: "12px 14px",
+    marginBottom: 10,
+  },
+  goalRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  goalLabel: { fontSize: 10, color: MUTED, letterSpacing: "0.1em", fontWeight: 700 },
+  goalCount: { fontSize: 13, fontWeight: 700 },
+  progressTrack: {
+    width: "100%",
+    height: 6,
+    background: "rgba(255,255,255,0.06)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 3,
+    transition: "width 0.3s ease",
+  },
+
+  // stats
+  toggleBtn: {
+    padding: "3px 10px",
+    border: `1px solid ${BORDER}`,
+    borderRadius: 5,
+    background: "none",
+    color: MUTED,
+    fontFamily: "inherit",
+    fontSize: 10,
+    fontWeight: 700,
+    cursor: "pointer",
+    letterSpacing: "0.08em",
+  },
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: 8,
+  },
+  statBox: {
+    background: CARD,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 8,
+    padding: "10px 14px",
+  },
+  statLabel: { fontSize: 10, color: MUTED, marginBottom: 4, letterSpacing: "0.06em" },
+  statVal: { fontSize: 20, fontWeight: 700, letterSpacing: "-0.02em" },
 };
 
 function CrmStyles() {
