@@ -557,11 +557,13 @@ export default function CrmClient() {
           </select>
         </div>
 
-        {/* needs followup banner */}
+        {/* needs followup panel */}
         {visibleLeads.filter((l) => l.needs_followup).length > 0 && (
-          <div style={S.followupBanner}>
-            {visibleLeads.filter((l) => l.needs_followup).length} lead(s) behöver uppföljning
-          </div>
+          <FollowupPanel
+            leads={visibleLeads.filter((l) => l.needs_followup)}
+            onOpen={(lead) => setModal(lead)}
+            apiKey={KEY()}
+          />
         )}
 
         {/* lead list */}
@@ -590,6 +592,7 @@ export default function CrmClient() {
         <LeadModal
           lead={modal}
           saving={saving}
+          apiKey={KEY()}
           onUpdate={(patch) => updateLead(modal.id, patch)}
           onDelete={() => deleteLead(modal.id)}
           onClose={() => setModal(null)}
@@ -748,13 +751,76 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
   );
 }
 
+// ── FollowupPanel component ───────────────────────────────────────────────────
+
+function FollowupPanel({ leads, onOpen, apiKey }: { leads: Lead[]; onOpen: (l: Lead) => void; apiKey: string }) {
+  const [suggestions, setSuggestions] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
+
+  const fetchOne = async (lead: Lead) => {
+    setLoading((p) => ({ ...p, [lead.id]: true }));
+    try {
+      const r = await fetch(`/api/crm/suggest?k=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lead }),
+      });
+      const { suggestion } = await r.json();
+      setSuggestions((p) => ({ ...p, [lead.id]: suggestion ?? "—" }));
+    } catch {
+      setSuggestions((p) => ({ ...p, [lead.id]: "Fel vid hämtning." }));
+    }
+    setLoading((p) => ({ ...p, [lead.id]: false }));
+  };
+
+  useEffect(() => {
+    leads.slice(0, 5).forEach(fetchOne);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const MUTED = "rgba(232,224,204,0.35)";
+  const G = "#c9a84c";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 4 }}>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: MUTED }}>UPPFÖLJNING</div>
+      {leads.map((lead) => (
+        <div
+          key={lead.id}
+          style={{
+            background: "rgba(201,168,76,0.07)",
+            border: "1px solid rgba(201,168,76,0.25)",
+            borderRadius: 10,
+            padding: "10px 14px",
+            cursor: "pointer",
+          }}
+          onClick={() => onOpen(lead)}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#e8e0cc" }}>
+              {lead.company_name || lead.full_name || "Okänd"}
+            </span>
+            <span style={{ fontSize: 10, color: G, fontWeight: 700, letterSpacing: "0.08em" }}>
+              {lead.status === "engaged" ? "KONTAKT" : lead.status === "booked" ? "BOKAD" : lead.status.toUpperCase()}
+            </span>
+          </div>
+          <div style={{ fontSize: 12, color: loading[lead.id] ? MUTED : "#c9a84c", fontStyle: loading[lead.id] ? "italic" : "normal" }}>
+            {loading[lead.id] ? "AI tänker…" : suggestions[lead.id] ?? "—"}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── LeadModal component ───────────────────────────────────────────────────────
 
 function LeadModal({
-  lead, saving, onUpdate, onDelete, onClose,
+  lead, saving, apiKey, onUpdate, onDelete, onClose,
 }: {
   lead: Lead;
   saving: boolean;
+  apiKey: string;
   onUpdate: (patch: Partial<Lead>) => void;
   onDelete: () => void;
   onClose: () => void;
@@ -771,6 +837,25 @@ function LeadModal({
     demo_date: lead.demo_date || "",
   });
   const [dirty, setDirty] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const fetchSuggestion = async () => {
+    setAiLoading(true);
+    setAiSuggestion(null);
+    try {
+      const r = await fetch(`/api/crm/suggest?k=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lead }),
+      });
+      const { suggestion } = await r.json();
+      setAiSuggestion(suggestion ?? "Kunde inte generera förslag.");
+    } catch {
+      setAiSuggestion("Något gick fel.");
+    }
+    setAiLoading(false);
+  };
 
   const set = (k: string, v: unknown) => {
     setForm((p) => ({ ...p, [k]: v }));
@@ -852,6 +937,31 @@ function LeadModal({
             />
             <span style={{ marginLeft: 8 }}>Behöver uppföljning</span>
           </label>
+
+          {/* AI suggestion */}
+          <div style={{ marginTop: 8 }}>
+            <button
+              style={S.aiBtn}
+              onClick={fetchSuggestion}
+              disabled={aiLoading}
+            >
+              {aiLoading ? "Tänker…" : "✦ AI-förslag på nästa steg"}
+            </button>
+            {aiSuggestion && (
+              <div style={S.aiBox}>
+                <div style={S.aiText}>{aiSuggestion}</div>
+                <button
+                  style={S.aiUseBtn}
+                  onClick={() => {
+                    set("next_step", aiSuggestion);
+                    setAiSuggestion(null);
+                  }}
+                >
+                  Använd som nästa steg
+                </button>
+              </div>
+            )}
+          </div>
 
           <div style={S.modalActions}>
             <button
@@ -1302,6 +1412,42 @@ const S: Record<string, React.CSSProperties> = {
     fontFamily: "inherit",
     fontSize: 13,
     cursor: "pointer",
+  },
+  aiBtn: {
+    width: "100%",
+    padding: "10px",
+    background: "rgba(126,184,212,0.1)",
+    color: "#7eb8d4",
+    border: "1px solid rgba(126,184,212,0.3)",
+    borderRadius: 8,
+    fontFamily: "inherit",
+    fontSize: 12,
+    fontWeight: 600,
+    cursor: "pointer",
+    letterSpacing: "0.04em",
+  },
+  aiBox: {
+    marginTop: 8,
+    background: "rgba(126,184,212,0.07)",
+    border: "1px solid rgba(126,184,212,0.2)",
+    borderRadius: 8,
+    padding: "10px 12px",
+  },
+  aiText: {
+    fontSize: 13,
+    color: "#7eb8d4",
+    lineHeight: 1.5,
+    marginBottom: 8,
+  },
+  aiUseBtn: {
+    fontSize: 11,
+    color: "#7eb8d4",
+    background: "transparent",
+    border: "1px solid rgba(126,184,212,0.3)",
+    borderRadius: 6,
+    padding: "4px 10px",
+    cursor: "pointer",
+    fontFamily: "inherit",
   },
   modalMeta: {
     fontSize: 10,
