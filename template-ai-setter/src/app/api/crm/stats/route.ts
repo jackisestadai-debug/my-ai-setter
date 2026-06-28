@@ -41,10 +41,15 @@ export async function GET(req: NextRequest) {
   const cash_collected = sum("cash_collected");
   const contract_value = sum("contract_value");
 
+  const outreaches = sum("outreaches");
+  const followups_outreach = sum("followups_outreach");
+
   const stats = {
     dials,
     conversations,
     pickups,
+    outreaches,
+    followups_outreach,
     demos_pitched,
     demos_booked,
     demos_done,
