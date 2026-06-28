@@ -736,6 +736,7 @@ function AddLeadModal({
       next_step: form.next_step || null,
       crm_notes: form.crm_notes || null,
       needs_followup: form.needs_followup,
+      demo_date: null,
     });
   };
 
