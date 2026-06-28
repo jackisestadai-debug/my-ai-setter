@@ -9,6 +9,10 @@ let cachedKey: { value: string; fetchedAt: number } | null = null;
 const KEY_TTL_MS = 60_000;
 
 export async function getAccessKey(): Promise<string | null> {
+  // Allow per-deployment override via env var (used for demo deployments).
+  const envOverride = process.env.ACCESS_KEY_OVERRIDE;
+  if (envOverride) return envOverride;
+
   if (cachedKey && Date.now() - cachedKey.fetchedAt < KEY_TTL_MS) {
     return cachedKey.value;
   }
