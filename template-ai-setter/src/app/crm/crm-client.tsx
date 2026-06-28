@@ -112,6 +112,7 @@ function displayDate(iso: string) {
 // ── main component ───────────────────────────────────────────────────────────
 
 export default function CrmClient() {
+  const [view, setView] = useState<"tracker" | "log">("tracker");
   const [channel, setChannel] = useState<Channel>("call");
   const [activity, setActivity] = useState<Activity>(EMPTY_ACTIVITY);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -126,6 +127,11 @@ export default function CrmClient() {
   const [addOpen, setAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savingActivity, setSavingActivity] = useState(false);
+
+  // ── log view state ────────────────────────────────────────────────────────
+  const [logDate, setLogDate] = useState(todayIso);
+  const [logActivity, setLogActivity] = useState<Activity | null>(null);
+  const [logLoading, setLogLoading] = useState(false);
 
   const actSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -170,10 +176,25 @@ export default function CrmClient() {
     setLeads(l ?? []);
   }, [api, channel, statusFilter, search]);
 
+  const loadLog = useCallback(async (date: string) => {
+    setLogLoading(true);
+    setLogActivity(null);
+    const r = await api(`/api/crm/activity?date=${date}`);
+    if (r.ok) {
+      const { activity: a } = await r.json();
+      setLogActivity(a ? { ...EMPTY_ACTIVITY, ...a } : EMPTY_ACTIVITY);
+    }
+    setLogLoading(false);
+  }, [api]);
+
   useEffect(() => {
     setLoading(true);
     Promise.all([loadActivity(), loadLeads(), loadStats(), loadWeek()]).finally(() => setLoading(false));
   }, [loadActivity, loadLeads, loadStats, loadWeek]);
+
+  useEffect(() => {
+    if (view === "log") loadLog(logDate);
+  }, [view, logDate, loadLog]);
 
   // ── activity counter: debounced save ─────────────────────────────────────
 
@@ -303,18 +324,18 @@ export default function CrmClient() {
         {savingActivity && <span style={S.savingDot} title="sparar..." />}
       </div>
 
-      {/* channel tabs */}
+      {/* top-level tabs */}
       <div style={S.tabs}>
-        {(["call", "dm"] as Channel[]).map((c) => (
-          <button
-            key={c}
-            style={{ ...S.tab, ...(channel === c ? S.tabActive : {}) }}
-            onClick={() => setChannel(c)}
-          >
-            {c === "call" ? "TELEFON" : "INSTAGRAM DM"}
-          </button>
-        ))}
+        <button style={{ ...S.tab, ...(view === "tracker" && channel === "call" ? S.tabActive : {}) }} onClick={() => { setView("tracker"); setChannel("call"); }}>TELEFON</button>
+        <button style={{ ...S.tab, ...(view === "tracker" && channel === "dm" ? S.tabActive : {}) }} onClick={() => { setView("tracker"); setChannel("dm"); }}>INSTAGRAM DM</button>
+        <button style={{ ...S.tab, ...(view === "log" ? S.tabActive : {}) }} onClick={() => setView("log")}>HISTORIK</button>
       </div>
+
+      {view === "log" && (
+        <LogView date={logDate} onDateChange={setLogDate} activity={logActivity} loading={logLoading} />
+      )}
+
+      {view === "tracker" && <>
 
       {/* daily tracker */}
       <div style={S.section}>
@@ -562,6 +583,8 @@ export default function CrmClient() {
         <a href={`/hq?k=${KEY()}`} style={S.hqLink}>← Tillbaka till HQ</a>
       </div>
 
+      </>}
+
       {/* lead detail modal */}
       {modal && (
         <LeadModal
@@ -584,6 +607,90 @@ export default function CrmClient() {
       )}
 
       <CrmStyles />
+    </div>
+  );
+}
+
+// ── LogView component ─────────────────────────────────────────────────────────
+
+const LOG_ROWS: { key: keyof Activity; label: string; isMoney?: boolean }[] = [
+  { key: "dials", label: "Samtal Ringda" },
+  { key: "pickups", label: "Svar" },
+  { key: "conversations", label: "Samtal Startade" },
+  { key: "outreaches", label: "DM Skickade" },
+  { key: "followups_outreach", label: "Uppföljningar DM" },
+  { key: "followups_dials", label: "Uppföljningar Telefon" },
+  { key: "demos_pitched", label: "Demo Pitchade" },
+  { key: "demos_booked", label: "Demo Bokade" },
+  { key: "demos_done", label: "Demo Genomförda" },
+  { key: "deals_closed", label: "Avslutade Affärer" },
+  { key: "cash_collected", label: "Inkasserat Belopp", isMoney: true },
+  { key: "contract_value", label: "Kontraktsvärde", isMoney: true },
+];
+
+function LogView({
+  date, onDateChange, activity, loading,
+}: {
+  date: string;
+  onDateChange: (d: string) => void;
+  activity: Activity | null;
+  loading: boolean;
+}) {
+  const MUTED = "rgba(232,224,204,0.35)";
+  const CARD = "rgba(255,255,255,0.04)";
+  const BORDER = "rgba(126,184,212,0.12)";
+  const G = "#c9a84c";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => onDateChange(e.target.value)}
+          style={{
+            background: CARD,
+            border: `1px solid ${BORDER}`,
+            borderRadius: 8,
+            color: "#e8e0cc",
+            fontSize: 14,
+            padding: "8px 12px",
+            outline: "none",
+            colorScheme: "dark",
+          }}
+        />
+        <span style={{ fontSize: 11, color: MUTED }}>
+          {new Date(date + "T12:00:00").toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" })}
+        </span>
+      </div>
+
+      {loading ? (
+        <div style={{ color: MUTED, fontSize: 13, padding: "20px 0" }}>Laddar…</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {LOG_ROWS.map(({ key, label, isMoney }) => {
+            const val = activity?.[key] ?? 0;
+            const hasVal = val > 0;
+            return (
+              <div
+                key={key}
+                style={{
+                  background: CARD,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  opacity: hasVal ? 1 : 0.45,
+                }}
+              >
+                <div style={{ fontSize: 10, color: MUTED, letterSpacing: "0.06em", marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: hasVal ? G : "#e8e0cc" }}>
+                  {isMoney && hasVal ? val.toLocaleString("sv-SE") + " kr" : val}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
