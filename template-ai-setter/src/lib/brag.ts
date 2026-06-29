@@ -35,7 +35,7 @@ export async function bragCheck(): Promise<void> {
       const { count } = await supabase
         .from("reporting_funnel").select("id", { count: "exact", head: true })
         .eq("reached_booked", true).gte("lead_date", new Date(Date.now() - 7 * 86400_000).toISOString());
-      await sendTelegramPing(`⚡ Yo — just booked ${name}. That's ${count ?? "another one"} this week. — Aura`);
+      await sendTelegramPing(`⚡ Yo — bokade just in ${name}. Det är ${count ?? "ännu ett"} den här veckan. — Aura`);
       await logEvent({ client_id: clientId, lead_id: b.lead_id ?? undefined, event_type: "aura_brag", metadata: { ref: `b:${b.id}` } });
     }
 
@@ -47,7 +47,7 @@ export async function bragCheck(): Promise<void> {
         name = c?.name || name;
       }
       const amt = Number(p.amount) || 0;
-      await sendTelegramPing(`💰 ${name} just paid $${amt.toLocaleString("en-US")}. Cash in. — Aura`);
+      await sendTelegramPing(`💰 ${name} betalade precis ${amt.toLocaleString("sv-SE")} kr. Pengarna inne. — Aura`);
       await logEvent({ client_id: clientId, event_type: "aura_brag", metadata: { ref: `p:${p.id}` } });
     }
   } catch (err) {

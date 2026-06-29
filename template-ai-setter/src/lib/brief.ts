@@ -77,7 +77,7 @@ export async function briefCheck(): Promise<void> {
       const ref = `c:${call.ghl_appointment_id}`;
       if (done.has(ref)) continue;
       const mins = Math.max(1, Math.round((new Date(call.call_at).getTime() - now) / 60_000));
-      const text = `📞 CALL IN ~${mins} MIN\n\n${await leadBriefText(call.lead_id)}\n\n— Aura`;
+      const text = `📞 SAMTAL OM ~${mins} MIN\n\n${await leadBriefText(call.lead_id)}\n\n— Aura`;
       for (const chat of chats) await sendTo(chat, text.slice(0, 4000));
       await logEvent({ client_id: clientRow.id, lead_id: call.lead_id ?? undefined, event_type: "aura_brief", metadata: { ref } });
     }
@@ -104,7 +104,7 @@ export async function dailyCallSheet(): Promise<void> {
       const hhmm = new Date(call.call_at).toISOString().slice(11, 16);
       blocks.push(`🕐 ${hhmm} UTC\n${await leadBriefText(call.lead_id)}`);
     }
-    const text = `📋 CALL SHEET — next 24h (${calls.length})\n\n${blocks.join("\n\n")}\n\n— Aura`;
+    const text = `📋 SAMTAL — nästa 24h (${calls.length})\n\n${blocks.join("\n\n")}\n\n— Aura`;
     for (const chat of chats) await sendTo(chat, text.slice(0, 4000));
   } catch (err) {
     console.error("[brief] call sheet failed:", err);

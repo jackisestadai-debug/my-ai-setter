@@ -10,7 +10,7 @@ import { sendTelegramPing } from "@/lib/telegram";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const money = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
+const money = (n: number) => Math.round(n).toLocaleString("sv-SE") + " kr";
 
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -37,18 +37,18 @@ export async function GET(req: NextRequest) {
     const cash = (paysRows.data ?? []).reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const dealRows = deals.data ?? [];
     const signed = dealRows.reduce((s, c) => s + (Number(c.contract_value) || 0), 0);
-    const names = dealRows.map((c) => `${c.name}${c.booking_method === "ai_dm" ? " ⚡" : ""} (${money(Number(c.contract_value) || 0)})`).join(", ") || "none this week";
+    const names = dealRows.map((c) => `${c.name}${c.booking_method === "ai_dm" ? " ⚡" : ""} (${money(Number(c.contract_value) || 0)})`).join(", ") || "inga den här veckan";
     const s = d.sales ?? {};
     const msg = [
-      "📊 AURA WEEKLY REPORT",
+      "📊 AURA VECKORAPPORT",
       `${iso(startD)} → ${iso(now)}`,
       "",
-      `💰 Cash collected: ${money(cash)}`,
-      `✍️ Signed: ${money(signed)} — ${dealRows.length} deal${dealRows.length === 1 ? "" : "s"}: ${names}`,
-      `📞 Booked: ${s.booked ?? 0} (${s.ai_booked ?? 0} by me ⚡) · Showed: ${s.showed ?? 0} · Closed: ${s.closed ?? 0}`,
-      `📥 Leads in: ${leads}`,
+      `💰 Inbetalt: ${money(cash)}`,
+      `✍️ Signerat: ${money(signed)} — ${dealRows.length} deal${dealRows.length === 1 ? "" : "s"}: ${names}`,
+      `📞 Bokade: ${s.booked ?? 0} (${s.ai_booked ?? 0} av mig ⚡) · Dök upp: ${s.showed ?? 0} · Stängda: ${s.closed ?? 0}`,
+      `📥 Nya leads: ${leads}`,
       "",
-      `🥶 ${cold.count ?? 0} engaged leads going quiet 2+ days — say "who's going cold" in HQ and I'll line up the revival messages.`,
+      `🥶 ${cold.count ?? 0} engagerade leads har tystnat 2+ dagar — säg "vilka håller på att kallna" i HQ så fixar jag uppföljningarna.`,
       "",
       "— Aura",
     ].join("\n");
