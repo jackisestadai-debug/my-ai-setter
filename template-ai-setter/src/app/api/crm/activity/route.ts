@@ -2,18 +2,10 @@
  * CRM — daily activity tracker for the owner's call / DM numbers.
  *
  * GET  /api/crm/activity?k=<key>&date=<YYYY-MM-DD>
- *      Returns the team_activity row for that date (today if omitted).
- *
- * POST /api/crm/activity?k=<key>
- *      Body: { date?, dials?, conversations?, pickups?, outreaches?,
- *              followups_outreach?, followups_dials?,
- *              demos_pitched?, demos_booked?, demos_done?, deals_closed? }
- *      Upserts (creates or replaces) the row for that date.
+ * POST /api/crm/activity?k=<key>  body: { date?, dials?, ... }
  */
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { getAccessKey } from "@/lib/access";
-import { getClient } from "@/lib/supabase";
+import { supabase, getClientByKey } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -23,17 +15,10 @@ function todayIso() {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
-async function auth(req: NextRequest): Promise<boolean> {
-  const k = req.nextUrl.searchParams.get("k") ?? "";
-  const key = await getAccessKey();
-  return !!key && k === key;
-}
-
 export async function GET(req: NextRequest) {
-  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  const client = await getClient();
-  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const client = await getClientByKey(k);
+  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const date = req.nextUrl.searchParams.get("date") || todayIso();
 
@@ -50,10 +35,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  const client = await getClient();
-  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const client = await getClientByKey(k);
+  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const date = body.date || todayIso();

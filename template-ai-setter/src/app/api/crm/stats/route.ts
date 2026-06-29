@@ -1,25 +1,16 @@
 /**
  * GET /api/crm/stats?k=<key>
- * Returns lifetime totals from team_activity (excluding legacy seed rows tagged logged_by='legacy'
- * are included — they represent historical data before CRM started).
+ * Returns lifetime totals from team_activity for the requesting client.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, getClient } from "@/lib/supabase";
-import { getAccessKey } from "@/lib/access";
+import { supabase, getClientByKey } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
-async function auth(req: NextRequest): Promise<boolean> {
-  const k = req.nextUrl.searchParams.get("k") ?? "";
-  const key = await getAccessKey();
-  return !!key && k === key;
-}
-
 export async function GET(req: NextRequest) {
-  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  const client = await getClient();
-  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const client = await getClientByKey(k);
+  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { data, error } = await supabase
     .from("team_activity")
@@ -40,22 +31,13 @@ export async function GET(req: NextRequest) {
   const deals_closed = sum("deals_closed");
   const cash_collected = sum("cash_collected");
   const contract_value = sum("contract_value");
-
   const outreaches = sum("outreaches");
   const followups_outreach = sum("followups_outreach");
 
   const stats = {
-    dials,
-    conversations,
-    pickups,
-    outreaches,
-    followups_outreach,
-    demos_pitched,
-    demos_booked,
-    demos_done,
-    deals_closed,
-    cash_collected,
-    contract_value,
+    dials, conversations, pickups, outreaches, followups_outreach,
+    demos_pitched, demos_booked, demos_done, deals_closed,
+    cash_collected, contract_value,
     abr: dials > 0 ? ((pickups / dials) * 100).toFixed(1) : "0.0",
     show_rate: demos_booked > 0 ? ((demos_done / demos_booked) * 100).toFixed(1) : "0.0",
     close_rate: demos_pitched > 0 ? ((deals_closed / demos_pitched) * 100).toFixed(1) : "0.0",

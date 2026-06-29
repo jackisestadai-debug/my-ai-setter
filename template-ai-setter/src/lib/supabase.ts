@@ -178,6 +178,27 @@ export async function getClient(slug = OWNER_SLUG): Promise<Client | null> {
 }
 
 /**
+ * Look up a client by their access key.
+ * This is how the CRM/HQ identifies which client is making a request —
+ * the key in ?k= uniquely identifies the client, replacing OWNER_CLIENT_SLUG.
+ */
+export async function getClientByKey(key: string): Promise<Client | null> {
+  if (!key) return null;
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("access_key", key)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[supabase] getClientByKey failed:", error);
+    return null;
+  }
+  return data as Client | null;
+}
+
+/**
  * Get a client by their GHL location ID.
  * This is THE function the webhook uses to route incoming messages
  * to the right client/training in a multi-tenant world.

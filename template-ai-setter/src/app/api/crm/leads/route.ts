@@ -9,22 +9,14 @@
  *      Creates a new lead in the CRM.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, getClient } from "@/lib/supabase";
-import { getAccessKey } from "@/lib/access";
+import { supabase, getClientByKey } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
-async function auth(req: NextRequest): Promise<boolean> {
-  const k = req.nextUrl.searchParams.get("k") ?? "";
-  const key = await getAccessKey();
-  return !!key && k === key;
-}
-
 export async function GET(req: NextRequest) {
-  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  const client = await getClient();
-  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const client = await getClientByKey(k);
+  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const channel = req.nextUrl.searchParams.get("channel"); // 'call' | 'dm' | null (all)
   const status = req.nextUrl.searchParams.get("status");
@@ -52,10 +44,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  const client = await getClient();
-  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const client = await getClientByKey(k);
+  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json();
 
