@@ -54,7 +54,7 @@ function getSR(): SR | null {
 /** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
 const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "REKVO";
 
-type Tab = "aura" | "dashboard" | "crm" | "kalender";
+type Tab = "aura" | "dashboard" | "crm" | "kalender" | "noter";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
 type FxMode = "" | "boot" | "wake" | "down" | "off";
 
@@ -1432,6 +1432,7 @@ gl_FragColor=vec4(col,a);}`;
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
           <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>
           <button className={`hq-tab ${tab === "kalender" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("kalender")}>KALENDER</button>
+          <button className={`hq-tab ${tab === "noter" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("noter")}>NOTER</button>
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>
@@ -1477,6 +1478,57 @@ gl_FragColor=vec4(col,a);}`;
       {tab === "dashboard" && <div className="hq-frame"><iframe src="/dashboard" title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
       {tab === "crm" && <div className="hq-frame"><iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" /></div>}
       {tab === "kalender" && <div className="hq-frame"><iframe src={`/kalender?k=${KEY()}`} title="Kalender" className="hq-iframe" /></div>}
+      {tab === "noter" && <NoterTab />}
+    </div>
+  );
+}
+
+function NoterTab() {
+  const STORAGE_KEY = "rekvo-noter";
+  const [text, setText] = React.useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem(STORAGE_KEY) || "";
+  });
+  const [saved, setSaved] = React.useState(true);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setText(e.target.value);
+    setSaved(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, e.target.value);
+      setSaved(true);
+    }, 800);
+  }
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "24px 28px", gap: 12, minHeight: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ color: "#7eb8d4", fontSize: 11, letterSpacing: "0.1em", fontWeight: 700 }}>IDÉER &amp; ATT GÖRA</span>
+        <span style={{ color: saved ? "rgba(126,184,212,0.4)" : "#7eb8d4", fontSize: 10, letterSpacing: "0.05em" }}>
+          {saved ? "● sparat" : "sparar…"}
+        </span>
+      </div>
+      <textarea
+        value={text}
+        onChange={handleChange}
+        placeholder="Skriv idéer, planer, att-göra-listor..."
+        style={{
+          flex: 1,
+          background: "rgba(126,184,212,0.04)",
+          border: "1px solid rgba(126,184,212,0.15)",
+          borderRadius: 10,
+          color: "#e8e0cc",
+          fontSize: 14,
+          lineHeight: 1.7,
+          padding: "16px 18px",
+          resize: "none",
+          outline: "none",
+          fontFamily: "ui-sans-serif, system-ui, sans-serif",
+          minHeight: 0,
+        }}
+      />
     </div>
   );
 }
