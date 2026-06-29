@@ -415,10 +415,16 @@ export async function POST(req: NextRequest) {
 
   // --- 4. Extract fields from the EXACT real payload locations ---
   // Prefer customData.contactId, fall back to root contact_id.
-  const contactId = body.customData?.contactId || body.contact_id;
-  const locationId = body.location?.id || body.customData?.locationId;
-  // Always use message.body. NEVER read from a "Last Inbound Message" field.
-  const messageText = body.message?.body;
+  const contactId = body.customData?.contactId || body.contact_id || body.contact?.id;
+  // Fall back to ?locationId= query param so GHL workflow webhooks (which
+  // omit location from the payload) can still be routed correctly.
+  const locationId =
+    body.location?.id ||
+    body.customData?.locationId ||
+    req.nextUrl.searchParams.get("locationId") ||
+    undefined;
+  // Always use message.body. Fall back to customData.message for GHL workflow webhooks.
+  const messageText = body.message?.body || (body.customData?.message as string | undefined);
   const igSenderId =
     body.contact?.attributionSource?.igSid ||
     body.contact?.lastAttributionSource?.igSid;
