@@ -1079,7 +1079,7 @@ gl_FragColor=vec4(col,a);}`;
       { role: "lead",   text: "Toppen, tack!" },
     ];
 
-    type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number };
+    type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number; switchTab?: Tab };
     const beats: Beat[] = [
       {
         say: kickoff || "Okej — låt mig visa dig exakt vad jag gör för din klinik varje dag medan du är mitt i behandlingar.",
@@ -1114,8 +1114,9 @@ gl_FragColor=vec4(col,a);}`;
         hold: 800,
       },
       {
-        say: "Du ser allt i realtid — vilka behandlingar som bokas mest via Instagram, var leads fastnar, och exakt hur mycket intäkt systemet har genererat.",
+        say: "Du ser allt i realtid — vilka behandlingar som bokas mest via Instagram, var leads fastnar, och exakt hur mycket intäkt systemet har genererat. Titta här.",
         rings: true,
+        switchTab: "dashboard",
         panels: [
           { kind: "bars", title: "BOKNINGAR VIA DM · 30 DAGAR", rows: [{ label: "Lip fillers", value: 94 }, { label: "Botox panna", value: 81 }, { label: "Kindben", value: 47 }, { label: "Ansiktsbehandling", value: 25 }] },
           { kind: "stats", title: "NYCKELTAL", items: [{ label: "Svarstid", value: "9s" }, { label: "Konvertering", value: "41%" }, { label: "Intäkt / bokning", value: "4 520 kr" }, { label: "ROI", value: "14x" }] },
@@ -1124,11 +1125,12 @@ gl_FragColor=vec4(col,a);}`;
       },
       {
         say: "Kliniken som redan har det här vaknar till ett fullt schema varje dag. Utan att ha svarat ett enda DM kvällen innan.",
+        switchTab: "aura",
         panels: [{ kind: "metric", title: "SKILLNADEN", value: "+63 000 kr", sub: "per månad · automatiskt · utan extra personal", accent: true }],
         hold: 1000,
       },
       {
-        say: "Du kan testa det helt gratis i sju dagar. Ingen bindning, ingen installation, inget krångel. Vi sätter upp allt åt dig och du ser resultaten direkt.",
+        say: "Du kan testa det helt gratis i sju dagar. Ingen bindning, ingen installation, inget krångel. Vi sätter upp allt åt dig och du ser resultaten direkt. Vad säger du — kör vi?",
         rings: true,
         panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
         hold: 1000,
@@ -1144,6 +1146,7 @@ gl_FragColor=vec4(col,a);}`;
     for (const b of beats) {
       if (!pitchRef.current) return;
       if (b.closeConv) { autoConvRef.current = false; setDemoChatOpen(false); }
+      if (b.switchTab) setTab(b.switchTab);
       if (b.panels) replacePanels(b.panels, true, true);
       if (b.rings) ringsAt.current = performance.now();
       setSaid(b.say);

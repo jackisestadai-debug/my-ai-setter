@@ -65,7 +65,7 @@ Välj bland: Maria Svensson – botox i morse, Julia Anderson – fillers igår,
 • "avsluta demo" / "tillbaka" → demo: false
 • "gör det blått" / färgkommandon → theme: "<färg>"
 • "visa chatten" / "demo DM" / "visa receptionist" → demoChat: true
-• "pitch" / "kör presentationen" / "visa demot" / "imponera" / "ta fram demot" → pitch: true, demo: true (ge EN kort kickoff-mening som speech)
+• "pitch" / "kör presentationen" / "visa demot" / "visa demo" / "imponera" / "ta fram demot" / "kör demo" → pitch: true, demo: true (ge EN kort kickoff-mening som speech)
 
 [PANELTYPER]
 • {"kind":"metric","title":"OMSÄTTNING · 7D","value":"41 500 kr","sub":"11 bokningar","accent":true}
