@@ -43,6 +43,7 @@ export interface HqConfig {
   brandName?: string;
   apiBase?: string; // e.g. "/api/klinik-demo"
   dashboardPath?: string; // e.g. "/klinik-demo/dashboard"
+  hideTabs?: Array<"crm" | "kalender" | "noter">; // tabs to hide
 }
 
 interface SR {
@@ -223,6 +224,7 @@ function Hq({ config }: { config?: HqConfig } = {}) {
   const BRAND_NAME = config?.brandName ?? DEFAULT_BRAND;
   const apiBase = config?.apiBase ?? "/api/hq";
   const dashboardPath = config?.dashboardPath ?? "/dashboard";
+  const hideTabs = new Set(config?.hideTabs ?? []);
   const [tab, setTab] = useState<Tab>("aura");
   const [online, setOnline] = useState(false);
   const [orb, setOrb] = useState<OrbState>("idle");
@@ -1443,9 +1445,9 @@ gl_FragColor=vec4(col,a);}`;
         <nav className="hq-tabs">
           <button className={`hq-tab ${tab === "aura" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("aura")}>AURA</button>
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
-          <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>
-          <button className={`hq-tab ${tab === "kalender" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("kalender")}>KALENDER</button>
-          <button className={`hq-tab ${tab === "noter" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("noter")}>NOTER</button>
+          {!hideTabs.has("crm") && <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>}
+          {!hideTabs.has("kalender") && <button className={`hq-tab ${tab === "kalender" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("kalender")}>KALENDER</button>}
+          {!hideTabs.has("noter") && <button className={`hq-tab ${tab === "noter" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("noter")}>NOTER</button>}
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>

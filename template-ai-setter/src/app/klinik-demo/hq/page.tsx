@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default function GlowStudioHqPage() {
   return (
     <Suspense fallback={null}>
-      <HqClient config={{ brandName: "GLOW STUDIO", apiBase: "/api/klinik-demo", dashboardPath: "/klinik-demo/dashboard" }} />
+      <HqClient config={{ brandName: "GLOW STUDIO", apiBase: "/api/klinik-demo", dashboardPath: "/klinik-demo/dashboard", hideTabs: ["crm", "kalender", "noter"] }} />
     </Suspense>
   );
 }
