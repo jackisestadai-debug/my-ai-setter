@@ -59,7 +59,8 @@ export async function POST(req: NextRequest) {
     content: "Hej, har ni några lediga tider nångån kommande 1-2 veckor?",
   });
 
-  // Map history (skip first AI message if it duplicates the opener)
+  // history already includes the new message at the end (page.tsx appends
+  // before calling the API), so just map it — no need to add message again.
   for (const m of history) {
     if (m.role === "lead" || m.role === "user") {
       messages.push({ role: "user", content: m.content });
@@ -67,9 +68,6 @@ export async function POST(req: NextRequest) {
       messages.push({ role: "assistant", content: m.content });
     }
   }
-
-  // Add the new clinic message
-  messages.push({ role: "user", content: message });
 
   const response = await anthropic.messages.create({
     model: MODEL,
