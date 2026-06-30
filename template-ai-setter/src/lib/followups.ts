@@ -20,8 +20,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { supabase, logEvent, saveMessage, eventExists, type Lead } from "./supabase";
 import { sendGHLMessage } from "./ghl";
 
-const STAGES_A = ["opener", "transition_main_reason", "goals", "current_situation", "timeline", "problem"];
-const STAGES_B = ["pitch_help", "book"];
+const STAGES_A = ["opener_sequence"];
+const STAGES_B = ["demo_response", "book"];
 const OFFSETS_H = { A: [24, 72, 168], B: [0.5, 24, 72] }; // hours from the stall anchor
 const MIN_GAP_H = 20;   // HARD floor: never two follow-ups to the same lead within 20h (kills any "ding-ding-ding")
 const MAX_PER_RUN = 25; // global cap per tick — a surge drips over ticks, never blasts
@@ -42,72 +42,44 @@ async function enabledFollowupClients(): Promise<FUClient[]> {
   });
 }
 
-/** Only use the lead's first name if it's clearly a real name (not a handle
- *  like "Don Juba" or "Ali16539"). Otherwise return "" and we skip the name. */
-function leadFirstName(lead: Lead): string {
-  const fn = (lead.full_name || "").trim();
-  if (!fn) return "";
-  const first = fn.split(/\s+/)[0] || "";
-  if (!/^[a-zA-Z]{2,15}$/.test(first)) return ""; // letters only, sane length
-  if (first.toLowerCase() === (lead.ig_username || "").toLowerCase()) return "";
-  if (["the", "official", "real", "its", "mr", "coach", "king", "ceo", "team"].includes(first.toLowerCase())) return "";
-  return first.charAt(0).toUpperCase() + first.slice(1);
-}
 
-/** Best-effort pull of the lead's stated goal from captured facts. */
-function pullGoal(lead: Lead): string {
-  const sd = (lead.stage_data || {}) as Record<string, unknown>;
-  for (const k of Object.keys(sd)) {
-    if (/goal|outcome|dream|income|want|aspir/i.test(k)) {
-      const v = sd[k];
-      if (typeof v === "string" && v.trim() && v.trim().length < 80) return v.trim();
-    }
-  }
-  return "";
-}
+const TONE: Record<string, string> = {
+  A1: "Avslappnat ping. Referera naturligt till vad som sades senast i konversationen. Kort, en mening.",
+  A2: "Lite mer direkt. Fråga om tajmingen är fel eller om de har frågor om det vi pratade om. Kort.",
+  A3: "Sista pingen. Ingen press. Lämna dörren öppen på ett avslappnat sätt. En-två meningar max.",
+  B1: "Kolla om de hann titta på demot. Nyfiken ton, inga förväntningar. Kort.",
+  B2: "Fråga vad som stoppar dem. Referera till demot de sett. Mjukt och direkt.",
+  B3: "Sista chansen. Nämn att de inte riskerar något och att det är gratis i 7 dagar. Ingen press men tydlig.",
+};
 
-/** Generate the one context-aware question for A#1 / B#2. Falls back safely. */
-async function genQuestion(client: FUClient, leadId: string, kind: "A1" | "B2"): Promise<string> {
-  const fallback = kind === "A1" ? "where did we leave off?" : "wanna lock in a time?";
+const FALLBACK: Record<string, string> = {
+  A1: "hej, hörde aldrig av er — fortfarande aktuellt?",
+  A2: "bara ett snabbt ping — är tajmingen fel eller har ni frågor?",
+  A3: "inga problem om det inte passar just nu, hör av er om det ändras",
+  B1: "hann ni kika på demot?",
+  B2: "kollar in — är det något ni undrar över efter demot?",
+  B3: "sista försöket härifrån — ni riskerar ingenting, 7 dagar gratis och ni betalar bara om ni är nöjda. lmk",
+};
+
+async function generateFollowup(client: FUClient, leadId: string, slotKey: string): Promise<string> {
+  const fallback = FALLBACK[slotKey] ?? "hej, fortfarande intresserade?";
   try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) return fallback;
-    const { data } = await supabase.from("messages").select("role, content").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(8);
+    const { data } = await supabase.from("messages").select("role, content").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(10);
     const transcript = ((data ?? []) as { role: string; content: string }[]).reverse()
-      .map((m) => `${m.role === "lead" ? "THEM" : "US"}: ${String(m.content || "").slice(0, 200)}`).join("\n");
-    const instruction = kind === "A1"
-      ? "Write ONE short, casual question that naturally picks this conversation back up from exactly where it stalled (re-ask what we were last discussing). Just the question text."
-      : "Write ONE short, casual one-line nudge question that gently moves them toward booking the call, fitting where the conversation ended. Just the question text.";
+      .map((m) => `${m.role === "lead" ? "KLINIKEN" : "JACK"}: ${String(m.content || "").slice(0, 300)}`).join("\n");
     const anthropic = new Anthropic({ apiKey });
     const res = await anthropic.messages.create({
-      model: "claude-sonnet-4-6", max_tokens: 120, output_config: { effort: "low" },
-      system: `You write Instagram DMs in this person's voice. Match their style exactly.\nVOICE SAMPLES:\n${(client.voice_samples || "").slice(0, 1500)}\n\nOutput ONLY the message text — no quotes, no preamble, lowercase casual is fine.`,
-      messages: [{ role: "user", content: `Recent thread (oldest first):\n${transcript}\n\n${instruction}` }],
+      model: "claude-haiku-4-5-20251001", max_tokens: 100,
+      system: `Du skriver uppföljnings-DMs på Instagram åt Jack på Rekvo. Jack säljer AI-mötesbokare till skönhetskliniker i Sverige.\n\nJacks röst (matcha exakt):\n${(client.voice_samples || "").slice(0, 800)}\n\nSkriv BARA meddelandetexten — inga citattecken, ingen inledning. Kort och naturlig svenska.`,
+      messages: [{ role: "user", content: `Konversation (äldst först):\n${transcript}\n\nTon för detta meddelande: ${TONE[slotKey]}\n\nSkriv uppföljningsmeddelandet.` }],
     });
-    const txt = res.content.filter((b) => b.type === "text").map((b) => (b as { type: "text"; text: string }).text).join("").trim();
-    return txt ? txt.replace(/^["']|["']$/g, "").slice(0, 200) : fallback;
+    const txt = res.content.filter((b) => b.type === "text").map((b) => (b as { type: "text"; text: string }).text).join("").trim().replace(/^["']|["']$/g, "");
+    return txt || fallback;
   } catch {
     return fallback;
   }
-}
-
-function buildMessage(bucket: "A" | "B", attempt: number, ctx: { name: string; goal: string; linkSent: boolean; question: string }): string {
-  const nameTag = ctx.name ? ` ${ctx.name}` : "";
-  const closerGoal = ctx.goal ? `closer to ${ctx.goal}` : "closer to your goals";
-  if (bucket === "A") {
-    if (attempt === 1) return `yo${nameTag} I'm so sorry bro, I've been so busy but was just going through a few of my convos, so tell me ${ctx.question || "where did we leave off?"}`;
-    if (attempt === 2) return `you good bro?`;
-    return ctx.goal
-      ? `damn, just noticed our convo died out, lmk if ${ctx.goal} is still something you're striving for, feel free to ask any questions, i'm usually pretty active in the dms`
-      : `damn, just noticed our convo died out, lmk if you're potentially looking into making money online brotha, feel free to ask any questions, i'm usually pretty active in the dms`;
-  }
-  // Bucket B
-  if (attempt === 1) return ctx.linkSent
-    ? `my bad bro, jumped on a quick call but tell me, you got the confirmation email?`
-    : `my bad bro, jumped on a quick call but tell me, do you feel like talking to Ethan could help you get ${closerGoal}?`;
-  if (attempt === 2) return `just getting back to a few dms brotha, didn't see your name in my system yet so just wanted to reassure you that this is not a "sales call", see it as coaching call #0, worst case you walk away with a plan. ${ctx.question || "wanna lock in a time?"}`;
-  // B#3 — hardcoded, ONE single message (sent directly, never burst-split)
-  return `hey brother, been trying to reach you a few times these last days to potentially help you get ${closerGoal}\n\nbut didn't hear back from you...\n\nlmk where you want to take it from here?`;
 }
 
 /** Mark revival when a lead replied after we'd sent follow-ups (idempotent). */
@@ -185,10 +157,8 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
           const row = (claimed ?? [])[0] as { id: string } | undefined;
           if (!row) continue;
 
-          const linkSent = bucket === "B" ? await eventExists(lead.id, "ai_sent_booking_link") : false;
-          const needsQ = (bucket === "A" && attempt === 1) || (bucket === "B" && attempt === 2);
-          const question = needsQ ? await genQuestion(client, lead.id, bucket === "A" ? "A1" : "B2") : "";
-          const text = buildMessage(bucket, attempt, { name: leadFirstName(lead), goal: pullGoal(lead), linkSent, question });
+          const slotKey = `${bucket}${attempt}`;
+          const text = await generateFollowup(client, lead.id, slotKey);
 
           const res = await sendGHLMessage({ ghl_api_key: client.ghl_api_key, ghl_location_id: client.ghl_location_id, ghl_contact_id: lead.ghl_contact_id, message: text, type: "IG" });
           if (!res.success) {
