@@ -81,8 +81,7 @@ export async function POST(req: NextRequest) {
     .map((b) => (b as { type: "text"; text: string }).text)
     .join("");
 
-  // Join all [[SPLIT]] bubbles into one reply for the test chat
-  const reply = raw.split("[[SPLIT]]").map((s) => s.trim()).filter(Boolean).join("\n\n");
+  const bubbles = raw.split("[[SPLIT]]").map((s) => s.trim()).filter(Boolean);
 
-  return NextResponse.json({ reply });
+  return NextResponse.json({ reply: bubbles[0], bubbles });
 }

@@ -49,9 +49,10 @@ export default function TestChat() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message: text, history: next, sessionId, k: ACCESS_KEY }),
       });
-      const data = await res.json() as { reply?: string; error?: string };
-      const reply = data.reply ?? "…";
-      setMsgs([...next, { role: "ai", content: reply }]);
+      const data = await res.json() as { reply?: string; bubbles?: string[]; error?: string };
+      const bubbles = data.bubbles?.length ? data.bubbles : [data.reply ?? "…"];
+      const aiMsgs: Msg[] = bubbles.map((b) => ({ role: "ai" as const, content: b }));
+      setMsgs([...next, ...aiMsgs]);
     } catch {
       setMsgs([...next, { role: "ai", content: "(fel — försök igen)" }]);
     }
