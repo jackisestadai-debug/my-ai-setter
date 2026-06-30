@@ -1450,7 +1450,6 @@ gl_FragColor=vec4(col,a);}`;
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
           {!hideTabs.has("crm") && <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>}
           {!hideTabs.has("kalender") && <button className={`hq-tab ${tab === "kalender" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("kalender")}>KALENDER</button>}
-          {!hideTabs.has("noter") && <button className={`hq-tab ${tab === "noter" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("noter")}>NOTER</button>}
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
       </header>
@@ -1493,60 +1492,86 @@ gl_FragColor=vec4(col,a);}`;
         </div>
       )}
 
-      {tab === "dashboard" && <div className="hq-frame"><iframe src={dashboardPath} title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
+      {tab === "dashboard" && (
+        <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+          <div className="hq-frame" style={{ flex: 1 }}>
+            <iframe src={dashboardPath} title={`${BRAND_NAME} Dashboard`} className="hq-iframe" />
+          </div>
+          {!hideTabs.has("noter") && <NotesWidget />}
+        </div>
+      )}
       {tab === "crm" && <div className="hq-frame"><iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" /></div>}
       {tab === "kalender" && <div className="hq-frame"><iframe src={`/kalender?k=${KEY()}`} title="Kalender" className="hq-iframe" /></div>}
-      {tab === "noter" && <NoterTab />}
     </div>
   );
 }
 
-function NoterTab() {
-  const STORAGE_KEY = "rekvo-noter";
-  const [text, setText] = React.useState(() => {
-    if (typeof window === "undefined") return "";
-    return localStorage.getItem(STORAGE_KEY) || "";
-  });
+function NotesWidget() {
+  const [text, setText] = React.useState("");
   const [saved, setSaved] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const k = KEY();
+
+  React.useEffect(() => {
+    fetch(`/api/hq/notes?k=${k}`)
+      .then((r) => r.json())
+      .then((d) => { setText(d.notes ?? ""); setLoaded(true); })
+      .catch(() => setLoaded(true));
+  }, [k]);
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setText(e.target.value);
     setSaved(false);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, e.target.value);
-      setSaved(true);
+      fetch(`/api/hq/notes?k=${k}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: e.target.value }),
+      }).then(() => setSaved(true)).catch(() => setSaved(false));
     }, 800);
   }
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "24px 28px", gap: 12, minHeight: 0 }}>
+    <div style={{
+      width: 260,
+      minWidth: 220,
+      display: "flex",
+      flexDirection: "column",
+      borderLeft: "1px solid rgba(126,184,212,0.1)",
+      padding: "20px 16px",
+      gap: 10,
+      background: "rgba(126,184,212,0.02)",
+    }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ color: "#7eb8d4", fontSize: 11, letterSpacing: "0.1em", fontWeight: 700 }}>IDÉER &amp; ATT GÖRA</span>
-        <span style={{ color: saved ? "rgba(126,184,212,0.4)" : "#7eb8d4", fontSize: 10, letterSpacing: "0.05em" }}>
-          {saved ? "● sparat" : "sparar…"}
+        <span style={{ color: "#7eb8d4", fontSize: 10, letterSpacing: "0.12em", fontWeight: 700 }}>IDÉER &amp; TANKAR</span>
+        <span style={{ color: saved ? "rgba(126,184,212,0.35)" : "#7eb8d4", fontSize: 9, letterSpacing: "0.05em" }}>
+          {!loaded ? "" : saved ? "● sparat" : "sparar…"}
         </span>
       </div>
       <textarea
         value={text}
         onChange={handleChange}
-        placeholder="Skriv idéer, planer, att-göra-listor..."
+        placeholder="Skriv idéer, tankar, att göra..."
         style={{
           flex: 1,
           background: "rgba(126,184,212,0.04)",
-          border: "1px solid rgba(126,184,212,0.15)",
-          borderRadius: 10,
+          border: "1px solid rgba(126,184,212,0.12)",
+          borderRadius: 8,
           color: "#e8e0cc",
-          fontSize: 14,
+          fontSize: 13,
           lineHeight: 1.7,
-          padding: "16px 18px",
+          padding: "12px 14px",
           resize: "none",
           outline: "none",
           fontFamily: "ui-sans-serif, system-ui, sans-serif",
           minHeight: 0,
         }}
       />
+      <p style={{ color: "rgba(126,184,212,0.3)", fontSize: 9, margin: 0, lineHeight: 1.5 }}>
+        Varje måndag skickar Aura en sammanfattning av dina tankar på Telegram.
+      </p>
     </div>
   );
 }
