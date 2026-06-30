@@ -39,17 +39,6 @@ export async function bragCheck(): Promise<void> {
       await logEvent({ client_id: clientId, lead_id: b.lead_id ?? undefined, event_type: "aura_brag", metadata: { ref: `b:${b.id}` } });
     }
 
-    for (const p of pays.data ?? []) {
-      if (done.has(`p:${p.id}`)) continue;
-      let name = "a client";
-      if (p.customer_id) {
-        const { data: c } = await supabase.from("customers").select("name").eq("id", p.customer_id).maybeSingle();
-        name = c?.name || name;
-      }
-      const amt = Number(p.amount) || 0;
-      await sendTelegramPing(`💰 ${name} betalade precis ${amt.toLocaleString("sv-SE")} kr. Pengarna inne. — Aura`);
-      await logEvent({ client_id: clientId, event_type: "aura_brag", metadata: { ref: `p:${p.id}` } });
-    }
   } catch (err) {
     console.error("[brag] check failed:", err);
   }

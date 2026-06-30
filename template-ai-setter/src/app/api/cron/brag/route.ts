@@ -5,7 +5,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { bragCheck } from "@/lib/brag";
-import { briefCheck, dailyCallSheet } from "@/lib/brief";
+import { briefCheck } from "@/lib/brief";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -15,6 +15,6 @@ export async function GET(req: NextRequest) {
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  await Promise.all([bragCheck(), briefCheck(), dailyCallSheet()]);
+  await Promise.all([bragCheck(), briefCheck()]);
   return NextResponse.json({ ok: true });
 }

@@ -217,6 +217,7 @@ const LATE_FOLLOW_ON_WINDOW_MS = 180_000;
 const WHALE_THRESHOLD = 80;
 
 const NO_REPLY_TOKEN = "[[NO_REPLY]]";
+const JACK_HELP_TOKEN = "[[JACK_HELP]]";
 
 const LATE_FOLLOW_ON_INSTRUCTION =
   `LATE MESSAGE JUDGMENT: Your previous reply went out only moments before the lead's newest message — their text may just be the tail end of their last thought, possibly sent before they read your reply. Real people don't answer every single text. Compare the lead's newest message against your last reply and decide: ` +
@@ -839,13 +840,6 @@ async function runReplyGeneration(params: {
       event_type,
       metadata: { lead_hour: leadHourCount, client_hour: clientHourCount },
     });
-    if (!alreadyPinged) {
-      await sendTelegramPing(
-        leadLimited
-          ? `🛑 Setter safety brake: this lead already got ${leadHourCount} AI messages in the last hour, so I'm holding further replies to them for now (protects the IG account from spam flags). They'll get a reply on their next message once it cools down.\n${ghlContactLink(client.ghl_location_id ?? "", lead.ghl_contact_id ?? "")}`
-          : `🛑 Setter safety brake: ${clientHourCount} AI DMs went out in the last hour across all leads — holding replies until volume drops (protects the IG account from spam flags).`
-      );
-    }
     console.log("[webhook] rate-limit hold:", event_type, {
       leadHourCount,
       clientHourCount,
@@ -907,7 +901,7 @@ async function runReplyGeneration(params: {
         const handle = lead.ig_username ? ` (@${lead.ig_username})` : "";
         const link = client.ghl_location_id && lead.ghl_contact_id
           ? `\nJump in: ${ghlContactLink(client.ghl_location_id, lead.ghl_contact_id)}` : "";
-        await sendTelegramPing(`🐳 WHALE in the DMs — ${nm}${handle}\n${resolution.whale.reason} (score ${resolution.whale.score}/100)${link}`);
+        // whale alert removed — Jack doesn't want this notification
       }
     }
 
@@ -1194,6 +1188,21 @@ async function runReplyGeneration(params: {
       metadata: { lead_message: lastMsg.content.slice(0, 140) },
     });
     console.log("[webhook] model chose NO_REPLY for late follow-on — staying silent");
+    return;
+  }
+
+  // --- Jack-help: AI is unsure → ping Jack on Telegram instead of sending to lead ---
+  if (
+    aiResult.reply.includes(JACK_HELP_TOKEN) ||
+    aiResult.raw_response.includes(JACK_HELP_TOKEN)
+  ) {
+    const nm = lead.full_name || lead.ig_username || "okänd lead";
+    const handle = lead.ig_username ? ` (@${lead.ig_username})` : "";
+    const lastLeadMsg = [...dbMessages].reverse().find((m) => m.role === "lead")?.content ?? "";
+    const link = client.ghl_location_id && lead.ghl_contact_id
+      ? `\nGHL: ${ghlContactLink(client.ghl_location_id, lead.ghl_contact_id)}` : "";
+    await sendTelegramPing(`❓ Osäker på vad jag ska svara till ${nm}${handle}\n\nDe skrev: "${lastLeadMsg.slice(0, 200)}"\n\nSvara direkt i GHL:${link}`);
+    console.log("[webhook] AI unsure — pinged Jack on Telegram, no reply sent");
     return;
   }
 

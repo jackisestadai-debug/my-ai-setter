@@ -166,18 +166,6 @@ export async function pauseLead(params: {
 
   await Promise.all([dbUpdate, tagAdd]);
 
-  // ALWAYS notify Jack (best-effort — never throws into the caller).
-  try {
-    const label = notify?.label || "AI auto-paused";
-    const reasonLine = notify?.reason ? ` - ${notify.reason}` : "";
-    const link =
-      client.ghl_location_id && lead.ghl_contact_id
-        ? `\nOpen: ${ghlContactLink(client.ghl_location_id, lead.ghl_contact_id)}`
-        : "";
-    await sendTelegramPing(`🔴 ${label}\n${leadName(lead)} (@${leadIg(lead)})${reasonLine}${link}`);
-  } catch (err) {
-    console.error("[screener] pause ping failed:", err);
-  }
 }
 
 // ---------------------------------------------------------------------------
