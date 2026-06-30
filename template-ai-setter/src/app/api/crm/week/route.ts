@@ -1,15 +1,22 @@
 /**
  * GET /api/crm/week?k=<key>
- * Returns activity for the current Mon–Sun week for the requesting client.
+ * Returns activity for the current Mon–Sun week.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, getClientByKey } from "@/lib/supabase";
+import { supabase, getClient } from "@/lib/supabase";
+import { getAccessKey } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
+async function auth(req: NextRequest): Promise<boolean> {
+  const k = req.nextUrl.searchParams.get("k") ?? "";
+  const key = await getAccessKey();
+  return !!key && k === key;
+}
+
 function weekRange() {
   const now = new Date();
-  const day = now.getUTCDay();
+  const day = now.getUTCDay(); // 0=Sun
   const diffToMon = day === 0 ? -6 : 1 - day;
   const mon = new Date(now);
   mon.setUTCDate(now.getUTCDate() + diffToMon);
@@ -20,9 +27,10 @@ function weekRange() {
 }
 
 export async function GET(req: NextRequest) {
-  const k = req.nextUrl.searchParams.get("k") ?? "";
-  const client = await getClientByKey(k);
-  if (!client) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!(await auth(req))) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const client = await getClient();
+  if (!client) return NextResponse.json({ error: "owner not found" }, { status: 500 });
 
   const { from, to } = weekRange();
 

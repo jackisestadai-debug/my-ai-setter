@@ -31,8 +31,6 @@ type Activity = {
   demos_booked: number;
   demos_done: number;
   deals_closed: number;
-  cash_collected: number;
-  contract_value: number;
 };
 
 type Stats = {
@@ -87,7 +85,6 @@ const EMPTY_ACTIVITY: Activity = {
   dials: 0, conversations: 0, pickups: 0, outreaches: 0,
   followups_outreach: 0, followups_dials: 0,
   demos_pitched: 0, demos_booked: 0, demos_done: 0, deals_closed: 0,
-  cash_collected: 0, contract_value: 0,
 };
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
@@ -112,7 +109,6 @@ function displayDate(iso: string) {
 // ── main component ───────────────────────────────────────────────────────────
 
 export default function CrmClient() {
-  const [view, setView] = useState<"tracker" | "log">("tracker");
   const [channel, setChannel] = useState<Channel>("call");
   const [activity, setActivity] = useState<Activity>(EMPTY_ACTIVITY);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -127,11 +123,6 @@ export default function CrmClient() {
   const [addOpen, setAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savingActivity, setSavingActivity] = useState(false);
-
-  // ── log view state ────────────────────────────────────────────────────────
-  const [logDate, setLogDate] = useState(todayIso);
-  const [logActivity, setLogActivity] = useState<Activity | null>(null);
-  const [logLoading, setLogLoading] = useState(false);
 
   const actSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -176,25 +167,10 @@ export default function CrmClient() {
     setLeads(l ?? []);
   }, [api, channel, statusFilter, search]);
 
-  const loadLog = useCallback(async (date: string) => {
-    setLogLoading(true);
-    setLogActivity(null);
-    const r = await api(`/api/crm/activity?date=${date}`);
-    if (r.ok) {
-      const { activity: a } = await r.json();
-      setLogActivity(a ? { ...EMPTY_ACTIVITY, ...a } : EMPTY_ACTIVITY);
-    }
-    setLogLoading(false);
-  }, [api]);
-
   useEffect(() => {
     setLoading(true);
     Promise.all([loadActivity(), loadLeads(), loadStats(), loadWeek()]).finally(() => setLoading(false));
   }, [loadActivity, loadLeads, loadStats, loadWeek]);
-
-  useEffect(() => {
-    if (view === "log") loadLog(logDate);
-  }, [view, logDate, loadLog]);
 
   // ── activity counter: debounced save ─────────────────────────────────────
 
@@ -302,13 +278,10 @@ export default function CrmClient() {
 
   const dmCounters: { key: keyof Activity; label: string }[] = [
     { key: "outreaches", label: "DM Skickade" },
-    { key: "pickups", label: "Svar Mottagna" },
-    { key: "conversations", label: "Konversation Startade" },
+    { key: "followups_outreach", label: "Uppföljningar" },
     { key: "demos_pitched", label: "Demo Pitchade" },
     { key: "demos_booked", label: "Demo Bokade" },
-    { key: "demos_done", label: "Demo Genomförda" },
-    { key: "deals_closed", label: "Avslutade Affärer" },
-    { key: "followups_outreach", label: "Uppföljningar" },
+    { key: "deals_closed", label: "Avslutade" },
   ];
 
   const counters = channel === "call" ? callCounters : dmCounters;
@@ -324,18 +297,18 @@ export default function CrmClient() {
         {savingActivity && <span style={S.savingDot} title="sparar..." />}
       </div>
 
-      {/* top-level tabs */}
+      {/* channel tabs */}
       <div style={S.tabs}>
-        <button style={{ ...S.tab, ...(view === "tracker" && channel === "call" ? S.tabActive : {}) }} onClick={() => { setView("tracker"); setChannel("call"); }}>TELEFON</button>
-        <button style={{ ...S.tab, ...(view === "tracker" && channel === "dm" ? S.tabActive : {}) }} onClick={() => { setView("tracker"); setChannel("dm"); }}>INSTAGRAM DM</button>
-        <button style={{ ...S.tab, ...(view === "log" ? S.tabActive : {}) }} onClick={() => setView("log")}>HISTORIK</button>
+        {(["call", "dm"] as Channel[]).map((c) => (
+          <button
+            key={c}
+            style={{ ...S.tab, ...(channel === c ? S.tabActive : {}) }}
+            onClick={() => setChannel(c)}
+          >
+            {c === "call" ? "TELEFON" : "INSTAGRAM DM"}
+          </button>
+        ))}
       </div>
-
-      {view === "log" && (
-        <LogView date={logDate} onDateChange={setLogDate} activity={logActivity} loading={logLoading} />
-      )}
-
-      {view === "tracker" && <>
 
       {/* daily tracker */}
       <div style={S.section}>
@@ -374,57 +347,6 @@ export default function CrmClient() {
             />
           ))}
         </div>
-
-        {channel === "dm" && (
-          <div style={S.financeRow}>
-            <div style={S.financeField}>
-              <div style={S.financeLabel}>Inkasserat Belopp (SEK)</div>
-              <input
-                type="number"
-                min={0}
-                style={S.financeInput}
-                value={activity.cash_collected || ""}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value) || 0;
-                  setActivity((prev) => ({ ...prev, cash_collected: v }));
-                }}
-                onBlur={() => {
-                  if (actSaveTimer.current) clearTimeout(actSaveTimer.current);
-                  setSavingActivity(true);
-                  api("/api/crm/activity", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...activity, date: todayIso() }),
-                  }).finally(() => setSavingActivity(false));
-                }}
-                placeholder="0"
-              />
-            </div>
-            <div style={S.financeField}>
-              <div style={S.financeLabel}>Kontraktsvärde (SEK)</div>
-              <input
-                type="number"
-                min={0}
-                style={S.financeInput}
-                value={activity.contract_value || ""}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value) || 0;
-                  setActivity((prev) => ({ ...prev, contract_value: v }));
-                }}
-                onBlur={() => {
-                  if (actSaveTimer.current) clearTimeout(actSaveTimer.current);
-                  setSavingActivity(true);
-                  api("/api/crm/activity", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...activity, date: todayIso() }),
-                  }).finally(() => setSavingActivity(false));
-                }}
-                placeholder="0"
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* weekly view */}
@@ -557,13 +479,11 @@ export default function CrmClient() {
           </select>
         </div>
 
-        {/* needs followup panel */}
+        {/* needs followup banner */}
         {visibleLeads.filter((l) => l.needs_followup).length > 0 && (
-          <FollowupPanel
-            leads={visibleLeads.filter((l) => l.needs_followup)}
-            onOpen={(lead) => setModal(lead)}
-            apiKey={KEY()}
-          />
+          <div style={S.followupBanner}>
+            {visibleLeads.filter((l) => l.needs_followup).length} lead(s) behöver uppföljning
+          </div>
         )}
 
         {/* lead list */}
@@ -585,14 +505,11 @@ export default function CrmClient() {
         <a href={`/hq?k=${KEY()}`} style={S.hqLink}>← Tillbaka till HQ</a>
       </div>
 
-      </>}
-
       {/* lead detail modal */}
       {modal && (
         <LeadModal
           lead={modal}
           saving={saving}
-          apiKey={KEY()}
           onUpdate={(patch) => updateLead(modal.id, patch)}
           onDelete={() => deleteLead(modal.id)}
           onClose={() => setModal(null)}
@@ -610,90 +527,6 @@ export default function CrmClient() {
       )}
 
       <CrmStyles />
-    </div>
-  );
-}
-
-// ── LogView component ─────────────────────────────────────────────────────────
-
-const LOG_ROWS: { key: keyof Activity; label: string; isMoney?: boolean }[] = [
-  { key: "dials", label: "Samtal Ringda" },
-  { key: "pickups", label: "Svar" },
-  { key: "conversations", label: "Samtal Startade" },
-  { key: "outreaches", label: "DM Skickade" },
-  { key: "followups_outreach", label: "Uppföljningar DM" },
-  { key: "followups_dials", label: "Uppföljningar Telefon" },
-  { key: "demos_pitched", label: "Demo Pitchade" },
-  { key: "demos_booked", label: "Demo Bokade" },
-  { key: "demos_done", label: "Demo Genomförda" },
-  { key: "deals_closed", label: "Avslutade Affärer" },
-  { key: "cash_collected", label: "Inkasserat Belopp", isMoney: true },
-  { key: "contract_value", label: "Kontraktsvärde", isMoney: true },
-];
-
-function LogView({
-  date, onDateChange, activity, loading,
-}: {
-  date: string;
-  onDateChange: (d: string) => void;
-  activity: Activity | null;
-  loading: boolean;
-}) {
-  const MUTED = "rgba(232,224,204,0.35)";
-  const CARD = "rgba(255,255,255,0.04)";
-  const BORDER = "rgba(126,184,212,0.12)";
-  const G = "#c9a84c";
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => onDateChange(e.target.value)}
-          style={{
-            background: CARD,
-            border: `1px solid ${BORDER}`,
-            borderRadius: 8,
-            color: "#e8e0cc",
-            fontSize: 14,
-            padding: "8px 12px",
-            outline: "none",
-            colorScheme: "dark",
-          }}
-        />
-        <span style={{ fontSize: 11, color: MUTED }}>
-          {new Date(date + "T12:00:00").toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" })}
-        </span>
-      </div>
-
-      {loading ? (
-        <div style={{ color: MUTED, fontSize: 13, padding: "20px 0" }}>Laddar…</div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          {LOG_ROWS.map(({ key, label, isMoney }) => {
-            const val = activity?.[key] ?? 0;
-            const hasVal = val > 0;
-            return (
-              <div
-                key={key}
-                style={{
-                  background: CARD,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 8,
-                  padding: "10px 12px",
-                  opacity: hasVal ? 1 : 0.45,
-                }}
-              >
-                <div style={{ fontSize: 10, color: MUTED, letterSpacing: "0.06em", marginBottom: 4 }}>{label}</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: hasVal ? G : "#e8e0cc" }}>
-                  {isMoney && hasVal ? val.toLocaleString("sv-SE") + " kr" : val}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
@@ -751,76 +584,13 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
   );
 }
 
-// ── FollowupPanel component ───────────────────────────────────────────────────
-
-function FollowupPanel({ leads, onOpen, apiKey }: { leads: Lead[]; onOpen: (l: Lead) => void; apiKey: string }) {
-  const [suggestions, setSuggestions] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState<Record<string, boolean>>({});
-
-  const fetchOne = async (lead: Lead) => {
-    setLoading((p) => ({ ...p, [lead.id]: true }));
-    try {
-      const r = await fetch(`/api/crm/suggest?k=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lead }),
-      });
-      const { suggestion } = await r.json();
-      setSuggestions((p) => ({ ...p, [lead.id]: suggestion ?? "—" }));
-    } catch {
-      setSuggestions((p) => ({ ...p, [lead.id]: "Fel vid hämtning." }));
-    }
-    setLoading((p) => ({ ...p, [lead.id]: false }));
-  };
-
-  useEffect(() => {
-    leads.slice(0, 5).forEach(fetchOne);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const MUTED = "rgba(232,224,204,0.35)";
-  const G = "#c9a84c";
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 4 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: MUTED }}>UPPFÖLJNING</div>
-      {leads.map((lead) => (
-        <div
-          key={lead.id}
-          style={{
-            background: "rgba(201,168,76,0.07)",
-            border: "1px solid rgba(201,168,76,0.25)",
-            borderRadius: 10,
-            padding: "10px 14px",
-            cursor: "pointer",
-          }}
-          onClick={() => onOpen(lead)}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#e8e0cc" }}>
-              {lead.company_name || lead.full_name || "Okänd"}
-            </span>
-            <span style={{ fontSize: 10, color: G, fontWeight: 700, letterSpacing: "0.08em" }}>
-              {lead.status === "engaged" ? "KONTAKT" : lead.status === "booked" ? "BOKAD" : lead.status.toUpperCase()}
-            </span>
-          </div>
-          <div style={{ fontSize: 12, color: loading[lead.id] ? MUTED : "#c9a84c", fontStyle: loading[lead.id] ? "italic" : "normal" }}>
-            {loading[lead.id] ? "AI tänker…" : suggestions[lead.id] ?? "—"}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ── LeadModal component ───────────────────────────────────────────────────────
 
 function LeadModal({
-  lead, saving, apiKey, onUpdate, onDelete, onClose,
+  lead, saving, onUpdate, onDelete, onClose,
 }: {
   lead: Lead;
   saving: boolean;
-  apiKey: string;
   onUpdate: (patch: Partial<Lead>) => void;
   onDelete: () => void;
   onClose: () => void;
@@ -837,25 +607,6 @@ function LeadModal({
     demo_date: lead.demo_date || "",
   });
   const [dirty, setDirty] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-
-  const fetchSuggestion = async () => {
-    setAiLoading(true);
-    setAiSuggestion(null);
-    try {
-      const r = await fetch(`/api/crm/suggest?k=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lead }),
-      });
-      const { suggestion } = await r.json();
-      setAiSuggestion(suggestion ?? "Kunde inte generera förslag.");
-    } catch {
-      setAiSuggestion("Något gick fel.");
-    }
-    setAiLoading(false);
-  };
 
   const set = (k: string, v: unknown) => {
     setForm((p) => ({ ...p, [k]: v }));
@@ -937,31 +688,6 @@ function LeadModal({
             />
             <span style={{ marginLeft: 8 }}>Behöver uppföljning</span>
           </label>
-
-          {/* AI suggestion */}
-          <div style={{ marginTop: 8 }}>
-            <button
-              style={S.aiBtn}
-              onClick={fetchSuggestion}
-              disabled={aiLoading}
-            >
-              {aiLoading ? "Tänker…" : "✦ AI-förslag på nästa steg"}
-            </button>
-            {aiSuggestion && (
-              <div style={S.aiBox}>
-                <div style={S.aiText}>{aiSuggestion}</div>
-                <button
-                  style={S.aiUseBtn}
-                  onClick={() => {
-                    set("next_step", aiSuggestion);
-                    setAiSuggestion(null);
-                  }}
-                >
-                  Använd som nästa steg
-                </button>
-              </div>
-            )}
-          </div>
 
           <div style={S.modalActions}>
             <button
@@ -1165,31 +891,6 @@ const S: Record<string, React.CSSProperties> = {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
     gap: 8,
-  },
-  financeRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 8,
-    marginTop: 8,
-  },
-  financeField: {
-    background: CARD,
-    border: `1px solid ${BORDER}`,
-    borderRadius: 8,
-    padding: "10px 12px",
-  },
-  financeLabel: { fontSize: 10, color: MUTED, letterSpacing: "0.06em", marginBottom: 6 },
-  financeInput: {
-    width: "100%",
-    background: "transparent",
-    border: "none",
-    borderBottom: `1px solid ${BORDER}`,
-    color: "#e8e0cc",
-    fontSize: 20,
-    fontWeight: 700,
-    outline: "none",
-    padding: "2px 0",
-    boxSizing: "border-box" as const,
   },
   counter: {
     background: CARD,
@@ -1412,42 +1113,6 @@ const S: Record<string, React.CSSProperties> = {
     fontFamily: "inherit",
     fontSize: 13,
     cursor: "pointer",
-  },
-  aiBtn: {
-    width: "100%",
-    padding: "10px",
-    background: "rgba(126,184,212,0.1)",
-    color: "#7eb8d4",
-    border: "1px solid rgba(126,184,212,0.3)",
-    borderRadius: 8,
-    fontFamily: "inherit",
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-    letterSpacing: "0.04em",
-  },
-  aiBox: {
-    marginTop: 8,
-    background: "rgba(126,184,212,0.07)",
-    border: "1px solid rgba(126,184,212,0.2)",
-    borderRadius: 8,
-    padding: "10px 12px",
-  },
-  aiText: {
-    fontSize: 13,
-    color: "#7eb8d4",
-    lineHeight: 1.5,
-    marginBottom: 8,
-  },
-  aiUseBtn: {
-    fontSize: 11,
-    color: "#7eb8d4",
-    background: "transparent",
-    border: "1px solid rgba(126,184,212,0.3)",
-    borderRadius: 6,
-    padding: "4px 10px",
-    cursor: "pointer",
-    fontFamily: "inherit",
   },
   modalMeta: {
     fontSize: 10,
