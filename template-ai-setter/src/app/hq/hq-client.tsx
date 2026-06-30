@@ -37,6 +37,13 @@
 
 import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+/** Optional per-deployment overrides — pass from a wrapper page to customise
+ *  without touching the owner client. Omit for the default Rekvo setup. */
+export interface HqConfig {
+  brandName?: string;
+  apiBase?: string; // e.g. "/api/klinik-demo"
+}
+
 interface SR {
   continuous: boolean; interimResults: boolean; lang: string;
   onresult: ((e: SREvent) => void) | null; onend: (() => void) | null; onerror: ((e: { error: string }) => void) | null;
@@ -51,8 +58,8 @@ function getSR(): SR | null {
   try { return new C(); } catch { return null; }
 }
 
-/** Dashboard brand name (tab label + iframe title). Set NEXT_PUBLIC_BRAND_NAME in env. */
-const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "REKVO";
+/** Dashboard brand name resolved at runtime (see HqConfig). */
+const DEFAULT_BRAND = process.env.NEXT_PUBLIC_BRAND_NAME || "REKVO";
 
 type Tab = "aura" | "dashboard" | "crm" | "kalender" | "noter";
 type OrbState = "idle" | "listening" | "thinking" | "speaking" | "asleep";
@@ -207,9 +214,13 @@ class Boundary extends Component<{ children: ReactNode }, { broken: boolean }> {
   }
 }
 
-export default function HqClient() { return <Boundary><Hq /><HqStyles /></Boundary>; }
+export default function HqClient({ config }: { config?: HqConfig } = {}) {
+  return <Boundary><Hq config={config} /><HqStyles /></Boundary>;
+}
 
-function Hq() {
+function Hq({ config }: { config?: HqConfig } = {}) {
+  const BRAND_NAME = config?.brandName ?? DEFAULT_BRAND;
+  const apiBase = config?.apiBase ?? "/api/hq";
   const [tab, setTab] = useState<Tab>("aura");
   const [online, setOnline] = useState(false);
   const [orb, setOrb] = useState<OrbState>("idle");
@@ -976,7 +987,7 @@ gl_FragColor=vec4(col,a);}`;
     const after = onDone ?? (() => { bump(); beginCaptureRef.current(); });
     // stream straight from the GET endpoint: he starts TALKING as soon as the
     // first audio chunks arrive instead of waiting for the full mp3
-    const url = `/api/hq/speak?k=${encodeURIComponent(key)}&text=${encodeURIComponent(text.slice(0, 1900))}`;
+    const url = `${apiBase}/speak?k=${encodeURIComponent(key)}&text=${encodeURIComponent(text.slice(0, 1900))}`;
     await playTts(url, after, () => { setNote("röst ej ansluten ännu"); setOrb("idle"); startMic(); });
   }, [bump, playTts, startMic]);
 
@@ -1167,7 +1178,7 @@ gl_FragColor=vec4(col,a);}`;
     if (ackCat) ackTimer.current = setTimeout(() => playAck(ackCat), ACK_AFTER_MS);
     histRef.current.push({ role: "user", content: msg });
     try {
-      const res = await fetch(`/api/hq/chat?k=${encodeURIComponent(key)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ message: msg, history: histRef.current.slice(-8), demo: demoRef.current }) });
+      const res = await fetch(`${apiBase}/chat?k=${encodeURIComponent(key)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ message: msg, history: histRef.current.slice(-8), demo: demoRef.current }) });
       const data = (await res.json()) as { speech?: string; panels?: Panel[]; clear?: boolean; rings?: boolean; power?: "sleep" | "off" | null; demo?: boolean | null; theme?: string | null; demoChat?: boolean; pitch?: boolean };
       if (ackTimer.current) clearTimeout(ackTimer.current);
       try { ackAudioRef.current?.pause(); } catch { /* */ }
@@ -1262,7 +1273,7 @@ gl_FragColor=vec4(col,a);}`;
     const key = keyRef.current; if (!key) { greetUrl.current = null; return; }
     greetUrl.current = (async () => {
       try {
-        const res = await fetch(`/api/hq/speak?k=${encodeURIComponent(key)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: nextGreeting() }) });
+        const res = await fetch(`${apiBase}/speak?k=${encodeURIComponent(key)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: nextGreeting() }) });
         if (!res.ok) return null;
         return URL.createObjectURL(await res.blob());
       } catch { return null; }
@@ -1291,7 +1302,7 @@ gl_FragColor=vec4(col,a);}`;
     if (!ackUrls.current.ask.length && keyRef.current) {
       (["ask", "act"] as const).forEach((cat) => ACK_SETS[cat].forEach(async (line) => {
         try {
-          const res = await fetch(`/api/hq/speak?k=${encodeURIComponent(keyRef.current)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: line }) });
+          const res = await fetch(`${apiBase}/speak?k=${encodeURIComponent(keyRef.current)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: line }) });
           if (res.ok) ackUrls.current[cat].push(URL.createObjectURL(await res.blob()));
         } catch { /* acks are a bonus */ }
       }));
@@ -1348,7 +1359,7 @@ gl_FragColor=vec4(col,a);}`;
     const tick = async () => {
       const key = keyRef.current; if (!key || demoRef.current) return; // demo: never poll real data
       try {
-        const res = await fetch(`/api/hq/pulse?k=${encodeURIComponent(key)}&since=${encodeURIComponent(lastPulseRef.current)}`);
+        const res = await fetch(`${apiBase}/pulse?k=${encodeURIComponent(key)}&since=${encodeURIComponent(lastPulseRef.current)}`);
         if (!res.ok) return;
         const d = (await res.json()) as { now?: string; ring?: Ring; recent?: { t: string; at: string; amount?: number }[] };
         if (d.now) lastPulseRef.current = d.now;
@@ -1420,7 +1431,7 @@ gl_FragColor=vec4(col,a);}`;
           </div>
         </div>
       )}
-      {demoChatOpen && <DemoDM accessKey={keyRef.current} onClose={() => { setDemoChatOpen(false); autoConvRef.current = false; setAutoConvMsgs([]); }} onTick={() => sfx("tick")} autoMsgs={autoConvMsgs} />}
+      {demoChatOpen && <DemoDM accessKey={keyRef.current} apiBase={apiBase} onClose={() => { setDemoChatOpen(false); autoConvRef.current = false; setAutoConvMsgs([]); }} onTick={() => sfx("tick")} autoMsgs={autoConvMsgs} />}
       <HudStatus online={online} asleep={asleep} ringRef={ringRef} />
 
       <header className="hq-top">
@@ -1579,7 +1590,7 @@ function HudStatus({ online, asleep, ringRef }: { online: boolean; asleep: boole
 
 /** LIVE DEMO SETTER — a draggable IG-style chat. Jack (or a prospect) types
  *  as the lead; the real AI setter persona replies. Pure showcase. */
-function DemoDM({ accessKey, onClose, onTick, autoMsgs }: { accessKey: string; onClose: () => void; onTick?: () => void; autoMsgs?: { role: "lead" | "setter"; text: string }[] }) {
+function DemoDM({ accessKey, apiBase, onClose, onTick, autoMsgs }: { accessKey: string; apiBase: string; onClose: () => void; onTick?: () => void; autoMsgs?: { role: "lead" | "setter"; text: string }[] }) {
   const [msgs, setMsgs] = useState<{ role: "lead" | "setter"; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1606,7 +1617,7 @@ function DemoDM({ accessKey, onClose, onTick, autoMsgs }: { accessKey: string; o
     const next = [...msgs, { role: "lead" as const, text }];
     setMsgs(next); setInput(""); setBusy(true); onTick?.();
     try {
-      const res = await fetch(`/api/hq/demo-dm?k=${encodeURIComponent(accessKey)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ history: next.map((m) => ({ role: m.role, content: m.text })) }) });
+      const res = await fetch(`${apiBase}/demo-dm?k=${encodeURIComponent(accessKey)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ history: next.map((m) => ({ role: m.role, content: m.text })) }) });
       const data = (await res.json()) as { messages?: string[] };
       const bubbles = (data.messages ?? []).filter(Boolean);
       for (let i = 0; i < bubbles.length; i++) {
