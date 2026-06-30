@@ -158,7 +158,7 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
           }
           await supabase.from("follow_up_log").update({ status: "sent", message: text, ghl_message_id: res.ghl_message_id, sent_at: new Date().toISOString() }).eq("id", row.id);
           await saveMessage({ lead_id: lead.id, client_id: client.id, role: "ai", content: text, channel: "instagram", ghl_message_id: res.ghl_message_id, model_used: "followup_engine" });
-          await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "follow_up_sent", metadata: { bucket, attempt, stage } });
+          await logEvent({ client_id: client.id, lead_id: lead.id, event_type: "follow_up_sent", metadata: { bucket: "A", attempt, stage } });
           sent++;
         } catch (e) {
           console.error("[followups] lead failed:", leadRow.id, e);
