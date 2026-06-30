@@ -20,10 +20,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { supabase, logEvent, saveMessage, eventExists, type Lead } from "./supabase";
 import { sendGHLMessage } from "./ghl";
 
-const STAGES_A = ["opener_sequence"];
-const STAGES_B = ["demo_response", "book"];
-const OFFSETS_H = { A: [24, 72, 168], B: [0.5, 24, 72] }; // hours from the stall anchor
-const MIN_GAP_H = 20;   // HARD floor: never two follow-ups to the same lead within 20h (kills any "ding-ding-ding")
+const ACTIVE_STAGES = ["opener_sequence", "demo_response", "book", "post_book", "proof"];
+const OFFSETS_H = [24, 72, 168]; // 24h → 3d → 7d
+const MIN_GAP_H = 20;
 const MAX_PER_RUN = 25; // global cap per tick — a surge drips over ticks, never blasts
 
 interface FUClient { id: string; enabledAt: number; ghl_api_key: string | null; ghl_location_id: string | null; voice_samples: string | null; business_context: string | null }
@@ -44,21 +43,15 @@ async function enabledFollowupClients(): Promise<FUClient[]> {
 
 
 const TONE: Record<string, string> = {
-  A1: "Avslappnat ping. Referera naturligt till vad som sades senast i konversationen. Kort, en mening.",
-  A2: "Lite mer direkt. Fråga om tajmingen är fel eller om de har frågor om det vi pratade om. Kort.",
-  A3: "Sista pingen. Ingen press. Lämna dörren öppen på ett avslappnat sätt. En-två meningar max.",
-  B1: "Kolla om de hann titta på demot. Nyfiken ton, inga förväntningar. Kort.",
-  B2: "Fråga vad som stoppar dem. Referera till demot de sett. Mjukt och direkt.",
-  B3: "Sista chansen. Nämn att de inte riskerar något och att det är gratis i 7 dagar. Ingen press men tydlig.",
+  A1: "Avslappnat ping efter 24h tystnad. Referera naturligt till vad som sades senast. Kort, en mening.",
+  A2: "Lite mer direkt efter 3 dagars tystnad. Fråga om tajmingen är fel eller om de har frågor. Kort.",
+  A3: "Sista pingen efter 7 dagar. Ingen press. Lämna dörren öppen på ett avslappnat sätt. En-två meningar.",
 };
 
 const FALLBACK: Record<string, string> = {
   A1: "hej, hörde aldrig av er — fortfarande aktuellt?",
   A2: "bara ett snabbt ping — är tajmingen fel eller har ni frågor?",
-  A3: "inga problem om det inte passar just nu, hör av er om det ändras",
-  B1: "hann ni kika på demot?",
-  B2: "kollar in — är det något ni undrar över efter demot?",
-  B3: "sista försöket härifrån — ni riskerar ingenting, 7 dagar gratis och ni betalar bara om ni är nöjda. lmk",
+  A3: "inga problem om det inte passar just nu, hör av er om det ändras 🙏",
 };
 
 async function generateFollowup(client: FUClient, leadId: string, slotKey: string): Promise<string> {
@@ -100,7 +93,7 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
   try {
     const clients = await enabledFollowupClients();
     if (!clients.length) return { enabled: 0, sent: 0 };
-    const minQuietMs = 25 * 60_000; // smallest cadence is B#1 at 30min — candidates must be quiet ≥25m
+    const minQuietMs = 23 * 3_600_000; // first follow-up at 24h — skip leads quieter than 23h
     const now = Date.now();
 
     for (const client of clients) {
@@ -108,7 +101,7 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
       const { data: leads } = await supabase.from("leads").select("*")
         .eq("client_id", client.id).eq("status", "engaged")
         .eq("ai_paused", false).eq("followup_paused", false)
-        .in("funnel_stage", [...STAGES_A, ...STAGES_B])
+        .in("funnel_stage", ACTIVE_STAGES)
         .lt("last_message_at", new Date(now - minQuietMs).toISOString())
         .order("last_message_at", { ascending: true }).limit(60);
 
@@ -134,14 +127,12 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
           const quietH = (now - anchorMs) / 3_600_000;
 
           const stage = lead.funnel_stage || "";
-          const bucket: "A" | "B" = STAGES_B.includes(stage) ? "B" : "A";
-          const offsets = OFFSETS_H[bucket];
 
           const { data: prior } = await supabase.from("follow_up_log").select("attempt, anchor, sent_at, status").eq("lead_id", lead.id);
           const rows = (prior ?? []) as { attempt: number; anchor: string; sent_at: string | null; status: string }[];
           const attemptsSent = rows.filter((r) => r.anchor === anchorIso).length;
           if (attemptsSent >= 3) continue; // exhausted this stall
-          if (quietH < offsets[attemptsSent]) continue; // not due yet
+          if (quietH < OFFSETS_H[attemptsSent]) continue; // not due yet
           // HARD anti-burst: never a 2nd follow-up to this lead within MIN_GAP_H,
           // no matter how "overdue" the math says they are. Spaces every touch.
           const lastSentMs = rows.filter((r) => r.status === "sent" && r.sent_at).map((r) => new Date(r.sent_at as string).getTime()).sort((a, b) => b - a)[0];
@@ -151,13 +142,13 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
           const attempt = attemptsSent + 1;
           // CLAIM atomically — unique (lead_id, anchor, attempt). Empty insert = another tick owns it.
           const { data: claimed } = await supabase.from("follow_up_log").upsert(
-            { client_id: client.id, lead_id: lead.id, ghl_contact_id: lead.ghl_contact_id, bucket, attempt, anchor: anchorIso, stage_at_stall: stage, status: "sending" },
+            { client_id: client.id, lead_id: lead.id, ghl_contact_id: lead.ghl_contact_id, bucket: "A", attempt, anchor: anchorIso, stage_at_stall: stage, status: "sending" },
             { onConflict: "lead_id,anchor,attempt", ignoreDuplicates: true }
           ).select("id");
           const row = (claimed ?? [])[0] as { id: string } | undefined;
           if (!row) continue;
 
-          const slotKey = `${bucket}${attempt}`;
+          const slotKey = `A${attempt}`;
           const text = await generateFollowup(client, lead.id, slotKey);
 
           const res = await sendGHLMessage({ ghl_api_key: client.ghl_api_key, ghl_location_id: client.ghl_location_id, ghl_contact_id: lead.ghl_contact_id, message: text, type: "IG" });
