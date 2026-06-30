@@ -59,13 +59,16 @@ export async function POST(req: NextRequest) {
     content: "Hej, har ni några lediga tider nångån kommande 1-2 veckor?",
   });
 
-  // history already includes the new message at the end (page.tsx appends
-  // before calling the API), so just map it — no need to add message again.
+  // Build history — merge consecutive ai messages (from [[SPLIT]] bubbles) into
+  // one assistant turn so Claude API gets valid alternating user/assistant turns.
   for (const m of history) {
-    if (m.role === "lead" || m.role === "user") {
-      messages.push({ role: "user", content: m.content });
-    } else if (m.role === "ai" || m.role === "assistant") {
-      messages.push({ role: "assistant", content: m.content });
+    const role = (m.role === "lead" || m.role === "user") ? "user" : "assistant";
+    const last = messages[messages.length - 1];
+    if (last && last.role === role) {
+      // Merge consecutive same-role messages
+      last.content = (last.content as string) + "\n\n" + m.content;
+    } else {
+      messages.push({ role, content: m.content });
     }
   }
 
