@@ -42,6 +42,7 @@ import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, u
 export interface HqConfig {
   brandName?: string;
   apiBase?: string; // e.g. "/api/klinik-demo"
+  dashboardPath?: string; // e.g. "/klinik-demo/dashboard"
 }
 
 interface SR {
@@ -221,6 +222,7 @@ export default function HqClient({ config }: { config?: HqConfig } = {}) {
 function Hq({ config }: { config?: HqConfig } = {}) {
   const BRAND_NAME = config?.brandName ?? DEFAULT_BRAND;
   const apiBase = config?.apiBase ?? "/api/hq";
+  const dashboardPath = config?.dashboardPath ?? "/dashboard";
   const [tab, setTab] = useState<Tab>("aura");
   const [online, setOnline] = useState(false);
   const [orb, setOrb] = useState<OrbState>("idle");
@@ -1486,7 +1488,7 @@ gl_FragColor=vec4(col,a);}`;
         </div>
       )}
 
-      {tab === "dashboard" && <div className="hq-frame"><iframe src="/dashboard" title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
+      {tab === "dashboard" && <div className="hq-frame"><iframe src={dashboardPath} title={`${BRAND_NAME} Dashboard`} className="hq-iframe" /></div>}
       {tab === "crm" && <div className="hq-frame"><iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" /></div>}
       {tab === "kalender" && <div className="hq-frame"><iframe src={`/kalender?k=${KEY()}`} title="Kalender" className="hq-iframe" /></div>}
       {tab === "noter" && <NoterTab />}
