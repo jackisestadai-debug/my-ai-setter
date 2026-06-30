@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     },
     undefined,
     undefined,
-    undefined
+    "TESTLÄGE: Fullfölja hela din tanke i varje svar. Använd inte cliffhangers eller ofullständiga meningar som slutar med '...' — säg allt du vill säga i ett sammanhängande svar."
   );
 
   const systemPrompt = [stable, volatile].filter(Boolean).join("\n\n");
