@@ -565,20 +565,20 @@ function Counter({
 
 function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
   const name = lead.company_name || lead.full_name || lead.ig_username || "Okänd";
-  const sub = lead.company_name ? (lead.full_name || lead.phone || lead.ig_username) : (lead.phone || lead.ig_username);
+  const contact = lead.company_name ? lead.full_name : null;
 
   return (
     <div style={{ ...S.card, ...(lead.needs_followup ? S.cardFollowup : {}) }} onClick={onClick}>
       <div style={S.cardLeft}>
         <div style={S.cardName}>{name}</div>
-        {sub && <div style={S.cardSub}>{sub}</div>}
+        {contact && <div style={S.cardSub}>{contact}</div>}
+        {lead.phone && <div style={{ ...S.cardSub, color: G, letterSpacing: "0.04em" }}>{lead.phone}</div>}
         {lead.next_step && <div style={S.cardNextStep}>→ {lead.next_step}</div>}
       </div>
       <div style={S.cardRight}>
         <span style={{ ...S.statusChip, background: STATUS_COLORS[lead.status] || "#4a90b8" }}>
           {STATUS_LABELS[lead.status as LeadStatus] || lead.status}
         </span>
-        {lead.needs_followup && <span style={S.followupDot} title="Behöver uppföljning" />}
       </div>
     </div>
   );
@@ -599,41 +599,43 @@ function LeadModal({
     company_name: lead.company_name || "",
     full_name: lead.full_name || "",
     phone: lead.phone || "",
-    ig_username: lead.ig_username || "",
+    email: lead.email || "",
     status: lead.status,
     next_step: lead.next_step || "",
     crm_notes: lead.crm_notes || "",
-    needs_followup: lead.needs_followup,
-    demo_date: lead.demo_date || "",
   });
-  const [dirty, setDirty] = useState(false);
+  const dirty = useRef(false);
 
   const set = (k: string, v: unknown) => {
+    dirty.current = true;
     setForm((p) => ({ ...p, [k]: v }));
-    setDirty(true);
   };
 
   const save = () => {
+    if (!dirty.current) return;
     onUpdate({
       company_name: form.company_name || null,
       full_name: form.full_name || null,
       phone: form.phone || null,
-      ig_username: form.ig_username || null,
+      email: form.email || null,
       status: form.status,
       next_step: form.next_step || null,
       crm_notes: form.crm_notes || null,
-      needs_followup: form.needs_followup,
-      demo_date: form.demo_date || null,
     } as Partial<Lead>);
-    setDirty(false);
+    dirty.current = false;
   };
 
+  const handleClose = () => { save(); onClose(); };
+
   return (
-    <div style={S.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div style={S.overlay} onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
       <div style={S.modalBox}>
         <div style={S.modalHeader}>
           <span style={S.modalTitle}>{lead.company_name || lead.full_name || "Lead"}</span>
-          <button style={S.closeBtn} onClick={onClose}>✕</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {saving && <span style={{ fontSize: 11, color: MUTED }}>Sparar…</span>}
+            <button style={S.closeBtn} onClick={handleClose}>✕</button>
+          </div>
         </div>
 
         <div style={S.modalBody}>
@@ -643,30 +645,22 @@ function LeadModal({
           <Label>Kontaktperson</Label>
           <Input value={form.full_name} onChange={(v) => set("full_name", v)} placeholder="Namn" />
 
-          <Label>Telefon</Label>
+          <Label>Telefonnummer</Label>
           <Input value={form.phone} onChange={(v) => set("phone", v)} placeholder="+46 70 000 00 00" type="tel" />
 
-          <Label>Instagram</Label>
-          <Input value={form.ig_username} onChange={(v) => set("ig_username", v)} placeholder="@username" />
+          <Label>Mail</Label>
+          <Input value={form.email} onChange={(v) => set("email", v)} placeholder="namn@foretag.se" type="email" />
 
           <Label>Status</Label>
           <select
             style={S.modalSelect}
             value={form.status}
-            onChange={(e) => set("status", e.target.value)}
+            onChange={(e) => { set("status", e.target.value); }}
           >
             {(Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => (
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
             ))}
           </select>
-
-          <Label>Demo-datum</Label>
-          <input
-            style={S.modalInput}
-            type="date"
-            value={form.demo_date}
-            onChange={(e) => { set("demo_date", e.target.value); }}
-          />
 
           <Label>Nästa steg</Label>
           <Input value={form.next_step} onChange={(v) => set("next_step", v)} placeholder="T.ex. Ring igen fredag" />
@@ -677,25 +671,12 @@ function LeadModal({
             value={form.crm_notes}
             onChange={(e) => { set("crm_notes", e.target.value); }}
             placeholder="Vad sa de? Vad är deras problem?"
-            rows={4}
+            rows={5}
           />
 
-          <label style={S.checkRow}>
-            <input
-              type="checkbox"
-              checked={form.needs_followup}
-              onChange={(e) => set("needs_followup", e.target.checked)}
-            />
-            <span style={{ marginLeft: 8 }}>Behöver uppföljning</span>
-          </label>
-
           <div style={S.modalActions}>
-            <button
-              style={{ ...S.saveBtn, opacity: dirty ? 1 : 0.5 }}
-              disabled={!dirty || saving}
-              onClick={save}
-            >
-              {saving ? "Sparar…" : "Spara"}
+            <button style={S.saveBtn} onClick={save}>
+              Spara
             </button>
             <button style={S.deleteBtn} onClick={onDelete}>Ta bort</button>
           </div>
