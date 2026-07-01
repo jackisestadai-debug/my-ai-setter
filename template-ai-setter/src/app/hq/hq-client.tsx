@@ -55,7 +55,7 @@ export interface HqConfig {
   apiBase?: string; // e.g. "/api/klinik-demo"
   dashboardPath?: string; // e.g. "/klinik-demo/dashboard"
   hideTabs?: Array<"crm" | "kalender" | "noter">; // tabs to hide
-  pitchBeats?: (kickoff: string) => HqPitchBeat[]; // custom pitch script
+  pitchBeats?: HqPitchBeat[] | ((kickoff: string) => HqPitchBeat[]); // custom pitch script
 }
 
 interface SR {
@@ -1092,7 +1092,7 @@ gl_FragColor=vec4(col,a);}`;
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; conv?: { role: "lead" | "setter"; text: string }[]; closeConv?: boolean; hold?: number; switchTab?: Tab };
-    const beats: Beat[] = config?.pitchBeats ? (config.pitchBeats(kickoff) as Beat[]) : [
+    const beats: Beat[] = config?.pitchBeats ? (typeof config.pitchBeats === "function" ? (config.pitchBeats(kickoff) as Beat[]) : (config.pitchBeats as Beat[])) : [
       {
         say: kickoff || "Okej — låt mig visa dig exakt vad som händer i din klinik varje dag medan du är mitt i en behandling.",
         rings: true,

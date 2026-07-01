@@ -90,7 +90,7 @@ export default function NordicSolarHqPage() {
         apiBase: "/api/nordic-solar-demo",
         dashboardPath: "/nordic-solar-demo/dashboard",
         hideTabs: ["crm", "kalender", "noter"],
-        pitchBeats: nordicPitch,
+        pitchBeats: nordicPitch(""),
       }} />
     </Suspense>
   );
