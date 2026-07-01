@@ -44,6 +44,7 @@ export interface HqPitchBeat {
   panels?: { kind: string; [k: string]: unknown }[];
   rings?: boolean;
   autoConv?: boolean;
+  conv?: { role: "lead" | "setter"; text: string }[];
   closeConv?: boolean;
   hold?: number;
   switchTab?: "aura" | "dashboard" | "crm" | "kalender" | "noter";
@@ -1090,7 +1091,7 @@ gl_FragColor=vec4(col,a);}`;
       { role: "lead",   text: "Toppen, tack!" },
     ];
 
-    type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number; switchTab?: Tab };
+    type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; conv?: { role: "lead" | "setter"; text: string }[]; closeConv?: boolean; hold?: number; switchTab?: Tab };
     const beats: Beat[] = config?.pitchBeats ? (config.pitchBeats(kickoff) as Beat[]) : [
       {
         say: kickoff || "Okej — låt mig visa dig exakt vad som händer i din klinik varje dag medan du är mitt i en behandling.",
@@ -1174,7 +1175,7 @@ gl_FragColor=vec4(col,a);}`;
       // 2. if this beat triggers an auto-conversation, play it AFTER speech finishes
       if (b.autoConv) {
         await new Promise<void>((res) => setTimeout(res, 600));
-        await runAutoConv(CONV);
+        await runAutoConv(b.conv ?? CONV);
         if (!pitchRef.current) return;
       }
 
