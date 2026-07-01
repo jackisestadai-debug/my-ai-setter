@@ -1135,7 +1135,7 @@ gl_FragColor=vec4(col,a);}`;
         hold: 1000,
       },
       {
-        say: "Vad säger du — kör vi?",
+        say: "Kliniken som har det här behöver aldrig mer jaga leads manuellt. Systemet sköter det — dygnet runt.",
         rings: true,
         panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
         hold: 1000,
