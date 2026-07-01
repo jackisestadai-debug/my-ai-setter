@@ -39,11 +39,22 @@ import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, u
 
 /** Optional per-deployment overrides — pass from a wrapper page to customise
  *  without touching the owner client. Omit for the default Rekvo setup. */
+export interface HqPitchBeat {
+  say: string;
+  panels?: { kind: string; [k: string]: unknown }[];
+  rings?: boolean;
+  autoConv?: boolean;
+  closeConv?: boolean;
+  hold?: number;
+  switchTab?: "aura" | "dashboard" | "crm" | "kalender" | "noter";
+}
+
 export interface HqConfig {
   brandName?: string;
   apiBase?: string; // e.g. "/api/klinik-demo"
   dashboardPath?: string; // e.g. "/klinik-demo/dashboard"
   hideTabs?: Array<"crm" | "kalender" | "noter">; // tabs to hide
+  pitchBeats?: (kickoff: string) => HqPitchBeat[]; // custom pitch script
 }
 
 interface SR {
@@ -1080,7 +1091,7 @@ gl_FragColor=vec4(col,a);}`;
     ];
 
     type Beat = { say: string; panels?: Panel[]; rings?: boolean; autoConv?: boolean; closeConv?: boolean; hold?: number; switchTab?: Tab };
-    const beats: Beat[] = [
+    const beats: Beat[] = config?.pitchBeats ? (config.pitchBeats(kickoff) as Beat[]) : [
       {
         say: kickoff || "Okej — låt mig visa dig exakt vad som händer i din klinik varje dag medan du är mitt i en behandling.",
         rings: true,
@@ -1140,7 +1151,7 @@ gl_FragColor=vec4(col,a);}`;
         panels: [{ kind: "stats", title: "GRATIS I 7 DAGAR", items: [{ label: "Uppsättningstid", value: "24h" }, { label: "Bindningstid", value: "Ingen" }, { label: "Installation av dig", value: "Noll" }, { label: "Garanterat resultat", value: "Ja" }] }],
         hold: 1000,
       },
-    ];
+    ] as Beat[];
 
     const sayAndWait = (text: string) =>
       Promise.race([
