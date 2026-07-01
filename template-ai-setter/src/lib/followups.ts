@@ -48,30 +48,23 @@ const TONE: Record<string, string> = {
   A3: "Sista pingen efter 7 dagar. Ingen press. Lämna dörren öppen på ett avslappnat sätt. En-två meningar.",
 };
 
-const FALLBACK: Record<string, string> = {
-  A1: "hej, hörde aldrig av er — fortfarande aktuellt?",
-  A2: "bara ett snabbt ping — är tajmingen fel eller har ni frågor?",
-  A3: "inga problem om det inte passar just nu, hör av er om det ändras 🙏",
-};
-
-async function generateFollowup(client: FUClient, leadId: string, slotKey: string): Promise<string> {
-  const fallback = FALLBACK[slotKey] ?? "hej, fortfarande intresserade?";
+async function generateFollowup(client: FUClient, leadId: string, slotKey: string): Promise<string | null> {
   try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return fallback;
+    if (!apiKey) return null;
     const { data } = await supabase.from("messages").select("role, content").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(10);
     const transcript = ((data ?? []) as { role: string; content: string }[]).reverse()
       .map((m) => `${m.role === "lead" ? "KLINIKEN" : "JACK"}: ${String(m.content || "").slice(0, 300)}`).join("\n");
     const anthropic = new Anthropic({ apiKey });
     const res = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001", max_tokens: 100,
-      system: `Du skriver uppföljnings-DMs på Instagram åt Jack på Rekvo. Jack säljer AI-mötesbokare till skönhetskliniker i Sverige.\n\nJacks röst (matcha exakt):\n${(client.voice_samples || "").slice(0, 800)}\n\nSkriv BARA meddelandetexten — inga citattecken, ingen inledning. Kort och naturlig svenska.`,
+      system: `Du skriver uppföljnings-DMs på Instagram åt Jack på Rekvo. Jack säljer AI-mötesbokare till skönhetskliniker i Sverige.\n\nJacks röst (matcha exakt):\n${(client.voice_samples || "").slice(0, 800)}\n\nSkriv BARA meddelandetexten — inga citattecken, ingen inledning. Kort och naturlig svenska. Inga tankstreck eller bindestreck.`,
       messages: [{ role: "user", content: `Konversation (äldst först):\n${transcript}\n\nTon för detta meddelande: ${TONE[slotKey]}\n\nSkriv uppföljningsmeddelandet.` }],
     });
     const txt = res.content.filter((b) => b.type === "text").map((b) => (b as { type: "text"; text: string }).text).join("").trim().replace(/^["']|["']$/g, "");
-    return txt || fallback;
+    return txt || null;
   } catch {
-    return fallback;
+    return null;
   }
 }
 
@@ -150,6 +143,11 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
 
           const slotKey = `A${attempt}`;
           const text = await generateFollowup(client, lead.id, slotKey);
+
+          if (!text) {
+            await supabase.from("follow_up_log").update({ status: "failed", message: "ai_generation_failed" }).eq("id", row.id);
+            continue;
+          }
 
           const res = await sendGHLMessage({ ghl_api_key: client.ghl_api_key, ghl_location_id: client.ghl_location_id, ghl_contact_id: lead.ghl_contact_id, message: text, type: "IG" });
           if (!res.success) {
