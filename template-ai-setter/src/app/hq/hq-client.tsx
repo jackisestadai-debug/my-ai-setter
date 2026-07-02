@@ -1537,7 +1537,8 @@ function MiniList({ label, lsKey, placeholder, showBooked, onItemsChange }: { la
     try { return JSON.parse(localStorage.getItem(lsKey) ?? "[]"); } catch { return []; }
   });
   const [input, setInput] = React.useState("");
-  const dragId = React.useRef<string | null>(null);
+  const dragIdx = React.useRef<number | null>(null);
+  const [dragOver, setDragOver] = React.useState<number | null>(null);
 
   function save(next: ListItem[]) {
     setItems(next);
@@ -1548,50 +1549,61 @@ function MiniList({ label, lsKey, placeholder, showBooked, onItemsChange }: { la
   function toggle(id: string) { save(items.map((i) => i.id === id ? { ...i, booked: !i.booked } : i)); }
   function remove(id: string) { save(items.filter((i) => i.id !== id)); }
 
-  function onDragStart(id: string) { dragId.current = id; }
-  function onDragOver(e: React.DragEvent, overId: string) {
-    e.preventDefault();
-    if (!dragId.current || dragId.current === overId) return;
-    const from = items.findIndex((i) => i.id === dragId.current);
-    const to = items.findIndex((i) => i.id === overId);
-    if (from === -1 || to === -1) return;
-    const next = [...items];
-    const [moved] = next.splice(from, 1);
-    next.splice(to, 0, moved);
-    save(next);
-  }
-
   const active = items.filter((i) => !i.booked);
   const booked = items.filter((i) => i.booked);
 
-  const itemStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 7, padding: "6px 8px", background: "rgba(201,168,76,0.04)", borderRadius: 5, border: "1px solid rgba(201,168,76,0.1)", cursor: "grab" };
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ color: "#c9a84c", fontSize: 9, letterSpacing: "0.14em", fontWeight: 700 }}>{label}</span>
+      <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>{label}</span>
       <div style={{ display: "flex", gap: 5 }}>
         <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") add(); }}
           placeholder={placeholder}
-          style={{ flex: 1, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 5, color: "#e8e0cc", fontSize: 11, padding: "5px 8px", outline: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif" }} />
-        <button onClick={add} style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 5, color: "#c9a84c", fontSize: 16, padding: "1px 9px", cursor: "pointer", lineHeight: 1 }}>+</button>
+          style={{ flex: 1, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, color: "#e8e0cc", fontSize: 12, padding: "7px 10px", outline: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif" }} />
+        <button onClick={add} style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 6, color: "#c9a84c", fontSize: 18, padding: "2px 11px", cursor: "pointer", lineHeight: 1 }}>+</button>
       </div>
-      {active.length === 0 && booked.length === 0 && <span style={{ color: "rgba(201,168,76,0.25)", fontSize: 10 }}>Tom</span>}
-      {active.map((item) => (
-        <div key={item.id} draggable onDragStart={() => onDragStart(item.id)} onDragOver={(e) => onDragOver(e, item.id)} style={itemStyle}>
-          <span style={{ color: "rgba(201,168,76,0.3)", fontSize: 10, flexShrink: 0, cursor: "grab" }}>⠿</span>
-          {showBooked && <button onClick={() => toggle(item.id)} title="Boka in" style={{ width: 14, height: 14, borderRadius: 3, flexShrink: 0, border: "1px solid rgba(201,168,76,0.35)", background: "transparent", cursor: "pointer", padding: 0 }} />}
-          <span style={{ flex: 1, color: "#e8e0cc", fontSize: 11, lineHeight: 1.4, wordBreak: "break-word" }}>{item.text}</span>
-          <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.25)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
+      {active.length === 0 && booked.length === 0 && <span style={{ color: "rgba(201,168,76,0.25)", fontSize: 11 }}>Tom</span>}
+      {active.map((item, idx) => (
+        <div
+          key={item.id}
+          draggable
+          onDragStart={() => { dragIdx.current = idx; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(idx); }}
+          onDrop={() => {
+            if (dragIdx.current === null || dragIdx.current === idx) { setDragOver(null); return; }
+            const next = [...active];
+            const [moved] = next.splice(dragIdx.current, 1);
+            next.splice(idx, 0, moved);
+            dragIdx.current = null; setDragOver(null);
+            save([...next, ...booked]);
+          }}
+          onDragEnd={() => { dragIdx.current = null; setDragOver(null); }}
+          style={{
+            display: "flex", alignItems: "center", gap: 8, padding: "8px 10px",
+            background: dragOver === idx ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.05)",
+            borderRadius: 6, border: `1px solid ${dragOver === idx ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.12)"}`,
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+        >
+          {/* drag handle */}
+          <span style={{ color: "#c9a84c", fontSize: 14, flexShrink: 0, cursor: "grab", userSelect: "none", opacity: 0.7 }}>☰</span>
+          {showBooked && (
+            <button onClick={() => toggle(item.id)} title="Markera som bokad" style={{
+              width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+              border: "1.5px solid rgba(201,168,76,0.5)", background: "transparent", cursor: "pointer", padding: 0,
+            }} />
+          )}
+          <span style={{ flex: 1, color: "#e8e0cc", fontSize: 12, lineHeight: 1.4, wordBreak: "break-word" }}>{item.text}</span>
+          <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.3)", cursor: "pointer", fontSize: 15, padding: 0, lineHeight: 1 }}>×</button>
         </div>
       ))}
       {showBooked && booked.length > 0 && (
         <>
-          <span style={{ color: "rgba(201,168,76,0.2)", fontSize: 9, letterSpacing: "0.1em", marginTop: 2 }}>BOKADE IN</span>
+          <span style={{ color: "rgba(201,168,76,0.25)", fontSize: 9, letterSpacing: "0.1em", marginTop: 4 }}>✓ BOKADE IN</span>
           {booked.map((item) => (
-            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 5, border: "1px solid rgba(201,168,76,0.05)" }}>
-              <button onClick={() => toggle(item.id)} style={{ width: 14, height: 14, borderRadius: 3, flexShrink: 0, border: "1px solid #c9a84c", background: "#c9a84c", cursor: "pointer", padding: 0 }} />
-              <span style={{ flex: 1, color: "rgba(232,224,204,0.25)", fontSize: 11, textDecoration: "line-through", wordBreak: "break-word" }}>{item.text}</span>
-              <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.15)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
+            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 6, border: "1px solid rgba(201,168,76,0.06)", opacity: 0.5 }}>
+              <button onClick={() => toggle(item.id)} style={{ width: 16, height: 16, borderRadius: 4, flexShrink: 0, border: "1.5px solid #c9a84c", background: "#c9a84c", cursor: "pointer", padding: 0 }} />
+              <span style={{ flex: 1, color: "rgba(232,224,204,0.4)", fontSize: 12, textDecoration: "line-through", wordBreak: "break-word" }}>{item.text}</span>
+              <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.2)", cursor: "pointer", fontSize: 15, padding: 0, lineHeight: 1 }}>×</button>
             </div>
           ))}
         </>
@@ -1603,20 +1615,27 @@ function MiniList({ label, lsKey, placeholder, showBooked, onItemsChange }: { la
 function TodoWidget() {
   const [todos, setTodos] = React.useState<ListItem[]>([]);
   const [ideas, setIdeas] = React.useState<ListItem[]>([]);
+  const [context, setContext] = React.useState(() => { try { return localStorage.getItem("rekvo-aura-context") ?? ""; } catch { return ""; } });
   const [advice, setAdvice] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+
+  function saveContext(v: string) {
+    setContext(v);
+    try { localStorage.setItem("rekvo-aura-context", v); } catch { /**/ }
+  }
 
   async function askAura() {
     setLoading(true);
     setAdvice("");
     try {
-      const res = await fetch(`/api/hq/advise?k=${KEY()}`, {
+      const res = await fetch(`/api/hq/advise`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           k: KEY(),
           todos: todos.filter((i) => !i.booked).map((i) => i.text),
           ideas: ideas.map((i) => i.text),
+          context,
         }),
       });
       const d = await res.json() as { advice?: string };
@@ -1627,27 +1646,37 @@ function TodoWidget() {
 
   return (
     <div style={{
-      width: 240, minWidth: 200, display: "flex", flexDirection: "column", gap: 14,
-      border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "16px 14px",
-      background: "rgba(10,18,30,0.9)", boxShadow: "0 0 24px rgba(201,168,76,0.06)", overflowY: "auto",
+      width: 290, minWidth: 260, display: "flex", flexDirection: "column", gap: 16,
+      border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "18px 16px",
+      background: "rgba(10,18,30,0.92)", boxShadow: "0 0 30px rgba(201,168,76,0.07)", overflowY: "auto",
     }}>
       <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked onItemsChange={setTodos} />
       <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
       <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." onItemsChange={setIdeas} />
       <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
-      <button onClick={askAura} disabled={loading} style={{
-        background: loading ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.12)",
-        border: "1px solid rgba(201,168,76,0.3)", borderRadius: 6, color: "#c9a84c",
-        fontSize: 10, letterSpacing: "0.1em", fontWeight: 700, padding: "7px 10px",
-        cursor: loading ? "default" : "pointer",
-      }}>
-        {loading ? "AURA TÄNKER…" : "✦ FRÅGA AURA"}
-      </button>
-      {advice && (
-        <div style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 6, padding: "10px 12px", color: "#e8e0cc", fontSize: 11, lineHeight: 1.6 }}>
-          {advice}
-        </div>
-      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>KONTEXT TILL AURA</span>
+        <textarea
+          value={context}
+          onChange={(e) => saveContext(e.target.value)}
+          placeholder="Skriv vad som händer just nu, problem, mål... Aura tar hänsyn till det."
+          rows={3}
+          style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 6, color: "#e8e0cc", fontSize: 11, padding: "8px 10px", outline: "none", resize: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif", lineHeight: 1.5 }}
+        />
+        <button onClick={askAura} disabled={loading} style={{
+          background: loading ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.15)",
+          border: "1px solid rgba(201,168,76,0.35)", borderRadius: 7, color: "#c9a84c",
+          fontSize: 11, letterSpacing: "0.1em", fontWeight: 700, padding: "9px 12px",
+          cursor: loading ? "default" : "pointer", transition: "background 0.15s",
+        }}>
+          {loading ? "AURA TÄNKER…" : "✦ FRÅGA AURA"}
+        </button>
+        {advice && (
+          <div style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "12px 13px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7 }}>
+            {advice}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
