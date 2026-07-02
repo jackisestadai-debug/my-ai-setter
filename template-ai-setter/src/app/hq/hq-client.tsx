@@ -1530,125 +1530,65 @@ gl_FragColor=vec4(col,a);}`;
   );
 }
 
-interface BookingItem { id: string; name: string; done: boolean }
+interface ListItem { id: string; text: string; booked: boolean }
 
-function TodoWidget() {
-  const LS_KEY = "rekvo-booking-v1";
-  const [items, setItems] = React.useState<BookingItem[]>(() => {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"); } catch { return []; }
+function MiniList({ label, lsKey, placeholder, showBooked }: { label: string; lsKey: string; placeholder: string; showBooked?: boolean }) {
+  const [items, setItems] = React.useState<ListItem[]>(() => {
+    try { return JSON.parse(localStorage.getItem(lsKey) ?? "[]"); } catch { return []; }
   });
   const [input, setInput] = React.useState("");
 
-  function save(next: BookingItem[]) {
-    setItems(next);
-    try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch { /* */ }
-  }
+  function save(next: ListItem[]) { setItems(next); try { localStorage.setItem(lsKey, JSON.stringify(next)); } catch { /**/ } }
+  function add() { const t = input.trim(); if (!t) return; save([{ id: Date.now().toString(), text: t, booked: false }, ...items]); setInput(""); }
+  function toggle(id: string) { save(items.map((i) => i.id === id ? { ...i, booked: !i.booked } : i)); }
+  function remove(id: string) { save(items.filter((i) => i.id !== id)); }
 
-  function add() {
-    const t = input.trim();
-    if (!t) return;
-    save([{ id: Date.now().toString(), name: t, done: false }, ...items]);
-    setInput("");
-  }
-
-  function toggle(id: string) {
-    save(items.map((i) => i.id === id ? { ...i, done: !i.done } : i));
-  }
-
-  function remove(id: string) {
-    save(items.filter((i) => i.id !== id));
-  }
-
-  const pending = items.filter((i) => !i.done);
-  const done = items.filter((i) => i.done);
+  const active = items.filter((i) => !i.booked);
+  const booked = items.filter((i) => i.booked);
 
   return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ color: "#c9a84c", fontSize: 9, letterSpacing: "0.14em", fontWeight: 700 }}>{label}</span>
+      <div style={{ display: "flex", gap: 5 }}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") add(); }}
+          placeholder={placeholder}
+          style={{ flex: 1, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 5, color: "#e8e0cc", fontSize: 11, padding: "5px 8px", outline: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif" }} />
+        <button onClick={add} style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 5, color: "#c9a84c", fontSize: 16, padding: "1px 9px", cursor: "pointer", lineHeight: 1 }}>+</button>
+      </div>
+      {active.length === 0 && booked.length === 0 && <span style={{ color: "rgba(201,168,76,0.25)", fontSize: 10 }}>Tom</span>}
+      {active.map((item) => (
+        <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 7, padding: "6px 8px", background: "rgba(201,168,76,0.04)", borderRadius: 5, border: "1px solid rgba(201,168,76,0.1)" }}>
+          {showBooked && <button onClick={() => toggle(item.id)} title="Markera som bokad" style={{ width: 14, height: 14, borderRadius: 3, flexShrink: 0, border: "1px solid rgba(201,168,76,0.35)", background: "transparent", cursor: "pointer", padding: 0 }} />}
+          <span style={{ flex: 1, color: "#e8e0cc", fontSize: 11, lineHeight: 1.4, wordBreak: "break-word" }}>{item.text}</span>
+          <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.25)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
+        </div>
+      ))}
+      {showBooked && booked.length > 0 && (
+        <>
+          <span style={{ color: "rgba(201,168,76,0.2)", fontSize: 9, letterSpacing: "0.1em", marginTop: 2 }}>BOKADE IN</span>
+          {booked.map((item) => (
+            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", background: "transparent", borderRadius: 5, border: "1px solid rgba(201,168,76,0.05)" }}>
+              <button onClick={() => toggle(item.id)} style={{ width: 14, height: 14, borderRadius: 3, flexShrink: 0, border: "1px solid #c9a84c", background: "#c9a84c", cursor: "pointer", padding: 0 }} />
+              <span style={{ flex: 1, color: "rgba(232,224,204,0.25)", fontSize: 11, textDecoration: "line-through", wordBreak: "break-word" }}>{item.text}</span>
+              <button onClick={() => remove(item.id)} style={{ background: "none", border: "none", color: "rgba(201,168,76,0.15)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function TodoWidget() {
+  return (
     <div style={{
-      width: 240,
-      minWidth: 200,
-      display: "flex",
-      flexDirection: "column",
-      border: "1px solid rgba(201,168,76,0.2)",
-      borderRadius: 12,
-      padding: "16px 14px",
-      gap: 10,
-      background: "rgba(10,18,30,0.85)",
-      boxShadow: "0 0 24px rgba(201,168,76,0.06)",
+      width: 240, minWidth: 200, display: "flex", flexDirection: "column", gap: 16,
+      border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "16px 14px",
+      background: "rgba(10,18,30,0.9)", boxShadow: "0 0 24px rgba(201,168,76,0.06)", overflowY: "auto",
     }}>
-      <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>BOKA IN</span>
-      <div style={{ display: "flex", gap: 6 }}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") add(); }}
-          placeholder="Kliniknamn..."
-          style={{
-            flex: 1,
-            background: "rgba(201,168,76,0.06)",
-            border: "1px solid rgba(201,168,76,0.2)",
-            borderRadius: 6,
-            color: "#e8e0cc",
-            fontSize: 12,
-            padding: "6px 10px",
-            outline: "none",
-            fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          }}
-        />
-        <button onClick={add} style={{
-          background: "rgba(201,168,76,0.15)",
-          border: "1px solid rgba(201,168,76,0.3)",
-          borderRadius: 6,
-          color: "#c9a84c",
-          fontSize: 18,
-          padding: "2px 10px",
-          cursor: "pointer",
-          lineHeight: 1,
-        }}>+</button>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
-        {pending.length === 0 && done.length === 0 && (
-          <span style={{ color: "rgba(201,168,76,0.3)", fontSize: 11, marginTop: 6 }}>Lägg till kliniker att boka in</span>
-        )}
-        {pending.map((item) => (
-          <div key={item.id} style={{
-            display: "flex", alignItems: "center", gap: 8, padding: "8px 10px",
-            background: "rgba(201,168,76,0.05)", borderRadius: 6, border: "1px solid rgba(201,168,76,0.12)",
-          }}>
-            <button onClick={() => toggle(item.id)} style={{
-              width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-              border: "1px solid rgba(201,168,76,0.4)", background: "transparent",
-              cursor: "pointer", padding: 0,
-            }} />
-            <span style={{ flex: 1, color: "#e8e0cc", fontSize: 12, lineHeight: 1.4, wordBreak: "break-word" }}>{item.name}</span>
-            <button onClick={() => remove(item.id)} style={{
-              background: "none", border: "none", color: "rgba(201,168,76,0.3)",
-              cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1, flexShrink: 0,
-            }}>×</button>
-          </div>
-        ))}
-        {done.length > 0 && (
-          <>
-            <div style={{ color: "rgba(201,168,76,0.25)", fontSize: 9, letterSpacing: "0.1em", marginTop: 6 }}>BOKADE</div>
-            {done.map((item) => (
-              <div key={item.id} style={{
-                display: "flex", alignItems: "center", gap: 8, padding: "6px 10px",
-                background: "rgba(201,168,76,0.02)", borderRadius: 6, border: "1px solid rgba(201,168,76,0.06)",
-              }}>
-                <button onClick={() => toggle(item.id)} style={{
-                  width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                  border: "1px solid #c9a84c", background: "#c9a84c",
-                  cursor: "pointer", padding: 0,
-                }} />
-                <span style={{ flex: 1, color: "rgba(232,224,204,0.3)", fontSize: 12, textDecoration: "line-through", wordBreak: "break-word" }}>{item.name}</span>
-                <button onClick={() => remove(item.id)} style={{
-                  background: "none", border: "none", color: "rgba(201,168,76,0.2)",
-                  cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1, flexShrink: 0,
-                }}>×</button>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
+      <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked />
+      <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
+      <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." />
     </div>
   );
 }
