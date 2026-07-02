@@ -1467,6 +1467,7 @@ gl_FragColor=vec4(col,a);}`;
           <button className={`hq-tab ${tab === "dashboard" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("dashboard")}>{BRAND_NAME}</button>
           {!hideTabs.has("crm") && <button className={`hq-tab ${tab === "crm" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("crm")}>CRM</button>}
           {!hideTabs.has("kalender") && <button className={`hq-tab ${tab === "kalender" ? "on" : ""}`} onMouseEnter={() => sfx("tick")} onClick={() => setTab("kalender")}>KALENDER</button>}
+          <a className="hq-tab" href={`/logg?k=${KEY()}`} target="_blank" rel="noopener noreferrer" onMouseEnter={() => sfx("tick")} style={{ textDecoration: "none" }}>LOGG</a>
           <a className="hq-tab" href="/test-chat" target="_blank" rel="noopener noreferrer" onMouseEnter={() => sfx("tick")} style={{ textDecoration: "none" }}>TEST AI</a>
         </nav>
         <span className={`hq-state s-${orb}`}>{online ? `● ${orb === "idle" ? "väntar" : orb === "listening" ? "lyssnar" : orb === "thinking" ? "tänker" : orb === "speaking" ? "talar" : "viloläge"}` : "○ offline"}</span>
