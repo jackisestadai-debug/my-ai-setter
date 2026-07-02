@@ -1515,40 +1515,48 @@ gl_FragColor=vec4(col,a);}`;
           <div className="hq-frame" style={{ flex: 1 }}>
             <iframe src={dashboardPath} title={`${BRAND_NAME} Dashboard`} className="hq-iframe" />
           </div>
-          {!hideTabs.has("noter") && <NotesWidget />}
         </div>
       )}
-      {tab === "crm" && <div className="hq-frame"><iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" /></div>}
+      {tab === "crm" && (
+        <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+          <div className="hq-frame" style={{ flex: 1 }}>
+            <iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" />
+          </div>
+          <TodoWidget />
+        </div>
+      )}
       {tab === "kalender" && <div className="hq-frame"><iframe src={`/kalender?k=${KEY()}`} title="Kalender" className="hq-iframe" /></div>}
     </div>
   );
 }
 
-function NotesWidget() {
-  const [text, setText] = React.useState("");
-  const [saved, setSaved] = React.useState(true);
-  const [loaded, setLoaded] = React.useState(false);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const k = KEY();
+interface TodoItem { id: string; text: string; done: boolean }
 
-  React.useEffect(() => {
-    fetch(`/api/hq/notes?k=${k}`)
-      .then((r) => r.json())
-      .then((d) => { setText(d.notes ?? ""); setLoaded(true); })
-      .catch(() => setLoaded(true));
-  }, [k]);
+function TodoWidget() {
+  const LS_KEY = "rekvo-todo-v1";
+  const [items, setItems] = React.useState<TodoItem[]>(() => {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"); } catch { return []; }
+  });
+  const [input, setInput] = React.useState("");
 
-  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    setText(e.target.value);
-    setSaved(false);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      fetch(`/api/hq/notes?k=${k}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notes: e.target.value }),
-      }).then(() => setSaved(true)).catch(() => setSaved(false));
-    }, 800);
+  function save(next: TodoItem[]) {
+    setItems(next);
+    try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch { /* */ }
+  }
+
+  function add() {
+    const t = input.trim();
+    if (!t) return;
+    save([{ id: Date.now().toString(), text: t, done: false }, ...items]);
+    setInput("");
+  }
+
+  function toggle(id: string) {
+    save(items.map((i) => i.id === id ? { ...i, done: !i.done } : i));
+  }
+
+  function remove(id: string) {
+    save(items.filter((i) => i.id !== id));
   }
 
   return (
@@ -1559,37 +1567,74 @@ function NotesWidget() {
       flexDirection: "column",
       borderLeft: "1px solid rgba(126,184,212,0.1)",
       padding: "20px 16px",
-      gap: 10,
+      gap: 12,
       background: "rgba(126,184,212,0.02)",
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ color: "#7eb8d4", fontSize: 10, letterSpacing: "0.12em", fontWeight: 700 }}>IDÉER &amp; TANKAR</span>
-        <span style={{ color: saved ? "rgba(126,184,212,0.35)" : "#7eb8d4", fontSize: 9, letterSpacing: "0.05em" }}>
-          {!loaded ? "" : saved ? "● sparat" : "sparar…"}
-        </span>
+      <span style={{ color: "#7eb8d4", fontSize: 10, letterSpacing: "0.12em", fontWeight: 700 }}>ATT GÖRA</span>
+      <div style={{ display: "flex", gap: 6 }}>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") add(); }}
+          placeholder="Lägg till..."
+          style={{
+            flex: 1,
+            background: "rgba(126,184,212,0.06)",
+            border: "1px solid rgba(126,184,212,0.15)",
+            borderRadius: 6,
+            color: "#e8e0cc",
+            fontSize: 12,
+            padding: "6px 10px",
+            outline: "none",
+            fontFamily: "ui-sans-serif, system-ui, sans-serif",
+          }}
+        />
+        <button onClick={add} style={{
+          background: "rgba(126,184,212,0.15)",
+          border: "1px solid rgba(126,184,212,0.25)",
+          borderRadius: 6,
+          color: "#7eb8d4",
+          fontSize: 16,
+          padding: "4px 10px",
+          cursor: "pointer",
+          lineHeight: 1,
+        }}>+</button>
       </div>
-      <textarea
-        value={text}
-        onChange={handleChange}
-        placeholder="Skriv idéer, tankar, att göra..."
-        style={{
-          flex: 1,
-          background: "rgba(126,184,212,0.04)",
-          border: "1px solid rgba(126,184,212,0.12)",
-          borderRadius: 8,
-          color: "#e8e0cc",
-          fontSize: 13,
-          lineHeight: 1.7,
-          padding: "12px 14px",
-          resize: "none",
-          outline: "none",
-          fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          minHeight: 0,
-        }}
-      />
-      <p style={{ color: "rgba(126,184,212,0.3)", fontSize: 9, margin: 0, lineHeight: 1.5 }}>
-        Varje måndag skickar Aura en sammanfattning av dina tankar på Telegram.
-      </p>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+        {items.length === 0 && (
+          <span style={{ color: "rgba(126,184,212,0.3)", fontSize: 11, marginTop: 8 }}>Inga uppgifter ännu</span>
+        )}
+        {items.map((item) => (
+          <div key={item.id} style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 8,
+            padding: "8px 10px",
+            background: "rgba(126,184,212,0.04)",
+            borderRadius: 6,
+            border: "1px solid rgba(126,184,212,0.08)",
+          }}>
+            <button onClick={() => toggle(item.id)} style={{
+              width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
+              border: `1px solid ${item.done ? "#7eb8d4" : "rgba(126,184,212,0.3)"}`,
+              background: item.done ? "#7eb8d4" : "transparent",
+              cursor: "pointer", padding: 0,
+            }} />
+            <span style={{
+              flex: 1,
+              color: item.done ? "rgba(126,184,212,0.35)" : "#e8e0cc",
+              fontSize: 12,
+              lineHeight: 1.5,
+              textDecoration: item.done ? "line-through" : "none",
+              wordBreak: "break-word",
+            }}>{item.text}</span>
+            <button onClick={() => remove(item.id)} style={{
+              background: "none", border: "none", color: "rgba(126,184,212,0.3)",
+              cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1, flexShrink: 0,
+            }}>×</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
