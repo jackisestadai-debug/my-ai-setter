@@ -1650,35 +1650,36 @@ function TodoWidget() {
       border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12,
       background: "rgba(10,18,30,0.92)", boxShadow: "0 0 30px rgba(201,168,76,0.07)",
     }}>
-      {/* AURA-sektion — fast längst upp, alltid synlig */}
-      <div style={{ padding: "16px 16px 14px", display: "flex", flexDirection: "column", gap: 8, borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+      {/* Listor scrollar */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked onItemsChange={setTodos} />
+        <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
+        <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." onItemsChange={setIdeas} />
+      </div>
+
+      {/* AURA — fast längst ner, scrollar aldrig bort */}
+      <div style={{ borderTop: "1px solid rgba(201,168,76,0.15)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, background: "rgba(201,168,76,0.03)" }}>
         <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>✦ FRÅGA AURA</span>
         <textarea
           value={context}
           onChange={(e) => saveContext(e.target.value)}
-          placeholder="Berätta vad som händer, vad du kämpar med eller vad du vill ha råd om..."
-          rows={3}
-          style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, color: "#e8e0cc", fontSize: 12, padding: "9px 11px", outline: "none", resize: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif", lineHeight: 1.5, width: "100%", boxSizing: "border-box" }}
+          placeholder="Skriv vad du vill ha råd om..."
+          rows={2}
+          style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 6, color: "#e8e0cc", fontSize: 12, padding: "8px 10px", outline: "none", resize: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif", lineHeight: 1.5, width: "100%", boxSizing: "border-box" }}
         />
         <button onClick={askAura} disabled={loading} style={{
-          background: loading ? "rgba(201,168,76,0.06)" : "rgba(201,168,76,0.18)",
-          border: "1.5px solid rgba(201,168,76,0.5)", borderRadius: 7, color: "#c9a84c",
+          background: loading ? "rgba(201,168,76,0.06)" : "rgba(201,168,76,0.2)",
+          border: "1.5px solid rgba(201,168,76,0.55)", borderRadius: 7, color: "#c9a84c",
           fontSize: 12, letterSpacing: "0.08em", fontWeight: 700, padding: "10px 14px",
           cursor: loading ? "default" : "pointer", width: "100%",
         }}>
           {loading ? "AURA TÄNKER…" : "FRÅGA AURA"}
         </button>
         {advice && (
-          <div style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "11px 13px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7 }}>
+          <div style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 7, padding: "10px 12px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7, maxHeight: 160, overflowY: "auto" }}>
             {advice}
           </div>
         )}
-      </div>
-      {/* Listor — scrollbar under Aura-sektionen */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
-        <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked onItemsChange={setTodos} />
-        <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
-        <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." onItemsChange={setIdeas} />
       </div>
     </div>
   );
