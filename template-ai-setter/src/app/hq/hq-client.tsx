@@ -1649,6 +1649,7 @@ function TodoWidget() {
       width: 290, minWidth: 260, display: "flex", flexDirection: "column",
       border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12,
       background: "rgba(10,18,30,0.92)", boxShadow: "0 0 30px rgba(201,168,76,0.07)",
+      height: "100%",
     }}>
       {/* Listor scrollar */}
       <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
