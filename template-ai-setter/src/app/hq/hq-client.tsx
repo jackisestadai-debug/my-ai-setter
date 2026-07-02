@@ -1669,12 +1669,14 @@ function TodoWidget() {
           style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 6, color: "#e8e0cc", fontSize: 12, padding: "8px 10px", outline: "none", resize: "none", fontFamily: "ui-sans-serif,system-ui,sans-serif", lineHeight: 1.5, width: "100%", boxSizing: "border-box" }}
         />
         <button onClick={askAura} disabled={loading} style={{
-          background: loading ? "rgba(201,168,76,0.06)" : "rgba(201,168,76,0.2)",
-          border: "1.5px solid rgba(201,168,76,0.55)", borderRadius: 7, color: "#c9a84c",
-          fontSize: 12, letterSpacing: "0.08em", fontWeight: 700, padding: "10px 14px",
+          background: loading ? "rgba(201,168,76,0.1)" : "#c9a84c",
+          border: "none", borderRadius: 8, color: loading ? "#c9a84c" : "#0a121e",
+          fontSize: 13, letterSpacing: "0.1em", fontWeight: 800, padding: "12px 14px",
           cursor: loading ? "default" : "pointer", width: "100%",
+          boxShadow: loading ? "none" : "0 0 18px rgba(201,168,76,0.4)",
+          transition: "all 0.15s",
         }}>
-          {loading ? "AURA TÄNKER…" : "FRÅGA AURA"}
+          {loading ? "AURA TÄNKER…" : "✦ FRÅGA AURA"}
         </button>
         {advice && (
           <div style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 7, padding: "10px 12px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7, maxHeight: 160, overflowY: "auto" }}>
