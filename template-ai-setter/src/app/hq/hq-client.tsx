@@ -1518,9 +1518,9 @@ gl_FragColor=vec4(col,a);}`;
         </div>
       )}
       {tab === "crm" && (
-        <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
-          <div className="hq-frame" style={{ flex: 1 }}>
-            <iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" />
+        <div style={{ position: "absolute", inset: "60px 14px 14px 14px", display: "flex", gap: 12, zIndex: 3 }}>
+          <div style={{ flex: 1, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 12, overflow: "hidden", boxShadow: "0 0 40px rgba(201,168,76,0.08)" }}>
+            <iframe src={`/crm?k=${KEY()}`} title="CRM" className="hq-iframe" style={{ width: "100%", height: "100%", border: "none", display: "block" }} />
           </div>
           <TodoWidget />
         </div>
@@ -1530,16 +1530,16 @@ gl_FragColor=vec4(col,a);}`;
   );
 }
 
-interface TodoItem { id: string; text: string; done: boolean }
+interface BookingItem { id: string; name: string; done: boolean }
 
 function TodoWidget() {
-  const LS_KEY = "rekvo-todo-v1";
-  const [items, setItems] = React.useState<TodoItem[]>(() => {
+  const LS_KEY = "rekvo-booking-v1";
+  const [items, setItems] = React.useState<BookingItem[]>(() => {
     try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"); } catch { return []; }
   });
   const [input, setInput] = React.useState("");
 
-  function save(next: TodoItem[]) {
+  function save(next: BookingItem[]) {
     setItems(next);
     try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch { /* */ }
   }
@@ -1547,7 +1547,7 @@ function TodoWidget() {
   function add() {
     const t = input.trim();
     if (!t) return;
-    save([{ id: Date.now().toString(), text: t, done: false }, ...items]);
+    save([{ id: Date.now().toString(), name: t, done: false }, ...items]);
     setInput("");
   }
 
@@ -1559,28 +1559,33 @@ function TodoWidget() {
     save(items.filter((i) => i.id !== id));
   }
 
+  const pending = items.filter((i) => !i.done);
+  const done = items.filter((i) => i.done);
+
   return (
     <div style={{
-      width: 260,
-      minWidth: 220,
+      width: 240,
+      minWidth: 200,
       display: "flex",
       flexDirection: "column",
-      borderLeft: "1px solid rgba(126,184,212,0.1)",
-      padding: "20px 16px",
-      gap: 12,
-      background: "rgba(126,184,212,0.02)",
+      border: "1px solid rgba(201,168,76,0.2)",
+      borderRadius: 12,
+      padding: "16px 14px",
+      gap: 10,
+      background: "rgba(10,18,30,0.85)",
+      boxShadow: "0 0 24px rgba(201,168,76,0.06)",
     }}>
-      <span style={{ color: "#7eb8d4", fontSize: 10, letterSpacing: "0.12em", fontWeight: 700 }}>ATT GÖRA</span>
+      <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>BOKA IN</span>
       <div style={{ display: "flex", gap: 6 }}>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") add(); }}
-          placeholder="Lägg till..."
+          placeholder="Kliniknamn..."
           style={{
             flex: 1,
-            background: "rgba(126,184,212,0.06)",
-            border: "1px solid rgba(126,184,212,0.15)",
+            background: "rgba(201,168,76,0.06)",
+            border: "1px solid rgba(201,168,76,0.2)",
             borderRadius: 6,
             color: "#e8e0cc",
             fontSize: 12,
@@ -1590,50 +1595,59 @@ function TodoWidget() {
           }}
         />
         <button onClick={add} style={{
-          background: "rgba(126,184,212,0.15)",
-          border: "1px solid rgba(126,184,212,0.25)",
+          background: "rgba(201,168,76,0.15)",
+          border: "1px solid rgba(201,168,76,0.3)",
           borderRadius: 6,
-          color: "#7eb8d4",
-          fontSize: 16,
-          padding: "4px 10px",
+          color: "#c9a84c",
+          fontSize: 18,
+          padding: "2px 10px",
           cursor: "pointer",
           lineHeight: 1,
         }}>+</button>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-        {items.length === 0 && (
-          <span style={{ color: "rgba(126,184,212,0.3)", fontSize: 11, marginTop: 8 }}>Inga uppgifter ännu</span>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
+        {pending.length === 0 && done.length === 0 && (
+          <span style={{ color: "rgba(201,168,76,0.3)", fontSize: 11, marginTop: 6 }}>Lägg till kliniker att boka in</span>
         )}
-        {items.map((item) => (
+        {pending.map((item) => (
           <div key={item.id} style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 8,
-            padding: "8px 10px",
-            background: "rgba(126,184,212,0.04)",
-            borderRadius: 6,
-            border: "1px solid rgba(126,184,212,0.08)",
+            display: "flex", alignItems: "center", gap: 8, padding: "8px 10px",
+            background: "rgba(201,168,76,0.05)", borderRadius: 6, border: "1px solid rgba(201,168,76,0.12)",
           }}>
             <button onClick={() => toggle(item.id)} style={{
-              width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
-              border: `1px solid ${item.done ? "#7eb8d4" : "rgba(126,184,212,0.3)"}`,
-              background: item.done ? "#7eb8d4" : "transparent",
+              width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+              border: "1px solid rgba(201,168,76,0.4)", background: "transparent",
               cursor: "pointer", padding: 0,
             }} />
-            <span style={{
-              flex: 1,
-              color: item.done ? "rgba(126,184,212,0.35)" : "#e8e0cc",
-              fontSize: 12,
-              lineHeight: 1.5,
-              textDecoration: item.done ? "line-through" : "none",
-              wordBreak: "break-word",
-            }}>{item.text}</span>
+            <span style={{ flex: 1, color: "#e8e0cc", fontSize: 12, lineHeight: 1.4, wordBreak: "break-word" }}>{item.name}</span>
             <button onClick={() => remove(item.id)} style={{
-              background: "none", border: "none", color: "rgba(126,184,212,0.3)",
+              background: "none", border: "none", color: "rgba(201,168,76,0.3)",
               cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1, flexShrink: 0,
             }}>×</button>
           </div>
         ))}
+        {done.length > 0 && (
+          <>
+            <div style={{ color: "rgba(201,168,76,0.25)", fontSize: 9, letterSpacing: "0.1em", marginTop: 6 }}>BOKADE</div>
+            {done.map((item) => (
+              <div key={item.id} style={{
+                display: "flex", alignItems: "center", gap: 8, padding: "6px 10px",
+                background: "rgba(201,168,76,0.02)", borderRadius: 6, border: "1px solid rgba(201,168,76,0.06)",
+              }}>
+                <button onClick={() => toggle(item.id)} style={{
+                  width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                  border: "1px solid #c9a84c", background: "#c9a84c",
+                  cursor: "pointer", padding: 0,
+                }} />
+                <span style={{ flex: 1, color: "rgba(232,224,204,0.3)", fontSize: 12, textDecoration: "line-through", wordBreak: "break-word" }}>{item.name}</span>
+                <button onClick={() => remove(item.id)} style={{
+                  background: "none", border: "none", color: "rgba(201,168,76,0.2)",
+                  cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1, flexShrink: 0,
+                }}>×</button>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
