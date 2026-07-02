@@ -1651,16 +1651,8 @@ function TodoWidget() {
       background: "rgba(10,18,30,0.92)", boxShadow: "0 0 30px rgba(201,168,76,0.07)",
       height: "100%",
     }}>
-      {/* Listor scrollar */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
-        <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked onItemsChange={setTodos} />
-        <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
-        <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." onItemsChange={setIdeas} />
-      </div>
-
-      {/* AURA — fast längst ner, scrollar aldrig bort */}
-      <div style={{ borderTop: "1px solid rgba(201,168,76,0.15)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, background: "rgba(201,168,76,0.03)" }}>
-        <span style={{ color: "#c9a84c", fontSize: 10, letterSpacing: "0.14em", fontWeight: 700 }}>✦ FRÅGA AURA</span>
+      {/* AURA — fast längst upp, aldrig dold */}
+      <div style={{ borderBottom: "1px solid rgba(201,168,76,0.15)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, background: "rgba(201,168,76,0.03)" }}>
         <textarea
           value={context}
           onChange={(e) => saveContext(e.target.value)}
@@ -1674,15 +1666,21 @@ function TodoWidget() {
           fontSize: 13, letterSpacing: "0.1em", fontWeight: 800, padding: "12px 14px",
           cursor: loading ? "default" : "pointer", width: "100%",
           boxShadow: loading ? "none" : "0 0 18px rgba(201,168,76,0.4)",
-          transition: "all 0.15s",
         }}>
           {loading ? "AURA TÄNKER…" : "✦ FRÅGA AURA"}
         </button>
         {advice && (
-          <div style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 7, padding: "10px 12px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7, maxHeight: 160, overflowY: "auto" }}>
+          <div style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 7, padding: "10px 12px", color: "#e8e0cc", fontSize: 12, lineHeight: 1.7, maxHeight: 140, overflowY: "auto" }}>
             {advice}
           </div>
         )}
+      </div>
+
+      {/* Listor scrollar under */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <MiniList label="ATT GÖRA" lsKey="rekvo-todo-v2" placeholder="Lägg till uppgift..." showBooked onItemsChange={setTodos} />
+        <div style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }} />
+        <MiniList label="IDÉER" lsKey="rekvo-ideas-v1" placeholder="Skriv en idé..." onItemsChange={setIdeas} />
       </div>
     </div>
   );
