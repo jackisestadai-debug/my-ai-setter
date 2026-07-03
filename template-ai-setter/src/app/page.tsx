@@ -3,174 +3,131 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-/* ── Nisch-data ── */
+/* ── Types ── */
 type NicheKey = "klinik" | "coach" | "artist" | "maklare" | "byra" | "restaurant";
-
 interface NicheData {
   icon: string;
   label: string;
-  heroLine: string;
-  heroSub: string;
   conversation: { from: "aura" | "lead"; text: string }[];
-  features: string[];
-  result: string;
-  ctaLabel: string;
 }
 
+/* ── Nisch-konversationer ── */
 const NICHES: Record<NicheKey, NicheData> = {
   klinik: {
-    icon: "🏥",
-    label: "Klinik & Hälsa",
-    heroLine: "Fyll din bokningskalender — automatiskt",
-    heroSub:
-      "Aura hanterar patientförfrågningar i Instagram-DMs, kvalificerar och bokar tider direkt. Inga fler missade leads.",
+    icon: "🏥", label: "Klinik & Hälsa",
     conversation: [
       { from: "aura", text: "Hej! Söker du hjälp med något specifikt just nu? 😊" },
-      { from: "lead", text: "Ja, jag har haft ont i ryggen ett tag och letar efter en naprapat" },
-      { from: "aura", text: "Det förstår jag — ryggbesvär kan vara riktigt jobbigt. Vi har lediga tider redan den här veckan. Vill du att jag bokar in ett första besök åt dig?" },
+      { from: "lead", text: "Ja, jag har ont i ryggen och letar efter en naprapat" },
+      { from: "aura", text: "Det förstår jag — ryggbesvär kan vara jobbigt. Vi har lediga tider redan den här veckan. Vill du att jag bokar in ett besök?" },
       { from: "lead", text: "Ja gärna, vad kostar det?" },
       { from: "aura", text: "Första besöket kostar 595 kr och tar 45 min. Jag skickar en bokningslänk direkt 👉 [länk]" },
     ],
-    features: [
-      "Svarar på patientfrågor dygnet runt",
-      "Bokar in besök direkt i ditt bokningssystem",
-      "Minskar no-shows med automatiska påminnelser",
-      "Hanterar återkommande patienter och uppföljningar",
-      "Fungerar på svenska, engelska och fler språk",
-    ],
-    result: "Kliniker ser i snitt 3× fler bokningar inom 60 dagar.",
-    ctaLabel: "Boka demo för din klinik →",
   },
   coach: {
-    icon: "🏋️",
-    label: "Coach & PT",
-    heroLine: "Mer tid för klienter — AI:n sköter inboket",
-    heroSub:
-      "Aura kvalificerar leads, svarar på frågor om dina program och bokar konsultationer — medan du tränar dina befintliga klienter.",
+    icon: "🏋️", label: "Coach & PT",
     conversation: [
-      { from: "aura", text: "Hej! Såg att du kollade in våra träningsprogram — vad är ditt mål just nu? 💪" },
-      { from: "lead", text: "Jag vill gå ner i vikt och komma igång med styrketräning" },
-      { from: "aura", text: "Perfekt, det är precis vad vi fokuserar på! Vi brukar se resultat redan inom 8 veckor med rätt program. Vill du boka en gratis 20-min konsultation så vi kan hitta rätt upplägg för dig?" },
-      { from: "lead", text: "Det låter bra!" },
-      { from: "aura", text: "Toppen! Här är en länk för att välja en tid 👉 [länk]. Ser fram emot att träffas!" },
+      { from: "aura", text: "Hej! Såg att du kollade in våra program — vad är ditt mål just nu? 💪" },
+      { from: "lead", text: "Vill gå ner i vikt och komma igång med styrketräning" },
+      { from: "aura", text: "Perfekt! Vi ser resultat redan inom 8 veckor med rätt program. Vill du boka en gratis 20-min konsultation?" },
+      { from: "lead", text: "Ja det låter bra!" },
+      { from: "aura", text: "Toppen! Välj en tid här 👉 [länk]. Ser fram emot att träffas!" },
     ],
-    features: [
-      "Kvalificerar leads baserat på mål och budget",
-      "Bokar gratis konsultationer automatiskt",
-      "Presenterar dina program och priser",
-      "Följer upp ointresserade leads efter 3–7 dagar",
-      "Hanterar frågor om schema, betalning och avbokning",
-    ],
-    result: "Coacher sparar i snitt 15 timmar per vecka på administration.",
-    ctaLabel: "Boka demo för din coaching →",
   },
   artist: {
-    icon: "🎤",
-    label: "Artist & Event",
-    heroLine: "Konvertera fans till betalande kunder — i DMs",
-    heroSub:
-      "Aura hanterar bokningsförfrågningar, säljer biljetter och event-paket direkt i Instagram-DMs. Aldrig en missad affärsmöjlighet.",
+    icon: "🎤", label: "Artist & Event",
     conversation: [
       { from: "aura", text: "Tack för att du hör av dig! 🎶 Vad kan vi hjälpa dig med?" },
-      { from: "lead", text: "Jag undrar om ni är tillgängliga för en bröllopsceremoni i juni" },
-      { from: "aura", text: "Vilken fin anledning! Juni är populärt — vi har fortfarande några datum lediga. Kan du berätta mer om din dag? Ungefär hur många gäster och vilket datum tänkte du?" },
+      { from: "lead", text: "Undrar om ni är tillgängliga för bröllop i juni" },
+      { from: "aura", text: "Vilken fin anledning! Vi har några datum kvar i juni. Hur många gäster och vilket datum tänkte du?" },
       { from: "lead", text: "Ca 80 gäster, 14 juni" },
-      { from: "aura", text: "14 juni är faktiskt ledigt! Jag bokar in ett kort samtal med oss så vi kan gå igenom detaljerna och skicka offert. Fungerar det i morgon kl 10? 👉 [länk]" },
+      { from: "aura", text: "14 juni är ledigt! Jag bokar ett samtal så vi går igenom detaljerna 👉 [länk]" },
     ],
-    features: [
-      "Hanterar bokningsförfrågningar för event och spelningar",
-      "Svarar på prisfrågor och skickar offerter",
-      "Säljer merch och biljetter via DMs",
-      "Bygger relation med fans automatiskt",
-      "Håller varma leads varma tills de bokar",
-    ],
-    result: "Artister ökar intäkterna från DMs med 4× utan extra jobb.",
-    ctaLabel: "Boka demo för ditt artisteri →",
   },
   maklare: {
-    icon: "🏠",
-    label: "Mäklare & Fastighet",
-    heroLine: "Boka fler visningar — utan att lyfta luren",
-    heroSub:
-      "Aura svarar på fastighetsförfrågningar, kvalificerar spekulanter och bokar visningar direkt i din kalender.",
+    icon: "🏠", label: "Mäklare & Fastighet",
     conversation: [
-      { from: "aura", text: "Hej! Ser att du är intresserad av fastigheter i området — letar du aktivt just nu? 🏠" },
-      { from: "lead", text: "Ja vi letar efter villa i Djursholm, budget ca 8 miljoner" },
-      { from: "aura", text: "Bra budget för det området! Vi har ett par objekt på gång som matchar exakt det du beskriver. Vill du boka en privat visning den här veckan?" },
-      { from: "lead", text: "Ja gärna, helst på lördag" },
-      { from: "aura", text: "Lördag fungerar! Välj en tid här så bekräftar vi direkt 👉 [länk]. Jag skickar adress och detaljer så fort det är bokat." },
+      { from: "aura", text: "Hej! Letar du aktivt efter bostad just nu? 🏠" },
+      { from: "lead", text: "Ja vi letar villa i Djursholm, budget ca 8 miljoner" },
+      { from: "aura", text: "Bra budget! Vi har objekt på gång som matchar exakt. Vill du boka en privat visning den här veckan?" },
+      { from: "lead", text: "Ja gärna, helst lördag" },
+      { from: "aura", text: "Lördag fungerar! Välj tid här 👉 [länk]. Jag skickar adress direkt." },
     ],
-    features: [
-      "Kvalificerar spekulanter (budget, tidplan, krav)",
-      "Bokar visningar direkt i din kalender",
-      "Följer upp efter visningar automatiskt",
-      "Hanterar både köpare och säljare",
-      "Arbetar parallellt med hundratals leads",
-    ],
-    result: "Mäklare bokar 2× fler visningar utan att öka arbetstiden.",
-    ctaLabel: "Boka demo för din mäklarbyrå →",
   },
   byra: {
-    icon: "📈",
-    label: "Digital byrå",
-    heroLine: "Skala din outreach utan att anställa",
-    heroSub:
-      "Aura hanterar hundratals parallella DM-konversationer, kvalificerar prospekt och bokar säljmöten — helt automatiskt.",
+    icon: "📈", label: "Digital byrå",
     conversation: [
-      { from: "aura", text: "Hej! Ser att ni driver en e-handel — hur går det med er sociala trafik just nu?" },
-      { from: "lead", text: "Okej men vi får inte ut så mycket av Instagram som vi borde" },
-      { from: "aura", text: "Det är vanligt! De flesta e-handlare vi jobbar med ökar sin Instagram-ROI med 3–5× inom 90 dagar. Vill du höra hur vi gör det? Kan boka ett 20-min möte direkt." },
+      { from: "aura", text: "Hej! Hur går det med er Instagram-trafik just nu?" },
+      { from: "lead", text: "Okej men vi får inte ut så mycket av det som vi borde" },
+      { from: "aura", text: "Det är vanligt! Vi ökar Instagram-ROI med 3–5× inom 90 dagar. Vill du höra hur? Kan boka 20 min direkt." },
       { from: "lead", text: "Absolut, vad kostar det?" },
-      { from: "aura", text: "Vi börjar alltid med ett gratis strategisamtal — ingen sälj, bara ett möte för att se om vi passar varandra. Här är länken 👉 [länk]" },
+      { from: "aura", text: "Vi börjar alltid med ett gratis strategisamtal — ingen sälj, bara se om vi passar. Här är länken 👉 [länk]" },
     ],
-    features: [
-      "Hanterar hundratals parallella prospektkonversationer",
-      "Kvalificerar leads baserat på bransch och budget",
-      "Bokar discovery calls i ditt CRM",
-      "Anpassas till din byrås röst och erbjudande",
-      "Integreras med GoHighLevel och andra CRM-system",
-    ],
-    result: "Byråer genererar 5× fler kvalificerade möten per månad.",
-    ctaLabel: "Boka demo för din byrå →",
   },
   restaurant: {
-    icon: "🍽️",
-    label: "Restaurant & Café",
-    heroLine: "Fyll dina bord — AI:n tar bordsbokningarna",
-    heroSub:
-      "Aura hanterar bordsbokningar, svarar på menyfrågor och säljer event-paket direkt i Instagram-DMs.",
+    icon: "🍽️", label: "Restaurant & Café",
     conversation: [
-      { from: "aura", text: "Hej! Välkommen 🍽️ Vill du boka bord eller har du en fråga?" },
-      { from: "lead", text: "Vi är 8 personer och vill fira en födelsedag nästa lördag" },
-      { from: "aura", text: "Vad kul! Vi har ett perfekt fönsterbord för 8 ledigt nästa lördag. Vill du ha en speciell tårta eller dekorationer? Vi ordnar det gärna!" },
-      { from: "lead", text: "Ja tårta vore toppen! Kan ni skriva ett namn på den?" },
-      { from: "aura", text: "Absolut! Vad ska vi skriva? Jag bekräftar bokningen och noterar dina önskemål direkt 👉 [bokningslänk]" },
+      { from: "aura", text: "Hej! Vill du boka bord eller har du en fråga? 🍽️" },
+      { from: "lead", text: "Vi är 8 personer och vill fira födelsedag nästa lördag" },
+      { from: "aura", text: "Vad kul! Vi har ett perfekt fönsterbord för 8 ledigt. Vill du ha tårta eller dekorationer?" },
+      { from: "lead", text: "Ja tårta vore toppen!" },
+      { from: "aura", text: "Självklart! Bekräftar bokningen direkt 👉 [länk]" },
     ],
-    features: [
-      "Tar emot och bekräftar bordsreservationer 24/7",
-      "Svarar på frågor om meny, allergi och öppettider",
-      "Säljer event-paket och privata middagar",
-      "Skickar påminnelser och hanterar avbokningar",
-      "Tar emot cateringförfrågningar automatiskt",
-    ],
-    result: "Restauranger ökar sin beläggning med 30% på 30 dagar.",
-    ctaLabel: "Boka demo för din restaurang →",
   },
 };
 
 const NICHE_KEYS = Object.keys(NICHES) as NicheKey[];
 
-/* ── Main component ── */
+/* ── Animated demo conversation ── */
+function AnimatedChat({ messages }: { messages: { from: "aura" | "lead"; text: string }[] }) {
+  const [visible, setVisible] = useState(0);
+  const [typing, setTyping] = useState(false);
+
+  useEffect(() => {
+    setVisible(0);
+    setTyping(false);
+    let cancelled = false;
+
+    async function run() {
+      for (let i = 0; i < messages.length; i++) {
+        if (cancelled) return;
+        setTyping(true);
+        await new Promise(r => setTimeout(r, 900));
+        if (cancelled) return;
+        setTyping(false);
+        setVisible(i + 1);
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
+    run();
+    return () => { cancelled = true; };
+  }, [messages]);
+
+  return (
+    <div className="demo-phone__chat">
+      {messages.slice(0, visible).map((m, i) => (
+        <div key={i} className={`chat-bubble chat-bubble--${m.from}`}>{m.text}</div>
+      ))}
+      {typing && (
+        <div className="chat-bubble chat-bubble--aura typing-indicator">
+          <span /><span /><span />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main ── */
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeNiche, setActiveNiche] = useState<NicheKey | null>(null);
-  const [animating, setAnimating] = useState(false);
+  const [activeNiche, setActiveNiche] = useState<NicheKey>("klinik");
 
-  const nicheRef = useRef<HTMLElement>(null);
-  const demoRef = useRef<HTMLElement>(null);
+  const tjänsterRef = useRef<HTMLElement>(null);
+  const aiRef = useRef<HTMLElement>(null);
+  const webRef = useRef<HTMLElement>(null);
   const processRef = useRef<HTMLElement>(null);
-  const contactRef = useRef<HTMLElement>(null);
+  const omRef = useRef<HTMLElement>(null);
+  const bokRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -183,123 +140,116 @@ export default function Home() {
     setTimeout(() => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 10);
   }
 
-  function pickNiche(key: NicheKey) {
-    if (key === activeNiche) return;
-    setAnimating(true);
-    setTimeout(() => {
-      setActiveNiche(key);
-      setAnimating(false);
-      setTimeout(() => demoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-    }, 220);
-  }
-
-  const niche = activeNiche ? NICHES[activeNiche] : null;
-
   return (
     <>
-      {/* ── NAV ── */}
+      {/* NAV */}
       <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
         <div className="nav__inner">
           <div className="nav__logo">
-            <Image src="/logo.svg" alt="Rekvo" width={160} height={60} priority />
+            <Image src="/logo.svg" alt="Rekvo" width={140} height={52} priority />
           </div>
           <nav className={`nav__links ${menuOpen ? "nav__links--open" : ""}`}>
-            <button className="nav__link" onClick={() => go(nicheRef)}>Välj bransch</button>
-            <button className="nav__link" onClick={() => go(demoRef)}>Demo</button>
-            <button className="nav__link" onClick={() => go(processRef)}>Process</button>
-            <button className="nav__cta" onClick={() => go(contactRef)}>Boka möte</button>
+            <button className="nav__link" onClick={() => go(tjänsterRef)}>Tjänster</button>
+            <button className="nav__link" onClick={() => go(aiRef)}>AI-säljare</button>
+            <button className="nav__link" onClick={() => go(webRef)}>Hemsidor</button>
+            <button className="nav__link" onClick={() => go(omRef)}>Om oss</button>
+            <button className="nav__cta" onClick={() => go(bokRef)}>Boka möte</button>
           </nav>
-          <button className="nav__burger" aria-label="Meny" onClick={() => setMenuOpen((v) => !v)}>
+          <button className="nav__burger" aria-label="Meny" onClick={() => setMenuOpen(v => !v)}>
             <span /><span /><span />
           </button>
         </div>
       </header>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <section className="hero">
         <div className="hero__glow" />
-        <div className={`container hero__inner ${animating ? "fade-out" : "fade-in"}`}>
-          <span className="badge">
-            {niche ? `${niche.icon} Anpassad för ${niche.label}` : "AI-driven försäljning · Byggt för Sverige"}
-          </span>
+        <div className="container hero__inner">
+          <span className="badge">Digitala verktyg · Byggt för svenska företag</span>
           <h1 className="hero__h1">
-            {niche ? (
-              niche.heroLine
-            ) : (
-              <>
-                Din AI-säljare som bokar<br />
-                <span className="gradient-text">möten dygnet runt</span>
-              </>
-            )}
+            Vi bygger det digitala<br />
+            <span className="gradient-text">som driver din tillväxt</span>
           </h1>
           <p className="hero__sub">
-            {niche
-              ? niche.heroSub
-              : "Rekvo levererar en fullt tränad AI-assistent som hanterar Instagram-DMs, kvalificerar leads och bokar möten — helt automatiskt, på svenska, i din röst."}
+            Rekvo hjälper företag att växa med AI-drivna säljsystem och
+            professionella hemsidor — från idé till live på rekordtid.
           </p>
           <div className="hero__btns">
-            <button className="btn btn--primary" onClick={() => go(niche ? demoRef : nicheRef)}>
-              {niche ? "Se din demo →" : "Välj din bransch →"}
+            <button className="btn btn--primary" onClick={() => go(tjänsterRef)}>
+              Se vad vi gör →
             </button>
-            <button className="btn btn--ghost" onClick={() => go(contactRef)}>
+            <button className="btn btn--ghost" onClick={() => go(bokRef)}>
               Boka ett gratis samtal
             </button>
           </div>
           <div className="stats">
-            <Stat value="24/7" label="Alltid tillgänglig" />
+            <Stat value="24/7" label="AI alltid aktiv" />
             <div className="stats__divider" />
-            <Stat value="&lt;60s" label="Svarstid" />
+            <Stat value="7 dagar" label="Från start till live" />
             <div className="stats__divider" />
             <Stat value="3×" label="Fler bokade möten" />
           </div>
         </div>
       </section>
 
-      {/* ── NISCH-VÄLJARE ── */}
-      <section ref={nicheRef} className="section section--dark">
+      {/* TJÄNSTER */}
+      <section ref={tjänsterRef} className="section section--dark">
         <div className="container">
-          <p className="section__label">Steg 1</p>
-          <h2 className="section__h2">Vad är du för typ av företag?</h2>
+          <p className="section__label">Vad vi gör</p>
+          <h2 className="section__h2">Två tjänster, ett mål — din tillväxt</h2>
           <p className="section__sub">
-            Välj din bransch — så visar vi hur Aura pratar med just dina kunder
-            och vad du kan förvänta dig i resultat.
+            Vi kombinerar AI-teknik och webbdesign för att ge ditt företag
+            en komplett digital närvaro som faktiskt säljer.
           </p>
-          <div className="niche-picker">
-            {NICHE_KEYS.map((key) => {
-              const n = NICHES[key];
-              return (
-                <button
-                  key={key}
-                  className={`niche-btn ${activeNiche === key ? "niche-btn--active" : ""}`}
-                  onClick={() => pickNiche(key)}
-                >
-                  <span className="niche-btn__icon">{n.icon}</span>
-                  <span className="niche-btn__label">{n.label}</span>
-                  {activeNiche === key && <span className="niche-btn__check">✓</span>}
-                </button>
-              );
-            })}
+          <div className="services-grid">
+            <div className="service-card" onClick={() => go(aiRef)}>
+              <div className="service-card__icon">🤖</div>
+              <h3 className="service-card__title">AI-säljare</h3>
+              <p className="service-card__desc">
+                En fullt tränad AI-assistent som hanterar dina Instagram-DMs,
+                kvalificerar leads och bokar möten — dygnet runt, i din röst.
+              </p>
+              <span className="service-card__link">Läs mer →</span>
+            </div>
+            <div className="service-card" onClick={() => go(webRef)}>
+              <div className="service-card__icon">💻</div>
+              <h3 className="service-card__title">Hemsidor</h3>
+              <p className="service-card__desc">
+                Moderna, snabba hemsidor byggda med Next.js och driftsatta på
+                Vercel — optimerade för konvertering och Google-ranking.
+              </p>
+              <span className="service-card__link">Läs mer →</span>
+            </div>
           </div>
-          {!activeNiche && (
-            <p className="niche-hint">↑ Klicka på din bransch för att se en personaliserad demo</p>
-          )}
         </div>
       </section>
 
-      {/* ── DEMO (personaliserad) ── */}
-      <section ref={demoRef} className="section">
+      {/* AI-SÄLJARE */}
+      <section ref={aiRef} className="section">
         <div className="container">
-          <p className="section__label">Demo</p>
-          <h2 className="section__h2">
-            {niche ? `Så pratar Aura med dina ${niche.label.toLowerCase()}-kunder` : "Möt Aura — din AI-assistent"}
-          </h2>
+          <p className="section__label">AI-säljare</p>
+          <h2 className="section__h2">Möt Aura — din AI-assistent</h2>
           <p className="section__sub">
-            {niche
-              ? `En verklig exempelkonversation för ${niche.label.toLowerCase()}. Ton och innehåll anpassas helt efter din verksamhet.`
-              : "Välj en bransch ovan för att se en konversation anpassad för just din verksamhet."}
+            Aura pratar med dina leads precis som du skulle göra. Välj din
+            bransch och se hur en verklig konversation ser ut.
           </p>
 
-          <div className={`demo-wrap ${animating ? "fade-out" : "fade-in"}`}>
+          {/* Nisch-väljare */}
+          <div className="niche-picker">
+            {NICHE_KEYS.map(key => (
+              <button
+                key={key}
+                className={`niche-btn ${activeNiche === key ? "niche-btn--active" : ""}`}
+                onClick={() => setActiveNiche(key)}
+              >
+                <span className="niche-btn__icon">{NICHES[key].icon}</span>
+                <span className="niche-btn__label">{NICHES[key].label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Demo */}
+          <div className="demo-wrap">
             <div className="demo-phone">
               <div className="demo-phone__bar">
                 <div className="demo-phone__avatar">A</div>
@@ -308,85 +258,80 @@ export default function Home() {
                   <div className="demo-phone__status">● Online</div>
                 </div>
               </div>
-              <div className="demo-phone__chat">
-                {niche ? (
-                  niche.conversation.map((msg, i) => (
-                    <ChatBubble key={i} from={msg.from}>{msg.text}</ChatBubble>
-                  ))
-                ) : (
-                  <>
-                    <ChatBubble from="aura">Hej! Kul att du hittade oss 😊 Vad är det du jobbar med?</ChatBubble>
-                    <div className="demo-empty">
-                      <span>← Välj din bransch för att se en riktigt konversation</span>
-                    </div>
-                  </>
-                )}
-              </div>
+              <AnimatedChat key={activeNiche} messages={NICHES[activeNiche].conversation} />
               <div className="demo-phone__footer">
-                <span className="demo-phone__note">
-                  {niche ? `Anpassat för ${niche.label} — inte ett manus, utan AI som tänker` : "Verklig AI-konversation — anpassas för din bransch"}
-                </span>
+                <span className="demo-phone__note">Verklig AI-konversation anpassad för {NICHES[activeNiche].label.toLowerCase()}</span>
               </div>
             </div>
 
             <div className="demo-info">
-              {niche ? (
-                <>
-                  <h3 className="demo-info__h3">Vad Aura gör för {niche.label.toLowerCase()}</h3>
-                  <ul className="demo-info__list">
-                    {niche.features.map((f, i) => <FeatureItem key={i}>{f}</FeatureItem>)}
-                  </ul>
-                  <div className="result-box">
-                    <span className="result-box__icon">📊</span>
-                    <span className="result-box__text">{niche.result}</span>
-                  </div>
-                  <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(contactRef)}>
-                    {niche.ctaLabel}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <h3 className="demo-info__h3">Vad Aura gör åt dig</h3>
-                  <ul className="demo-info__list">
-                    <FeatureItem>Svarar på DMs inom sekunder, dygnet runt</FeatureItem>
-                    <FeatureItem>Ställer kvalificerande frågor i din röst</FeatureItem>
-                    <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
-                    <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
-                    <FeatureItem>Lär sig av varje konversation och förbättras</FeatureItem>
-                  </ul>
-                  <button className="btn btn--primary" onClick={() => go(nicheRef)}>
-                    Välj din bransch för att se mer →
-                  </button>
-                </>
-              )}
+              <h3 className="demo-info__h3">Vad Aura gör åt dig</h3>
+              <ul className="demo-info__list">
+                <FeatureItem>Svarar på DMs inom sekunder, dygnet runt</FeatureItem>
+                <FeatureItem>Ställer kvalificerande frågor i din röst</FeatureItem>
+                <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
+                <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
+                <FeatureItem>Tränas på ditt erbjudande och dina kunder</FeatureItem>
+                <FeatureItem>Igång på 7 dagar — utan tekniska förkunskaper</FeatureItem>
+              </ul>
+              <button className="btn btn--primary" onClick={() => go(bokRef)}>
+                Boka en AI-demo →
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── PROCESS ── */}
-      <section ref={processRef} className="section section--dark">
+      {/* HEMSIDOR */}
+      <section ref={webRef} className="section section--dark">
         <div className="container">
-          <p className="section__label">Process</p>
-          <h2 className="section__h2">Igång på 7 dagar</h2>
+          <p className="section__label">Hemsidor</p>
+          <h2 className="section__h2">Hemsidor som faktiskt konverterar</h2>
           <p className="section__sub">
-            Inga tekniska förkunskaper krävs. Vi sköter allt — du fokuserar på din verksamhet.
+            Vi designar och bygger moderna hemsidor optimerade för snabbhet,
+            Google-ranking och konvertering. Precis som den här sidan.
           </p>
-          <div className="process-steps">
-            <ProcessStep num={1} title="Onboarding-samtal"
-              desc="Vi lär oss din röst, ditt erbjudande och dina idealkunder på 60 minuter." />
-            <div className="process-steps__arrow">→</div>
-            <ProcessStep num={2} title="AI-träning"
-              desc="Vi konfigurerar och tränar Aura med dina riktlinjer, svar och säljflöde." />
-            <div className="process-steps__arrow">→</div>
-            <ProcessStep num={3} title="Live & optimering"
-              desc="AI:n går live. Vi följer upp veckovis och justerar tills konverteringen är maxad." />
+          <div className="web-grid">
+            <WebFeature icon="⚡" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund — Google älskar det." />
+            <WebFeature icon="📱" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
+            <WebFeature icon="🔍" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
+            <WebFeature icon="🎨" title="Skräddarsydd design" desc="Ingen mall — varje sida designas utifrån ditt varumärke." />
+            <WebFeature icon="🔗" title="Integrationer" desc="Kopplas ihop med bokningssystem, CRM och betalningar." />
+            <WebFeature icon="🚀" title="Live på 7 dagar" desc="Från första möte till publicerad sida på en vecka." />
+          </div>
+          <div className="web-case">
+            <div className="web-case__label">Case — rekvo.se</div>
+            <p className="web-case__text">
+              Den här sidan är ett exempel på vad vi bygger. Designad, kodad
+              och driftsatt av Rekvo på 7 dagar.
+            </p>
+            <button className="btn btn--ghost" onClick={() => go(bokRef)}>
+              Få en hemsida som denna →
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      <section className="section">
+      {/* PROCESS */}
+      <section ref={processRef} className="section">
+        <div className="container">
+          <p className="section__label">Process</p>
+          <h2 className="section__h2">Från idé till live på 7 dagar</h2>
+          <p className="section__sub">
+            Inga långa projekt. Vi rör oss snabbt och levererar resultat.
+          </p>
+          <div className="process-steps">
+            <ProcessStep num={1} title="Möte & brief" desc="Vi lär oss ditt företag, dina mål och din målgrupp på 60 minuter." />
+            <div className="process-steps__arrow">→</div>
+            <ProcessStep num={2} title="Design & bygge" desc="Vi designar, kodar och konfigurerar allt — du behöver inte göra något." />
+            <div className="process-steps__arrow">→</div>
+            <ProcessStep num={3} title="Live & optimering" desc="Vi publicerar och följer upp. Du ser resultat från dag ett." />
+          </div>
+        </div>
+      </section>
+
+      {/* RESULTAT */}
+      <section className="section section--dark">
         <div className="container">
           <p className="section__label">Resultat</p>
           <h2 className="section__h2">Det våra kunder säger</h2>
@@ -395,52 +340,83 @@ export default function Home() {
               quote="Vi gick från 3–4 bokningar i veckan till 12–15 utan att anställa fler. Aura sköter allt."
               name="Maria L." role="Klinikägare, Stockholm" icon="🏥" />
             <TestimonialCard
-              quote="Mina följare börjar en konversation och avslutar med en bokad konsultation — helt automatiskt."
-              name="Johan K." role="Personlig tränare, Göteborg" icon="🏋️" />
+              quote="Rekvo byggde vår hemsida på 5 dagar. Den ser proffsig ut och rankar redan på Google."
+              name="Erik S." role="Företagare, Göteborg" icon="💻" />
             <TestimonialCard
-              quote="Rekvo satte upp systemet på en vecka. Nu hanterar AI:n all inbound och jag kan fokusera på jobbet."
-              name="Anna S." role="Digital byrå, Malmö" icon="📈" />
+              quote="AI:n hanterar all inbound nu. Jag kan fokusera på jobbet istället för att svara på DMs."
+              name="Anna K." role="Digital byrå, Malmö" icon="📈" />
           </div>
         </div>
       </section>
 
-      {/* ── BOKA MÖTE ── */}
-      <section ref={contactRef} className="section section--cta">
+      {/* OM REKVO */}
+      <section ref={omRef} className="section">
+        <div className="container">
+          <p className="section__label">Om oss</p>
+          <h2 className="section__h2">Vi är Rekvo</h2>
+          <div className="about-wrap">
+            <div className="about-text">
+              <p>
+                Rekvo är ett svenskt bolag som hjälper företag att växa digitalt —
+                snabbt och utan krångel. Vi tror att alla företag förtjänar
+                professionella digitala verktyg, oavsett storlek.
+              </p>
+              <p>
+                Vi kombinerar AI-teknik med modern webbutveckling för att leverera
+                system som faktiskt fungerar och ger mätbara resultat.
+              </p>
+              <p>
+                Från kliniker och coaches till byråer och restauranger — vi har
+                hjälpt företag i hela Sverige att automatisera sin försäljning
+                och stärka sin digitala närvaro.
+              </p>
+              <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>
+                Kom i kontakt →
+              </button>
+            </div>
+            <div className="about-values">
+              <ValueCard icon="⚡" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
+              <ValueCard icon="🎯" title="Resultat" desc="Vi mäter allt och optimerar kontinuerligt." />
+              <ValueCard icon="🤝" title="Enkelhet" desc="Inga tekniska förkunskaper krävs." />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BOKA MÖTE */}
+      <section ref={bokRef} className="section section--cta">
         <div className="container">
           <p className="section__label">Kom igång</p>
-          <h2 className="section__h2">
-            {niche ? `Boka en demo för din ${niche.label.toLowerCase()}` : "Boka ett gratis 20-minutersmöte"}
-          </h2>
+          <h2 className="section__h2">Boka ett gratis 20-minutersmöte</h2>
           <p className="section__sub">
-            {niche
-              ? `Vi visar exakt hur Aura kan anpassas för ${niche.label.toLowerCase()} och vad du kan förvänta dig i resultat — inga förpliktelser.`
-              : "Vi visar hur Aura fungerar för just din verksamhet — inga förpliktelser, inga tekniska förkunskaper krävs."}
+            Vi går igenom dina mål och visar vad vi kan göra för just ditt
+            företag — inga förpliktelser, inga tekniska förkunskaper krävs.
           </p>
+          {/* Byt ut src mot din Google Calendar Appointment-länk */}
           <div className="calendly-wrap">
             <iframe
-              src="https://calendly.com/rekvo/demo"
+              src="https://calendar.google.com/calendar/appointments/schedules/YOUR_SCHEDULE_ID"
               className="calendly-iframe"
               title="Boka möte med Rekvo"
             />
           </div>
           <p className="calendly-fallback">
-            Fungerar inte inbäddningen?{" "}
-            <a href="https://calendly.com/rekvo/demo" target="_blank" rel="noopener noreferrer">
-              Öppna Calendly direkt →
-            </a>
+            Fungerar inte bokningsformuläret?{" "}
+            <a href="mailto:hej@rekvo.se">Maila oss på hej@rekvo.se →</a>
           </p>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* FOOTER */}
       <footer className="footer">
         <div className="container footer__inner">
           <Image src="/logo.svg" alt="Rekvo" width={120} height={45} />
           <div className="footer__links">
-            <button onClick={() => go(nicheRef)}>Välj bransch</button>
-            <button onClick={() => go(demoRef)}>Demo</button>
-            <button onClick={() => go(processRef)}>Process</button>
-            <button onClick={() => go(contactRef)}>Kontakt</button>
+            <button onClick={() => go(tjänsterRef)}>Tjänster</button>
+            <button onClick={() => go(aiRef)}>AI-säljare</button>
+            <button onClick={() => go(webRef)}>Hemsidor</button>
+            <button onClick={() => go(omRef)}>Om oss</button>
+            <button onClick={() => go(bokRef)}>Kontakt</button>
           </div>
           <p className="footer__copy">© {new Date().getFullYear()} Rekvo · Alla rättigheter förbehålls</p>
         </div>
@@ -452,29 +428,30 @@ export default function Home() {
 }
 
 /* ── Sub-components ── */
-
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="stat">
-      <div className="stat__value" dangerouslySetInnerHTML={{ __html: value }} />
+      <div className="stat__value">{value}</div>
       <div className="stat__label">{label}</div>
     </div>
   );
 }
-
-function ChatBubble({ from, children }: { from: "aura" | "lead"; children: React.ReactNode }) {
-  return <div className={`chat-bubble chat-bubble--${from}`}>{children}</div>;
-}
-
 function FeatureItem({ children }: { children: React.ReactNode }) {
   return (
     <li className="feature-item">
-      <span className="feature-item__check">✓</span>
-      {children}
+      <span className="feature-item__check">✓</span>{children}
     </li>
   );
 }
-
+function WebFeature({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="web-feature">
+      <div className="web-feature__icon">{icon}</div>
+      <h4 className="web-feature__title">{title}</h4>
+      <p className="web-feature__desc">{desc}</p>
+    </div>
+  );
+}
 function ProcessStep({ num, title, desc }: { num: number; title: string; desc: string }) {
   return (
     <div className="process-step">
@@ -484,7 +461,6 @@ function ProcessStep({ num, title, desc }: { num: number; title: string; desc: s
     </div>
   );
 }
-
 function TestimonialCard({ quote, name, role, icon }: { quote: string; name: string; role: string; icon: string }) {
   return (
     <div className="testimonial">
@@ -497,16 +473,25 @@ function TestimonialCard({ quote, name, role, icon }: { quote: string; name: str
     </div>
   );
 }
+function ValueCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="value-card">
+      <span className="value-card__icon">{icon}</span>
+      <div>
+        <div className="value-card__title">{title}</div>
+        <div className="value-card__desc">{desc}</div>
+      </div>
+    </div>
+  );
+}
 
-/* ── Styles ── */
+/* ── CSS ── */
 const css = `
-  .container {
-    max-width: 1100px; margin: 0 auto; padding: 0 24px;
-  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-  .fade-in { animation: fadeIn 0.3s ease forwards; }
-  .fade-out { opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes typingPulse { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
   /* NAV */
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; transition: background 0.3s, box-shadow 0.3s; }
@@ -514,7 +499,7 @@ const css = `
   .nav__inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
   .nav__logo { display: flex; align-items: center; }
   .nav__links { display: flex; align-items: center; gap: 4px; }
-  .nav__link { background: none; border: none; color: #aaa; font-size: 15px; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: color 0.2s, background 0.2s; }
+  .nav__link { background: none; border: none; color: #aaa; font-size: 15px; cursor: pointer; padding: 8px 14px; border-radius: 8px; transition: color 0.2s, background 0.2s; }
   .nav__link:hover { color: #fff; background: rgba(255,255,255,0.05); }
   .nav__cta { background: #4f46e5; border: none; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; padding: 10px 22px; border-radius: 10px; margin-left: 8px; transition: background 0.2s, transform 0.15s; }
   .nav__cta:hover { background: #4338ca; transform: translateY(-1px); }
@@ -523,24 +508,22 @@ const css = `
 
   /* HERO */
   .hero { min-height: 100vh; display: flex; align-items: center; padding: 140px 0 80px; position: relative; overflow: hidden; }
-  .hero__glow { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 900px; height: 700px; background: radial-gradient(ellipse, rgba(79,70,229,0.25) 0%, transparent 65%); pointer-events: none; }
+  .hero__glow { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 900px; height: 700px; background: radial-gradient(ellipse, rgba(79,70,229,0.22) 0%, transparent 65%); pointer-events: none; }
   .hero__inner { text-align: center; position: relative; width: 100%; }
-  .badge { display: inline-block; background: rgba(79,70,229,0.15); border: 1px solid rgba(79,70,229,0.35); color: #a5b4fc; font-size: 13px; font-weight: 500; padding: 7px 18px; border-radius: 100px; margin-bottom: 32px; letter-spacing: 0.3px; transition: all 0.3s; }
+  .badge { display: inline-block; background: rgba(79,70,229,0.15); border: 1px solid rgba(79,70,229,0.35); color: #a5b4fc; font-size: 13px; font-weight: 500; padding: 7px 18px; border-radius: 100px; margin-bottom: 32px; }
   .hero__h1 { font-size: clamp(38px, 6vw, 68px); font-weight: 800; line-height: 1.08; letter-spacing: -2px; color: #fff; margin: 0 0 28px; }
   .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #c084fc 60%, #f472b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero__sub { font-size: 18px; color: #8080a8; line-height: 1.75; max-width: 580px; margin: 0 auto 44px; }
+  .hero__sub { font-size: 18px; color: #8080a8; line-height: 1.75; max-width: 560px; margin: 0 auto 44px; }
   .hero__btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
   .btn { cursor: pointer; border-radius: 12px; font-size: 16px; font-weight: 600; padding: 14px 30px; border: none; transition: transform 0.15s, background 0.2s; }
   .btn:hover { transform: translateY(-2px); }
   .btn--primary { background: #4f46e5; color: #fff; }
   .btn--primary:hover { background: #4338ca; }
   .btn--ghost { background: transparent; border: 1px solid #2a2a4a; color: #c0c0e0; }
   .btn--ghost:hover { background: rgba(255,255,255,0.04); }
-
-  .stats { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 60px; flex-wrap: wrap; }
+  .stats { display: flex; align-items: center; justify-content: center; margin-top: 60px; flex-wrap: wrap; }
   .stat { text-align: center; padding: 12px 40px; }
-  .stat__value { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+  .stat__value { font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -1px; }
   .stat__label { font-size: 13px; color: #606080; margin-top: 4px; }
   .stats__divider { width: 1px; height: 48px; background: #1a1a3a; }
 
@@ -549,26 +532,24 @@ const css = `
   .section--dark { background: #050514; }
   .section--cta { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(79,70,229,0.18) 0%, transparent 70%); }
   .section__label { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 2.5px; color: #6366f1; text-transform: uppercase; margin-bottom: 14px; }
-  .section__h2 { text-align: center; font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: -1px; color: #fff; margin: 0 auto 18px; max-width: 700px; }
-  .section__sub { text-align: center; color: #707090; font-size: 17px; line-height: 1.75; max-width: 560px; margin: 0 auto 60px; }
+  .section__h2 { text-align: center; font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: -1px; color: #fff; margin: 0 auto 18px; max-width: 680px; }
+  .section__sub { text-align: center; color: #707090; font-size: 17px; line-height: 1.75; max-width: 560px; margin: 0 auto 56px; }
+
+  /* TJÄNSTER */
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 800px; margin: 0 auto; }
+  .service-card { background: #0a0a1e; border: 1px solid #141430; border-radius: 20px; padding: 36px 32px; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+  .service-card:hover { border-color: #4f46e5; transform: translateY(-4px); }
+  .service-card__icon { font-size: 36px; margin-bottom: 16px; }
+  .service-card__title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .service-card__desc { font-size: 15px; color: #707090; line-height: 1.7; margin-bottom: 20px; }
+  .service-card__link { color: #818cf8; font-size: 14px; font-weight: 600; }
 
   /* NICHE PICKER */
-  .niche-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 760px; margin: 0 auto; }
-  .niche-btn {
-    display: flex; align-items: center; gap: 12px;
-    padding: 18px 22px; border-radius: 14px;
-    background: #0a0a1e; border: 1px solid #141430;
-    color: #a0a0c0; font-size: 15px; font-weight: 500;
-    cursor: pointer; text-align: left;
-    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
-    position: relative;
-  }
-  .niche-btn:hover { border-color: #4f46e5; color: #fff; transform: translateY(-2px); }
-  .niche-btn--active { border-color: #6366f1; background: rgba(79,70,229,0.12); color: #fff; }
-  .niche-btn__icon { font-size: 24px; flex-shrink: 0; }
-  .niche-btn__label { flex: 1; }
-  .niche-btn__check { color: #6366f1; font-weight: 700; font-size: 16px; }
-  .niche-hint { text-align: center; color: #444464; font-size: 14px; margin-top: 28px; }
+  .niche-picker { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 48px; }
+  .niche-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 100px; background: #0a0a1e; border: 1px solid #1a1a36; color: #8080a8; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .niche-btn:hover { border-color: #4f46e5; color: #fff; }
+  .niche-btn--active { border-color: #6366f1; background: rgba(79,70,229,0.15); color: #fff; }
+  .niche-btn__icon { font-size: 18px; }
 
   /* DEMO */
   .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 960px; margin: 0 auto; }
@@ -578,21 +559,29 @@ const css = `
   .demo-phone__name { font-weight: 600; font-size: 15px; color: #e8e8f8; }
   .demo-phone__status { font-size: 12px; color: #34d399; margin-top: 2px; }
   .demo-phone__chat { padding: 20px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 280px; }
-  .demo-empty { display: flex; align-items: center; justify-content: center; flex: 1; color: #333355; font-size: 13px; text-align: center; padding: 20px; margin-top: 16px; }
-  .chat-bubble { padding: 11px 15px; border-radius: 16px; max-width: 82%; font-size: 14px; line-height: 1.55; }
+  .chat-bubble { padding: 11px 15px; border-radius: 16px; max-width: 82%; font-size: 14px; line-height: 1.55; animation: fadeUp 0.3s ease forwards; }
   .chat-bubble--aura { align-self: flex-start; background: #16163a; color: #c8c8e8; border-bottom-left-radius: 4px; }
   .chat-bubble--lead { align-self: flex-end; background: #4f46e5; color: #fff; border-bottom-right-radius: 4px; }
+  .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 14px 18px; }
+  .typing-indicator span { width: 7px; height: 7px; border-radius: 50%; background: #6366f1; animation: typingPulse 1.2s infinite; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
   .demo-phone__footer { padding: 12px 20px; border-top: 1px solid #131330; background: #070720; }
   .demo-phone__note { font-size: 12px; color: #444464; }
-
   .demo-info__h3 { font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 22px; }
-  .demo-info__list { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 14px; }
+  .demo-info__list { list-style: none; padding: 0; margin: 0 0 32px; display: flex; flex-direction: column; gap: 14px; }
   .feature-item { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: #9090b0; line-height: 1.5; }
   .feature-item__check { color: #6366f1; font-weight: 700; flex-shrink: 0; }
 
-  .result-box { display: flex; align-items: flex-start; gap: 12px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 12px; padding: 14px 18px; }
-  .result-box__icon { font-size: 20px; flex-shrink: 0; }
-  .result-box__text { font-size: 14px; color: #a5b4fc; line-height: 1.55; font-weight: 500; }
+  /* HEMSIDOR */
+  .web-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 48px; }
+  .web-feature { background: #0a0a1e; border: 1px solid #141430; border-radius: 14px; padding: 24px; }
+  .web-feature__icon { font-size: 26px; margin-bottom: 12px; }
+  .web-feature__title { font-weight: 700; font-size: 16px; color: #fff; margin-bottom: 8px; }
+  .web-feature__desc { font-size: 14px; color: #707090; line-height: 1.6; }
+  .web-case { background: rgba(79,70,229,0.08); border: 1px solid rgba(79,70,229,0.2); border-radius: 16px; padding: 32px; text-align: center; max-width: 600px; margin: 0 auto; }
+  .web-case__label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #6366f1; text-transform: uppercase; margin-bottom: 12px; }
+  .web-case__text { color: #9090b0; font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
 
   /* PROCESS */
   .process-steps { display: flex; align-items: flex-start; gap: 16px; max-width: 900px; margin: 0 auto; justify-content: center; }
@@ -611,7 +600,16 @@ const css = `
   .testimonial__author strong { color: #d0d0f0; }
   .testimonial__author span { color: #505070; }
 
-  /* CALENDLY */
+  /* OM OSS */
+  .about-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; max-width: 960px; margin: 0 auto; }
+  .about-text p { color: #9090b0; font-size: 16px; line-height: 1.8; margin: 0 0 16px; }
+  .about-values { display: flex; flex-direction: column; gap: 16px; }
+  .value-card { display: flex; align-items: flex-start; gap: 16px; background: #0a0a1e; border: 1px solid #141430; border-radius: 14px; padding: 20px; }
+  .value-card__icon { font-size: 24px; flex-shrink: 0; }
+  .value-card__title { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 4px; }
+  .value-card__desc { font-size: 14px; color: #707090; }
+
+  /* BOKA */
   .calendly-wrap { max-width: 760px; margin: 0 auto; border-radius: 20px; overflow: hidden; border: 1px solid #1a1a3a; background: #fff; }
   .calendly-iframe { width: 100%; height: 660px; border: none; display: block; }
   .calendly-fallback { text-align: center; margin-top: 18px; font-size: 14px; color: #505070; }
@@ -630,16 +628,19 @@ const css = `
     .nav__links { display: none; }
     .nav__links--open { display: flex; flex-direction: column; position: fixed; top: 72px; left: 0; right: 0; background: rgba(7,7,26,0.98); padding: 20px 24px 28px; border-bottom: 1px solid #141430; }
     .nav__burger { display: flex; }
-    .niche-picker { grid-template-columns: 1fr 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
     .demo-wrap { grid-template-columns: 1fr; gap: 36px; }
+    .web-grid { grid-template-columns: 1fr 1fr; }
     .process-steps { flex-direction: column; align-items: center; gap: 12px; }
     .process-steps__arrow { transform: rotate(90deg); margin: -4px 0; }
     .testimonials { grid-template-columns: 1fr; }
+    .about-wrap { grid-template-columns: 1fr; gap: 36px; }
     .stats__divider { display: none; }
     .stat { padding: 12px 20px; }
   }
   @media (max-width: 480px) {
-    .niche-picker { grid-template-columns: 1fr; }
-    .hero__h1 { letter-spacing: -1px; }
+    .web-grid { grid-template-columns: 1fr; }
+    .niche-picker { gap: 8px; }
+    .niche-btn { font-size: 13px; padding: 8px 14px; }
   }
 `;
