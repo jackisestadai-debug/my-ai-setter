@@ -395,7 +395,7 @@ export default function Home() {
           {/* Byt ut src mot din Google Calendar Appointment-länk */}
           <div className="calendly-wrap">
             <iframe
-              src="https://calendar.google.com/calendar/appointments/schedules/YOUR_SCHEDULE_ID"
+              src="https://calendar.app.google/UDJT2g5qk4x4TTHx8"
               className="calendly-iframe"
               title="Boka möte med Rekvo"
             />
