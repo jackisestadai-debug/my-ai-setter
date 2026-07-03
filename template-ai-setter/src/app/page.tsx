@@ -392,13 +392,16 @@ export default function Home() {
             Vi går igenom dina mål och visar vad vi kan göra för just ditt
             företag — inga förpliktelser, inga tekniska förkunskaper krävs.
           </p>
-          {/* Byt ut src mot din Google Calendar Appointment-länk */}
-          <div className="calendly-wrap">
-            <iframe
-              src="https://calendar.app.google/UDJT2g5qk4x4TTHx8"
-              className="calendly-iframe"
-              title="Boka möte med Rekvo"
-            />
+          <div className="book-cta-wrap">
+            <a
+              href="https://calendar.app.google/UDJT2g5qk4x4TTHx8"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="book-cta-btn"
+            >
+              Välj en tid som passar dig →
+            </a>
+            <p className="book-cta-note">Öppnas i Google Kalender · Gratis · 30 min</p>
           </div>
           <p className="calendly-fallback">
             Fungerar inte bokningsformuläret?{" "}
@@ -610,10 +613,10 @@ const css = `
   .value-card__desc { font-size: 14px; color: #707090; }
 
   /* BOKA */
-  .calendly-wrap { max-width: 760px; margin: 0 auto; border-radius: 20px; overflow: hidden; border: 1px solid #1a1a3a; background: #fff; }
-  .calendly-iframe { width: 100%; height: 660px; border: none; display: block; }
-  .calendly-fallback { text-align: center; margin-top: 18px; font-size: 14px; color: #505070; }
-  .calendly-fallback a { color: #818cf8; text-decoration: underline; }
+  .book-cta-wrap { text-align: center; padding: 20px 0 10px; }
+  .book-cta-btn { display: inline-block; background: linear-gradient(135deg,#818cf8,#c084fc); color: #fff; font-size: 20px; font-weight: 600; padding: 20px 48px; border-radius: 14px; text-decoration: none; transition: opacity .2s, transform .2s; }
+  .book-cta-btn:hover { opacity: .88; transform: translateY(-2px); }
+  .book-cta-note { margin-top: 14px; color: #505070; font-size: 14px; }
 
   /* FOOTER */
   .footer { border-top: 1px solid #0e0e24; padding: 48px 0; background: #04040f; }
