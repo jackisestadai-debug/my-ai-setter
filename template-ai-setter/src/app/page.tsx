@@ -387,7 +387,7 @@ export default function Home() {
       <section ref={bokRef} className="section section--cta">
         <div className="container">
           <p className="section__label">Kom igång</p>
-          <h2 className="section__h2">Boka ett gratis 20-minutersmöte</h2>
+          <h2 className="section__h2">Boka ett gratis 30-minutersmöte</h2>
           <p className="section__sub">
             Vi går igenom dina mål och visar vad vi kan göra för just ditt
             företag — inga förpliktelser, inga tekniska förkunskaper krävs.
