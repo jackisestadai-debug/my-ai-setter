@@ -360,18 +360,18 @@ export default function Home() {
       {/* RESULTAT */}
       <section className="section section--dark">
         <div className="container">
-          <p className="section__label">Resultat</p>
-          <h2 className="section__h2">Det våra kunder säger</h2>
+          <p className="section__label">Vad du kan förvänta dig</p>
+          <h2 className="section__h2">Det här är vad systemet gör åt dig</h2>
           <div className="testimonials">
             <TestimonialCard
-              quote="Vi gick från 3–4 bokningar i veckan till 12–15 utan att anställa fler. Rekvo Systems sköter allt."
-              name="Maria L." role="Klinikägare, Stockholm" icon="🏥" />
+              quote="Tänk dig att vakna upp och kalendern redan har nya möten inbokade — utan att du lyft ett finger."
+              name="AI-säljare" role="Automatisk uppföljning dygnet runt" icon="🤖" />
             <TestimonialCard
-              quote="Rekvo byggde vår hemsida på 5 dagar. Den ser proffsig ut och rankar redan på Google."
-              name="Erik S." role="Företagare, Göteborg" icon="💻" />
+              quote="En hemsida som ser professionell ut, laddar snabbt och faktiskt konverterar besökare till kunder."
+              name="Hemsidor" role="Från brief till live på 7 dagar" icon="💻" />
             <TestimonialCard
-              quote="AI:n hanterar all inbound nu. Jag kan fokusera på jobbet istället för att svara på meddelanden."
-              name="Anna K." role="Digital byrå, Malmö" icon="📈" />
+              quote="Sluta lägga tid på att svara på samma frågor. Låt systemet sköta det — du fokuserar på leveransen."
+              name="Tidsbesparing" role="Mer tid till det du är bäst på" icon="⚡" />
           </div>
         </div>
       </section>
@@ -393,9 +393,7 @@ export default function Home() {
                 system som faktiskt fungerar och ger mätbara resultat.
               </p>
               <p>
-                Från kliniker och coaches till byråer och restauranger — vi har
-                hjälpt företag i hela Sverige att automatisera sin försäljning
-                och stärka sin digitala närvaro.
+                Oavsett om du driver klinik, är coach, byrå eller restaurang — vi bygger system som passar din verksamhet och ger dig tid att fokusera på det du är bäst på.
               </p>
               <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>
                 Kom i kontakt →
