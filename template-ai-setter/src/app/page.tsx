@@ -175,13 +175,14 @@ export default function Home() {
             professionella hemsidor — från idé till verklighet.
           </p>
           <div className="hero__btns">
-            <button className="btn btn--primary" onClick={() => go(tjänsterRef)}>
-              Se vad vi gör →
+            <button className="btn btn--primary" onClick={() => go(bokRef)}>
+              Testa gratis i 7 dagar →
             </button>
-            <button className="btn btn--ghost" onClick={() => go(bokRef)}>
-              Boka ett gratis samtal
+            <button className="btn btn--ghost" onClick={() => go(tjänsterRef)}>
+              Se vad vi gör
             </button>
           </div>
+          <p className="hero__trial">Ingen bindningstid · Ingen kreditkort krävs · Igång på 7 dagar</p>
           <div className="stats">
             <Stat value="24/7" label="AI alltid aktiv" />
             <div className="stats__divider" />
@@ -189,6 +190,33 @@ export default function Home() {
             <div className="stats__divider" />
             <Stat value="3×" label="Fler bokade möten" />
           </div>
+        </div>
+      </section>
+
+      {/* SMÄRTA */}
+      <section className="section section--pain">
+        <div className="container">
+          <p className="section__label">Känner du igen dig?</p>
+          <h2 className="section__h2">Du är duktig på det du gör.<br />Men försäljningen tar all din tid.</h2>
+          <div className="pain-grid">
+            <div className="pain-card">
+              <span className="pain-card__icon">😩</span>
+              <p>Du svarar på samma frågor om och om igen i DMs — men hinner aldrig följa upp</p>
+            </div>
+            <div className="pain-card">
+              <span className="pain-card__icon">📉</span>
+              <p>Leads faller bort för att du inte har tid att svara snabbt nog — de går vidare till konkurrenten</p>
+            </div>
+            <div className="pain-card">
+              <span className="pain-card__icon">🕐</span>
+              <p>Du jobbar kvällar och helger för att hänga med, men kalender&shy;en fylls ändå inte</p>
+            </div>
+            <div className="pain-card">
+              <span className="pain-card__icon">💸</span>
+              <p>Du betalar för annonser men ingen hanterar de leads som faktiskt hör av sig</p>
+            </div>
+          </div>
+          <p className="pain-solution">Rekvo löser det här — utan att du behöver anställa eller lära dig ny teknik.</p>
         </div>
       </section>
 
@@ -611,6 +639,17 @@ const css = `
   .value-card__icon { font-size: 24px; flex-shrink: 0; }
   .value-card__title { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 4px; }
   .value-card__desc { font-size: 14px; color: #707090; }
+
+  /* TRIAL */
+  .hero__trial { margin-top: 14px; font-size: 13px; color: #6070a0; letter-spacing: 0.3px; }
+
+  /* SMÄRTA */
+  .section--pain { background: #08081e; }
+  .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 40px 0 32px; }
+  .pain-card { background: #0d0d28; border: 1px solid #1a1a3a; border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .pain-card__icon { font-size: 28px; }
+  .pain-card p { margin: 0; color: #a0a8c8; font-size: 15px; line-height: 1.6; }
+  .pain-solution { text-align: center; font-size: 18px; font-weight: 600; color: #e0e0f0; max-width: 540px; margin: 0 auto; }
 
   /* BOKA */
   .book-cta-wrap { text-align: center; padding: 20px 0 10px; }
