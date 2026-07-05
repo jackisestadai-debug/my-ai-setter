@@ -201,7 +201,7 @@ export default function Home() {
           <div className="pain-grid">
             <div className="pain-card">
               <span className="pain-card__icon">😩</span>
-              <p>Du svarar på samma frågor om och om igen i DMs — men hinner aldrig följa upp</p>
+              <p>Du svarar på samma frågor om och om igen i meddelanden — men hinner aldrig följa upp</p>
             </div>
             <div className="pain-card">
               <span className="pain-card__icon">📉</span>
@@ -234,8 +234,7 @@ export default function Home() {
               <div className="service-card__icon">🤖</div>
               <h3 className="service-card__title">AI-säljare</h3>
               <p className="service-card__desc">
-                En fullt tränad AI-assistent som hanterar dina Instagram-DMs,
-                kvalificerar leads och bokar möten — dygnet runt, i din röst.
+                En fullt tränad AI-assistent som hanterar meddelanden på alla plattformar — Instagram, Facebook, SMS, hemsidechatt och mer — kvalificerar leads och bokar möten dygnet runt, i din röst.
               </p>
               <span className="service-card__link">Läs mer →</span>
             </div>
@@ -295,7 +294,7 @@ export default function Home() {
             <div className="demo-info">
               <h3 className="demo-info__h3">Vad Rekvo Systems gör åt dig</h3>
               <ul className="demo-info__list">
-                <FeatureItem>Svarar på DMs inom sekunder, dygnet runt</FeatureItem>
+                <FeatureItem>Svarar på meddelanden inom sekunder, dygnet runt</FeatureItem>
                 <FeatureItem>Ställer kvalificerande frågor i din röst</FeatureItem>
                 <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
                 <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
@@ -371,7 +370,7 @@ export default function Home() {
               quote="Rekvo byggde vår hemsida på 5 dagar. Den ser proffsig ut och rankar redan på Google."
               name="Erik S." role="Företagare, Göteborg" icon="💻" />
             <TestimonialCard
-              quote="AI:n hanterar all inbound nu. Jag kan fokusera på jobbet istället för att svara på DMs."
+              quote="AI:n hanterar all inbound nu. Jag kan fokusera på jobbet istället för att svara på meddelanden."
               name="Anna K." role="Digital byrå, Malmö" icon="📈" />
           </div>
         </div>
