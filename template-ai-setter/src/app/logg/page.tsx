@@ -17,7 +17,8 @@ function getKey() {
 }
 
 function fmtDate(iso: string) {
-  const d = new Date(iso + "T12:00:00");
+  const [y, m, day] = iso.split("-").map(Number);
+  const d = new Date(y, m - 1, day);
   return d.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" });
 }
 
