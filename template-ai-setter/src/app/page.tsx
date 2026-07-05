@@ -172,7 +172,7 @@ export default function Home() {
           </h1>
           <p className="hero__sub">
             Rekvo hjälper företag att växa med AI-drivna säljsystem och
-            professionella hemsidor — från idé till live på rekordtid.
+            professionella hemsidor — från idé till verklighet.
           </p>
           <div className="hero__btns">
             <button className="btn btn--primary" onClick={() => go(tjänsterRef)}>
@@ -228,9 +228,9 @@ export default function Home() {
       <section ref={aiRef} className="section">
         <div className="container">
           <p className="section__label">AI-säljare</p>
-          <h2 className="section__h2">Möt Aura — din AI-assistent</h2>
+          <h2 className="section__h2">Rekvo Systems — din AI-assistent</h2>
           <p className="section__sub">
-            Aura pratar med dina leads precis som du skulle göra. Välj din
+            Rekvo Systems pratar med dina leads precis som du skulle göra. Välj din
             bransch och se hur en verklig konversation ser ut.
           </p>
 
@@ -254,7 +254,7 @@ export default function Home() {
               <div className="demo-phone__bar">
                 <div className="demo-phone__avatar">A</div>
                 <div>
-                  <div className="demo-phone__name">Aura</div>
+                  <div className="demo-phone__name">Rekvo Systems</div>
                   <div className="demo-phone__status">● Online</div>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function Home() {
             </div>
 
             <div className="demo-info">
-              <h3 className="demo-info__h3">Vad Aura gör åt dig</h3>
+              <h3 className="demo-info__h3">Vad Rekvo Systems gör åt dig</h3>
               <ul className="demo-info__list">
                 <FeatureItem>Svarar på DMs inom sekunder, dygnet runt</FeatureItem>
                 <FeatureItem>Ställer kvalificerande frågor i din röst</FeatureItem>
@@ -337,7 +337,7 @@ export default function Home() {
           <h2 className="section__h2">Det våra kunder säger</h2>
           <div className="testimonials">
             <TestimonialCard
-              quote="Vi gick från 3–4 bokningar i veckan till 12–15 utan att anställa fler. Aura sköter allt."
+              quote="Vi gick från 3–4 bokningar i veckan till 12–15 utan att anställa fler. Rekvo Systems sköter allt."
               name="Maria L." role="Klinikägare, Stockholm" icon="🏥" />
             <TestimonialCard
               quote="Rekvo byggde vår hemsida på 5 dagar. Den ser proffsig ut och rankar redan på Google."
