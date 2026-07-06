@@ -698,7 +698,11 @@ async function handleLeadPipeline(params: {
   const { client, lead, inboundMessageId } = params;
   if (!client || !lead) return;
 
-  if (!lead.screened) {
+  // Screener is opt-in per client. When disabled, treat every lead as ICP and
+  // skip both Part A (first-contact screening) and Part B (ongoing tagging).
+  const screenerEnabled = client.screener_enabled !== false;
+
+  if (screenerEnabled && !lead.screened) {
     const outcome = await runFirstContactScreener({ client, lead });
     if (!outcome.shouldReply) return; // skip_owner / skip_friend / hold — no reply
     await generateAndSendReply({
@@ -710,10 +714,13 @@ async function handleLeadPipeline(params: {
     return;
   }
 
-  // Already screened ICP lead: tag in the background, never blocking the reply.
-  void runOngoingTagging({ client, lead }).catch((err) =>
-    console.error("[webhook] ongoing tagging failed:", err)
-  );
+  // Already screened ICP lead (or screener disabled): tag in the background,
+  // never blocking the reply.
+  if (screenerEnabled) {
+    void runOngoingTagging({ client, lead }).catch((err) =>
+      console.error("[webhook] ongoing tagging failed:", err)
+    );
+  }
   await generateAndSendReply({ client, lead, inboundMessageId });
 }
 

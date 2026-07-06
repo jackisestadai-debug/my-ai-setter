@@ -61,6 +61,7 @@ export type Client = {
   // Whale radar (see lib/stages.ts whale score). When true the setter pings the
   // owner the first time a lead scores as a high-value whale.
   whale_radar_enabled?: boolean;
+  screener_enabled?: boolean;
   created_at: string;
   updated_at: string;
 };
