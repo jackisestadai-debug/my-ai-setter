@@ -16,12 +16,11 @@
  * SAFETY: dormant unless clients.followup_enabled = true, and it only acts on
  * stalls that happen AFTER followup_enabled_at (no retroactive blasts).
  */
-import Anthropic from "@anthropic-ai/sdk";
 import { supabase, logEvent, saveMessage, eventExists, type Lead } from "./supabase";
 import { sendGHLMessage } from "./ghl";
 
-const ACTIVE_STAGES = ["opener_sequence", "demo_response", "book", "post_book", "proof"];
-const OFFSETS_H = [24, 72, 168]; // 24h → 3d → 7d
+const ACTIVE_STAGES = ["opener_sequence", "demo_response", "book", "post_book", "proof", "goals", "pivot", null];
+const OFFSETS_H = [24, 48, 72]; // 24h → 48h → 72h (each 24h apart)
 const MIN_GAP_H = 20;
 const MAX_PER_RUN = 25; // global cap per tick — a surge drips over ticks, never blasts
 
@@ -42,30 +41,14 @@ async function enabledFollowupClients(): Promise<FUClient[]> {
 }
 
 
-const TONE: Record<string, string> = {
-  A1: "Avslappnat ping efter 24h tystnad. Referera naturligt till vad som sades senast. Kort, en mening.",
-  A2: "Lite mer direkt efter 3 dagars tystnad. Fråga om tajmingen är fel eller om de har frågor. Kort.",
-  A3: "Sista pingen efter 7 dagar. Ingen press. Lämna dörren öppen på ett avslappnat sätt. En-två meningar.",
+const FIXED_MSGS: Record<string, string> = {
+  A1: "Hej, fick ni mitt senaste meddelande?",
+  A2: "Hej igen! Förstår att det är mycket som händer, tänkte bara kolla om det är något ni funderar på?",
+  A3: "Sista gången jag hör av mig — om det inte passar nu är det bara att höra av sig när det känns rätt",
 };
 
-async function generateFollowup(client: FUClient, leadId: string, slotKey: string): Promise<string | null> {
-  try {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return null;
-    const { data } = await supabase.from("messages").select("role, content").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(10);
-    const transcript = ((data ?? []) as { role: string; content: string }[]).reverse()
-      .map((m) => `${m.role === "lead" ? "KLINIKEN" : "JACK"}: ${String(m.content || "").slice(0, 300)}`).join("\n");
-    const anthropic = new Anthropic({ apiKey });
-    const res = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001", max_tokens: 100,
-      system: `Du skriver uppföljnings-DMs på Instagram åt Jack på Rekvo. Jack säljer AI-mötesbokare till skönhetskliniker i Sverige.\n\nJacks röst (matcha exakt):\n${(client.voice_samples || "").slice(0, 800)}\n\nSkriv BARA meddelandetexten — inga citattecken, ingen inledning. Kort och naturlig svenska. Inga tankstreck eller bindestreck.`,
-      messages: [{ role: "user", content: `Konversation (äldst först):\n${transcript}\n\nTon för detta meddelande: ${TONE[slotKey]}\n\nSkriv uppföljningsmeddelandet.` }],
-    });
-    const txt = res.content.filter((b) => b.type === "text").map((b) => (b as { type: "text"; text: string }).text).join("").trim().replace(/^["']|["']$/g, "");
-    return txt || null;
-  } catch {
-    return null;
-  }
+function generateFollowup(_client: FUClient, _leadId: string, slotKey: string): Promise<string | null> {
+  return Promise.resolve(FIXED_MSGS[slotKey] ?? null);
 }
 
 /** Mark revival when a lead replied after we'd sent follow-ups (idempotent). */
@@ -92,9 +75,9 @@ export async function runFollowups(): Promise<{ enabled: number; sent: number }>
     for (const client of clients) {
       if (!client.ghl_api_key || !client.ghl_location_id) continue;
       const { data: leads } = await supabase.from("leads").select("*")
-        .eq("client_id", client.id).eq("status", "engaged")
+        .eq("client_id", client.id).in("status", ["new", "engaged"])
         .eq("ai_paused", false).eq("followup_paused", false)
-        .in("funnel_stage", ACTIVE_STAGES)
+        .or(`funnel_stage.is.null,funnel_stage.in.(${ACTIVE_STAGES.filter(Boolean).join(",")})`)
         .lt("last_message_at", new Date(now - minQuietMs).toISOString())
         .order("last_message_at", { ascending: true }).limit(60);
 
