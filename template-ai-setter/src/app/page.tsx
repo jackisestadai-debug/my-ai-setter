@@ -382,7 +382,7 @@ export default function Home() {
       <section ref={omRef} className="section">
         <div className="container">
           <p className="section__label">Om oss</p>
-          <h2 className="section__h2">Rekvo.</h2>
+          <h3 className="section__h3">Rekvo.</h3>
           <div className="about-wrap">
             <div className="about-text">
               <p>
@@ -563,6 +563,7 @@ const css = `
   .section--cta { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(79,70,229,0.18) 0%, transparent 70%); }
   .section__label { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 2.5px; color: #6366f1; text-transform: uppercase; margin-bottom: 14px; }
   .section__h2 { text-align: center; font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: -1px; color: #fff; margin: 0 auto 18px; max-width: 680px; }
+  .section__h3 { text-align: left; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 18px; }
   .section__sub { text-align: center; color: #707090; font-size: 17px; line-height: 1.75; max-width: 560px; margin: 0 auto 56px; }
 
   /* TJÄNSTER */
