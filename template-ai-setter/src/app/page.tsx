@@ -394,9 +394,7 @@ export default function Home() {
               <p>
                 <strong>Hemsidor.</strong> Snabba, moderna hemsidor byggda med Next.js. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
               </p>
-              <p>
-                Två tjänster, ett mål: din tillväxt.
-              </p>
+
               <p>
                 Du behöver inte kunna teknik. Vi bygger, driftsätter och sköter allt. Du loggar in, ser resultatet, och kör ditt företag.
               </p>
