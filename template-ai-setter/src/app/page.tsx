@@ -384,16 +384,13 @@ export default function Home() {
           <div className="about-wrap">
             <div className="about-text">
               <p>
-                Rekvo är ett svenskt bolag som hjälper företag att växa digitalt —
-                snabbt och utan krångel. Vi tror att alla företag förtjänar
-                professionella digitala verktyg, oavsett storlek.
+                Vi bygger en AI som jobbar åt dig dygnet runt — bokar in möten, svarar på vanliga frågor och följer upp leads precis som en receptionist skulle göra. Helt anpassad efter ditt företag och hur du pratar med dina kunder.
               </p>
               <p>
-                Vi kombinerar AI-teknik med modern webbutveckling för att leverera
-                system som faktiskt fungerar och ger mätbara resultat.
+                Du behöver inte kunna ett dugg om teknik. Vi sköter allt — från upplägg till lansering. Du loggar in, ser dina bokningar och kör på.
               </p>
               <p>
-                Oavsett om du driver klinik, är coach, byrå eller restaurang — vi bygger system som passar din verksamhet och ger dig tid att fokusera på det du är bäst på.
+                Oavsett om du driver klinik, är coach, byrå eller restaurang — systemet anpassas efter dig och är igång på 7 dagar.
               </p>
               <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>
                 Kom i kontakt →
