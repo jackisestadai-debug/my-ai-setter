@@ -384,7 +384,7 @@ export default function Home() {
           <div className="about-wrap">
             <div className="about-text">
               <p>
-                Vi bygger en AI som jobbar åt dig dygnet runt, precis som en anställd. Den bokar in möten, svarar på vanliga frågor och följer upp leads, helt anpassad efter ditt företag och hur du kommunicerar med dina kunder.
+                Vi bygger en AI som jobbar åt dig dygnet runt, precis som en anställd. Den tar hand om hela kundkontakten, från första meddelandet till inbokat möte, och allt är anpassat efter just ditt företag.
               </p>
               <p>
                 Du behöver inte kunna ett dugg om teknik. Vi sköter allt, från upplägg till lansering. Du loggar in, ser dina bokningar och kör på.
