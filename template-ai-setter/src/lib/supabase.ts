@@ -62,6 +62,7 @@ export type Client = {
   // owner the first time a lead scores as a high-value whale.
   whale_radar_enabled?: boolean;
   screener_enabled?: boolean;
+  farewell_message?: string | null;
   created_at: string;
   updated_at: string;
 };

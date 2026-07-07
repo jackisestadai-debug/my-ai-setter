@@ -975,9 +975,19 @@ async function runReplyGeneration(params: {
       }
     }
 
-    // Disqualify branch (e.g. 3rd-world location per the operator's rules):
-    // pause the AI (pauseLead pings Jack), and do NOT reply.
+    // Disqualify branch: send a farewell message if configured, then pause.
     if (resolution.disqualify) {
+      const farewell = (client as typeof client & { farewell_message?: string | null }).farewell_message;
+      if (farewell && client.ghl_api_key && client.ghl_location_id && lead.ghl_contact_id) {
+        await sendGHLMixedSequence({
+          ghl_api_key: client.ghl_api_key,
+          ghl_location_id: client.ghl_location_id,
+          ghl_contact_id: lead.ghl_contact_id,
+          rawReply: farewell,
+          channel: "IG",
+        });
+        await saveMessage({ lead_id: lead.id, client_id: client.id, role: "ai", content: farewell, channel: "instagram", model_used: "farewell" });
+      }
       await pauseLead({ client, lead, notify: { label: "Disqualified lead (auto-paused)", reason: resolution.reason } });
       await logEvent({
         client_id: client.id,
@@ -985,9 +995,6 @@ async function runReplyGeneration(params: {
         event_type: "stage_disqualified",
         metadata: { stage: resolution.stage.id, reason: resolution.reason },
       });
-      // Move the GHL card to "Disqualified" too (best-effort, forward-guarded —
-      // leaves a booked/won card alone). The watcher logs the GHL milestone on
-      // its next pass.
       await syncPipelineDisqualified({ client, lead });
       return;
     }
