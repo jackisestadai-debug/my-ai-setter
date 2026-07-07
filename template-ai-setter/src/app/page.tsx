@@ -389,7 +389,7 @@ export default function Home() {
                 De flesta förlorar leads på två ställen. Långsamma svar på meddelanden, och hemsidor som inte konverterar. Vi löser båda.
               </p>
               <p>
-                <strong>AI-säljare.</strong> En AI-assistent som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS, hemsidechatt. Den kvalificerar leads och bokar möten i din röst, medan du gör annat.
+                <strong>AI-säljare.</strong> En AI som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS. Den är helt skräddarsydd efter ditt företag, pratar som en människa och kvalificerar leads och bokar möten medan du gör annat.
               </p>
               <p>
                 <strong>Hemsidor.</strong> Snabba, moderna hemsidor. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
