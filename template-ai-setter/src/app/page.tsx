@@ -379,17 +379,26 @@ export default function Home() {
       <section ref={omRef} className="section">
         <div className="container">
           <p className="section__label">Om oss</p>
-          <h2 className="section__h2">Vi är Rekvo</h2>
+          <h2 className="section__h2">Rekvo.</h2>
           <div className="about-wrap">
             <div className="about-text">
               <p>
-                Vi bygger en AI som jobbar åt dig dygnet runt, precis som en anställd. Den tar hand om hela kundkontakten, från första meddelandet till inbokat möte, och allt är anpassat efter just ditt företag.
+                Vi hjälper företag att sluta tappa kunder till dålig digital närvaro.
               </p>
               <p>
-                Du behöver inte kunna ett dugg om teknik. Vi sköter allt, från upplägg till lansering. Du loggar in, ser dina bokningar och kör på.
+                De flesta förlorar leads på två ställen. Långsamma svar på meddelanden, och hemsidor som inte konverterar. Vi löser båda.
               </p>
               <p>
-                Oavsett om du driver klinik, är coach, byrå eller restaurang, systemet anpassas efter dig och är igång på 7 dagar.
+                <strong>AI-säljare.</strong> En AI-assistent som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS, hemsidechatt. Den kvalificerar leads och bokar möten i din röst, medan du gör annat.
+              </p>
+              <p>
+                <strong>Hemsidor.</strong> Snabba, moderna hemsidor byggda med Next.js. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
+              </p>
+              <p>
+                Två tjänster, ett mål: din tillväxt.
+              </p>
+              <p>
+                Du behöver inte kunna teknik. Vi bygger, driftsätter och sköter allt. Du loggar in, ser resultatet, och kör ditt företag.
               </p>
               <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>
                 Kom i kontakt →
