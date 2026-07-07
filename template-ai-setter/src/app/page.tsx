@@ -356,21 +356,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* RESULTAT */}
+      {/* FÖRDELAR */}
       <section className="section section--dark">
         <div className="container">
-          <p className="section__label">Vad du kan förvänta dig</p>
-          <h2 className="section__h2">Det här är vad systemet gör åt dig</h2>
-          <div className="testimonials">
-            <TestimonialCard
-              quote="Tänk dig att vakna upp och kalendern redan har nya möten inbokade, utan att du lyft ett finger."
-              name="AI-säljare" role="Automatisk uppföljning dygnet runt" icon="🤖" />
-            <TestimonialCard
-              quote="En hemsida som ser professionell ut, laddar snabbt och faktiskt konverterar besökare till kunder."
-              name="Hemsidor" role="Från brief till live på 7 dagar" icon="💻" />
-            <TestimonialCard
-              quote="Sluta lägga tid på att svara på samma frågor. Låt systemet sköta det, du fokuserar på leveransen."
-              name="Tidsbesparing" role="Mer tid till det du är bäst på" icon="⚡" />
+          <p className="section__label">Varför Rekvo</p>
+          <h2 className="section__h2">Tre saker vi gör annorlunda</h2>
+          <div className="benefits-grid">
+            <div className="benefit-card">
+              <h3 className="benefit-card__title">Alltid tillgänglig</h3>
+              <p className="benefit-card__desc">Systemet svarar på varje meddelande direkt, dygnet runt, utan pauser. Inga leads tappas bort för att du sover eller är upptagen.</p>
+            </div>
+            <div className="benefit-card">
+              <h3 className="benefit-card__title">Helt skräddarsytt</h3>
+              <p className="benefit-card__desc">Vi bygger inte en generisk bot. Varje system tränas på ditt företag, dina erbjudanden och hur du pratar med dina kunder.</p>
+            </div>
+            <div className="benefit-card">
+              <h3 className="benefit-card__title">Igång på 7 dagar</h3>
+              <p className="benefit-card__desc">Du behöver inte vänta månader eller lära dig någon teknik. Vi sköter allt, och du ser resultat från dag ett.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -638,6 +641,12 @@ const css = `
 
   /* TRIAL */
   .hero__trial { margin-top: 14px; font-size: 13px; color: #6070a0; letter-spacing: 0.3px; }
+
+  /* FÖRDELAR */
+  .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 40px; }
+  .benefit-card { background: #0d0d28; border: 1px solid #1a1a3a; border-radius: 16px; padding: 32px 28px; }
+  .benefit-card__title { font-size: 20px; font-weight: 700; color: #e0e0f0; margin: 0 0 12px; }
+  .benefit-card__desc { font-size: 15px; color: #8090b8; line-height: 1.7; margin: 0; }
 
   /* SMÄRTA */
   .section--pain { background: #08081e; }
