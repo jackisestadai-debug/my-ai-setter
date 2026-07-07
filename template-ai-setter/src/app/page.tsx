@@ -318,7 +318,7 @@ export default function Home() {
             Google-ranking och konvertering. Precis som den här sidan.
           </p>
           <div className="web-grid">
-            <WebFeature icon="" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund, Google älskar det." />
+            <WebFeature icon="" title="Blixtsnabb" desc="Laddningstider under 1 sekund, Google älskar det." />
             <WebFeature icon="" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
             <WebFeature icon="" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
             <WebFeature icon="" title="Skräddarsydd design" desc="Ingen mall, varje sida designas utifrån ditt varumärke." />
