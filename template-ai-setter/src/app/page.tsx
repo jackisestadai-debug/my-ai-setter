@@ -56,11 +56,11 @@ const NICHES: Record<NicheKey, NicheData> = {
   byra: {
     icon: "📈", label: "Digital byrå",
     conversation: [
-      { from: "aura", text: "Hej! Hur går det med er Instagram-trafik just nu?" },
+      { from: "aura", text: "Hej! Hur känns er Instagram just nu, får ni ut det ni vill av den?" },
       { from: "lead", text: "Okej men vi får inte ut så mycket av det som vi borde" },
-      { from: "aura", text: "Det är vanligt! Vi ökar Instagram-ROI med 3–5× inom 90 dagar. Vill du höra hur? Kan boka 20 min direkt." },
+      { from: "aura", text: "Det är vanligt! Vi hjälper er att få ut mer, oftast 3 till 5 gånger mer, inom 90 dagar. Vill du höra hur? Kan boka 20 min direkt." },
       { from: "lead", text: "Absolut, vad kostar det?" },
-      { from: "aura", text: "Vi börjar alltid med ett gratis strategisamtal, ingen sälj, bara se om vi passar. Här är länken 👉 [länk]" },
+      { from: "aura", text: "Vi börjar alltid med ett gratis samtal, ingen sälj, bara se om vi passar. Här är länken 👉 [länk]" },
     ],
   },
   restaurant: {
@@ -171,8 +171,7 @@ export default function Home() {
             <span className="gradient-text">som driver din tillväxt</span>
           </h1>
           <p className="hero__sub">
-            Rekvo hjälper företag att växa med AI-drivna säljsystem och
-            professionella hemsidor, från idé till verklighet.
+            Vi hjälper dig att få fler kunder, med ett smart system som svarar och bokar åt dig, och en hemsida som faktiskt fungerar.
           </p>
           <div className="hero__btns">
             <button className="btn btn--primary" onClick={() => go(bokRef)}>
@@ -183,9 +182,9 @@ export default function Home() {
             </button>
           </div>
           <div className="stats">
-            <Stat value="24/7" label="AI alltid aktiv" />
+            <Stat value="24/7" label="Alltid tillgänglig" />
             <div className="stats__divider" />
-            <Stat value="7 dagar" label="Från start till live" />
+            <Stat value="7 dagar" label="Från möte till klar" />
             <div className="stats__divider" />
             <Stat value="3×" label="Fler bokade möten" />
           </div>
@@ -233,7 +232,7 @@ export default function Home() {
               
               <h3 className="service-card__title">AI-säljare</h3>
               <p className="service-card__desc">
-                En fullt tränad AI-assistent som hanterar meddelanden på alla plattformar, Instagram, Facebook, SMS, hemsidechatt och mer, kvalificerar leads och bokar möten dygnet runt, i din röst.
+                Ett system som svarar på meddelanden, sorterar ut seriösa kunder och bokar möten åt dig, dygnet runt. Helt anpassat till hur du pratar och vad du säljer.
               </p>
               <span className="service-card__link">Läs mer →</span>
             </div>
@@ -241,8 +240,7 @@ export default function Home() {
               
               <h3 className="service-card__title">Hemsidor</h3>
               <p className="service-card__desc">
-                Moderna, snabba hemsidor byggda med Next.js och driftsatta på
-                Vercel, optimerade för konvertering och Google-ranking.
+                Moderna, snabba hemsidor som syns på Google och förvandlar besökare till kunder. Designade från grunden utifrån ditt företag.
               </p>
               <span className="service-card__link">Läs mer →</span>
             </div>
@@ -256,7 +254,7 @@ export default function Home() {
           <p className="section__label">AI-säljare</p>
           <h2 className="section__h2">Rekvo Systems, din AI-assistent</h2>
           <p className="section__sub">
-            Rekvo Systems pratar med dina leads precis som du skulle göra. Välj din
+            Systemet pratar med dina kunder precis som du skulle göra. Välj din
             bransch och se hur en verklig konversation ser ut.
           </p>
 
@@ -294,7 +292,7 @@ export default function Home() {
               <h3 className="demo-info__h3">Vad Rekvo Systems gör åt dig</h3>
               <ul className="demo-info__list">
                 <FeatureItem>Svarar på meddelanden inom sekunder, dygnet runt</FeatureItem>
-                <FeatureItem>Ställer kvalificerande frågor i din röst</FeatureItem>
+                <FeatureItem>Ställer rätt frågor och sållar ut seriösa kunder</FeatureItem>
                 <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
                 <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
                 <FeatureItem>Tränas på ditt erbjudande och dina kunder</FeatureItem>
@@ -314,16 +312,15 @@ export default function Home() {
           <p className="section__label">Hemsidor</p>
           <h2 className="section__h2">Hemsidor som faktiskt konverterar</h2>
           <p className="section__sub">
-            Vi designar och bygger moderna hemsidor optimerade för snabbhet,
-            Google-ranking och konvertering. Precis som den här sidan.
+            Vi designar och bygger moderna hemsidor som laddar snabbt, syns när folk söker på Google och faktiskt förvandlar besökare till kunder.
           </p>
           <div className="web-grid">
-            <WebFeature icon="" title="Blixtsnabb" desc="Laddningstider under 1 sekund, Google älskar det." />
-            <WebFeature icon="" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
-            <WebFeature icon="" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
-            <WebFeature icon="" title="Skräddarsydd design" desc="Ingen mall, varje sida designas utifrån ditt varumärke." />
-            <WebFeature icon="" title="Integrationer" desc="Kopplas ihop med bokningssystem, CRM och betalningar." />
-            <WebFeature icon="" title="Live på 7 dagar" desc="Från första möte till publicerad sida på en vecka." />
+            <WebFeature icon="" title="Blixtsnabb" desc="Laddar på under en sekund. Besökare stannar kvar och Google gillar det." />
+            <WebFeature icon="" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, oavsett om man använder mobil eller dator." />
+            <WebFeature icon="" title="Syns på Google" desc="Din sida dyker upp när folk söker efter det du erbjuder, från dag ett." />
+            <WebFeature icon="" title="Skräddarsydd design" desc="Ingen mall. Varje sida designas från grunden utifrån ditt företag." />
+            <WebFeature icon="" title="Kopplas till dina verktyg" desc="Fungerar med din kalender, ditt bokningssystem och betalningar." />
+            <WebFeature icon="" title="Klar på 7 dagar" desc="Från första möte till en färdig sida på en vecka." />
           </div>
           <div className="web-case">
             <div className="web-case__label">Case, rekvo.se</div>
@@ -347,11 +344,11 @@ export default function Home() {
             Inga långa projekt. Vi rör oss snabbt och levererar resultat.
           </p>
           <div className="process-steps">
-            <ProcessStep num={1} title="Möte & brief" desc="Vi lär oss ditt företag, dina mål och din målgrupp på 60 minuter." />
+            <ProcessStep num={1} title="Vi lär känna dig" desc="Vi lär oss ditt företag, dina mål och dina kunder på ett kort möte." />
             <div className="process-steps__arrow">→</div>
-            <ProcessStep num={2} title="Design & bygge" desc="Vi designar, kodar och konfigurerar allt, du behöver inte göra något." />
+            <ProcessStep num={2} title="Vi bygger allt" desc="Vi sköter allt arbete. Du behöver inte göra något eller kunna något." />
             <div className="process-steps__arrow">→</div>
-            <ProcessStep num={3} title="Live & optimering" desc="Vi publicerar och följer upp. Du ser resultat från dag ett." />
+            <ProcessStep num={3} title="Du kör igång" desc="Vi levererar och följer upp. Du ser resultat från dag ett." />
           </div>
         </div>
       </section>
@@ -392,7 +389,7 @@ export default function Home() {
                 De flesta förlorar leads på två ställen. Långsamma svar på meddelanden, och hemsidor som inte konverterar. Vi löser båda.
               </p>
               <p>
-                <strong>AI-säljare.</strong> En AI som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS. Den är helt skräddarsydd efter ditt företag, pratar som en människa och kvalificerar leads och bokar möten medan du gör annat.
+                <strong>AI-säljare.</strong> Ett system som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS. Det är helt anpassat efter ditt företag, pratar som en människa och sorterar ut seriösa kunder och bokar möten, medan du gör annat.
               </p>
               <p>
                 <strong>Hemsidor.</strong> Snabba, moderna hemsidor. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
@@ -407,8 +404,8 @@ export default function Home() {
             </div>
             <div className="about-values">
               <ValueCard icon="" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
-              <ValueCard icon="" title="Resultat" desc="Vi mäter allt och optimerar kontinuerligt." />
-              <ValueCard icon="" title="Enkelhet" desc="Inga tekniska förkunskaper krävs." />
+              <ValueCard icon="" title="Resultat" desc="Vi följer upp och justerar tills det fungerar." />
+              <ValueCard icon="" title="Enkelhet" desc="Du behöver inte kunna ett dugg om teknik." />
             </div>
           </div>
         </div>
