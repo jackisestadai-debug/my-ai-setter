@@ -182,7 +182,6 @@ export default function Home() {
               Se vad vi gör
             </button>
           </div>
-          <p className="hero__trial">Ingen bindningstid · Igång på 7 dagar</p>
           <div className="stats">
             <Stat value="24/7" label="AI alltid aktiv" />
             <div className="stats__divider" />
