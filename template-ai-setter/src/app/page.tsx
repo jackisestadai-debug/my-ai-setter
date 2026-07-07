@@ -18,7 +18,7 @@ const NICHES: Record<NicheKey, NicheData> = {
     conversation: [
       { from: "aura", text: "Hej! Söker du hjälp med något specifikt just nu? 😊" },
       { from: "lead", text: "Ja, jag har ont i ryggen och letar efter en naprapat" },
-      { from: "aura", text: "Det förstår jag — ryggbesvär kan vara jobbigt. Vi har lediga tider redan den här veckan. Vill du att jag bokar in ett besök?" },
+      { from: "aura", text: "Det förstår jag, ryggbesvär kan vara jobbigt. Vi har lediga tider redan den här veckan. Vill du att jag bokar in ett besök?" },
       { from: "lead", text: "Ja gärna, vad kostar det?" },
       { from: "aura", text: "Första besöket kostar 595 kr och tar 45 min. Jag skickar en bokningslänk direkt 👉 [länk]" },
     ],
@@ -26,7 +26,7 @@ const NICHES: Record<NicheKey, NicheData> = {
   coach: {
     icon: "🏋️", label: "Coach & PT",
     conversation: [
-      { from: "aura", text: "Hej! Såg att du kollade in våra program — vad är ditt mål just nu? 💪" },
+      { from: "aura", text: "Hej! Såg att du kollade in våra program, vad är ditt mål just nu? 💪" },
       { from: "lead", text: "Vill gå ner i vikt och komma igång med styrketräning" },
       { from: "aura", text: "Perfekt! Vi ser resultat redan inom 8 veckor med rätt program. Vill du boka en gratis 20-min konsultation?" },
       { from: "lead", text: "Ja det låter bra!" },
@@ -60,7 +60,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Okej men vi får inte ut så mycket av det som vi borde" },
       { from: "aura", text: "Det är vanligt! Vi ökar Instagram-ROI med 3–5× inom 90 dagar. Vill du höra hur? Kan boka 20 min direkt." },
       { from: "lead", text: "Absolut, vad kostar det?" },
-      { from: "aura", text: "Vi börjar alltid med ett gratis strategisamtal — ingen sälj, bara se om vi passar. Här är länken 👉 [länk]" },
+      { from: "aura", text: "Vi börjar alltid med ett gratis strategisamtal, ingen sälj, bara se om vi passar. Här är länken 👉 [länk]" },
     ],
   },
   restaurant: {
@@ -172,7 +172,7 @@ export default function Home() {
           </h1>
           <p className="hero__sub">
             Rekvo hjälper företag att växa med AI-drivna säljsystem och
-            professionella hemsidor — från idé till verklighet.
+            professionella hemsidor, från idé till verklighet.
           </p>
           <div className="hero__btns">
             <button className="btn btn--primary" onClick={() => go(bokRef)}>
@@ -201,11 +201,11 @@ export default function Home() {
           <div className="pain-grid">
             <div className="pain-card">
               <span className="pain-card__icon">😩</span>
-              <p>Du svarar på samma frågor om och om igen i meddelanden — men hinner aldrig följa upp</p>
+              <p>Du svarar på samma frågor om och om igen i meddelanden, men hinner aldrig följa upp</p>
             </div>
             <div className="pain-card">
               <span className="pain-card__icon">📉</span>
-              <p>Leads faller bort för att du inte har tid att svara snabbt nog — de går vidare till konkurrenten</p>
+              <p>Leads faller bort för att du inte har tid att svara snabbt nog, de går vidare till konkurrenten</p>
             </div>
             <div className="pain-card">
               <span className="pain-card__icon">🕐</span>
@@ -216,7 +216,7 @@ export default function Home() {
               <p>Du betalar för annonser men ingen hanterar de leads som faktiskt hör av sig</p>
             </div>
           </div>
-          <p className="pain-solution">Rekvo löser det här — utan att du behöver anställa eller lära dig ny teknik.</p>
+          <p className="pain-solution">Rekvo löser det här, utan att du behöver anställa eller lära dig ny teknik.</p>
         </div>
       </section>
 
@@ -224,7 +224,7 @@ export default function Home() {
       <section ref={tjänsterRef} className="section section--dark">
         <div className="container">
           <p className="section__label">Vad vi gör</p>
-          <h2 className="section__h2">Två tjänster, ett mål — din tillväxt</h2>
+          <h2 className="section__h2">Två tjänster, ett mål, din tillväxt</h2>
           <p className="section__sub">
             Vi kombinerar AI-teknik och webbdesign för att ge ditt företag
             en komplett digital närvaro som faktiskt säljer.
@@ -234,7 +234,7 @@ export default function Home() {
               <div className="service-card__icon">🤖</div>
               <h3 className="service-card__title">AI-säljare</h3>
               <p className="service-card__desc">
-                En fullt tränad AI-assistent som hanterar meddelanden på alla plattformar — Instagram, Facebook, SMS, hemsidechatt och mer — kvalificerar leads och bokar möten dygnet runt, i din röst.
+                En fullt tränad AI-assistent som hanterar meddelanden på alla plattformar, Instagram, Facebook, SMS, hemsidechatt och mer, kvalificerar leads och bokar möten dygnet runt, i din röst.
               </p>
               <span className="service-card__link">Läs mer →</span>
             </div>
@@ -243,7 +243,7 @@ export default function Home() {
               <h3 className="service-card__title">Hemsidor</h3>
               <p className="service-card__desc">
                 Moderna, snabba hemsidor byggda med Next.js och driftsatta på
-                Vercel — optimerade för konvertering och Google-ranking.
+                Vercel, optimerade för konvertering och Google-ranking.
               </p>
               <span className="service-card__link">Läs mer →</span>
             </div>
@@ -255,7 +255,7 @@ export default function Home() {
       <section ref={aiRef} className="section">
         <div className="container">
           <p className="section__label">AI-säljare</p>
-          <h2 className="section__h2">Rekvo Systems — din AI-assistent</h2>
+          <h2 className="section__h2">Rekvo Systems, din AI-assistent</h2>
           <p className="section__sub">
             Rekvo Systems pratar med dina leads precis som du skulle göra. Välj din
             bransch och se hur en verklig konversation ser ut.
@@ -299,7 +299,7 @@ export default function Home() {
                 <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
                 <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
                 <FeatureItem>Tränas på ditt erbjudande och dina kunder</FeatureItem>
-                <FeatureItem>Igång på 7 dagar — utan tekniska förkunskaper</FeatureItem>
+                <FeatureItem>Igång på 7 dagar, utan tekniska förkunskaper</FeatureItem>
               </ul>
               <button className="btn btn--primary" onClick={() => go(bokRef)}>
                 Boka en AI-demo →
@@ -319,15 +319,15 @@ export default function Home() {
             Google-ranking och konvertering. Precis som den här sidan.
           </p>
           <div className="web-grid">
-            <WebFeature icon="⚡" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund — Google älskar det." />
+            <WebFeature icon="⚡" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund, Google älskar det." />
             <WebFeature icon="📱" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
             <WebFeature icon="🔍" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
-            <WebFeature icon="🎨" title="Skräddarsydd design" desc="Ingen mall — varje sida designas utifrån ditt varumärke." />
+            <WebFeature icon="🎨" title="Skräddarsydd design" desc="Ingen mall, varje sida designas utifrån ditt varumärke." />
             <WebFeature icon="🔗" title="Integrationer" desc="Kopplas ihop med bokningssystem, CRM och betalningar." />
             <WebFeature icon="🚀" title="Live på 7 dagar" desc="Från första möte till publicerad sida på en vecka." />
           </div>
           <div className="web-case">
-            <div className="web-case__label">Case — rekvo.se</div>
+            <div className="web-case__label">Case, rekvo.se</div>
             <p className="web-case__text">
               Den här sidan är ett exempel på vad vi bygger. Designad, kodad
               och driftsatt av Rekvo på 7 dagar.
@@ -350,7 +350,7 @@ export default function Home() {
           <div className="process-steps">
             <ProcessStep num={1} title="Möte & brief" desc="Vi lär oss ditt företag, dina mål och din målgrupp på 60 minuter." />
             <div className="process-steps__arrow">→</div>
-            <ProcessStep num={2} title="Design & bygge" desc="Vi designar, kodar och konfigurerar allt — du behöver inte göra något." />
+            <ProcessStep num={2} title="Design & bygge" desc="Vi designar, kodar och konfigurerar allt, du behöver inte göra något." />
             <div className="process-steps__arrow">→</div>
             <ProcessStep num={3} title="Live & optimering" desc="Vi publicerar och följer upp. Du ser resultat från dag ett." />
           </div>
@@ -364,13 +364,13 @@ export default function Home() {
           <h2 className="section__h2">Det här är vad systemet gör åt dig</h2>
           <div className="testimonials">
             <TestimonialCard
-              quote="Tänk dig att vakna upp och kalendern redan har nya möten inbokade — utan att du lyft ett finger."
+              quote="Tänk dig att vakna upp och kalendern redan har nya möten inbokade, utan att du lyft ett finger."
               name="AI-säljare" role="Automatisk uppföljning dygnet runt" icon="🤖" />
             <TestimonialCard
               quote="En hemsida som ser professionell ut, laddar snabbt och faktiskt konverterar besökare till kunder."
               name="Hemsidor" role="Från brief till live på 7 dagar" icon="💻" />
             <TestimonialCard
-              quote="Sluta lägga tid på att svara på samma frågor. Låt systemet sköta det — du fokuserar på leveransen."
+              quote="Sluta lägga tid på att svara på samma frågor. Låt systemet sköta det, du fokuserar på leveransen."
               name="Tidsbesparing" role="Mer tid till det du är bäst på" icon="⚡" />
           </div>
         </div>
@@ -384,13 +384,13 @@ export default function Home() {
           <div className="about-wrap">
             <div className="about-text">
               <p>
-                Vi bygger en AI som jobbar åt dig dygnet runt — bokar in möten, svarar på vanliga frågor och följer upp leads precis som en receptionist skulle göra. Helt anpassad efter ditt företag och hur du pratar med dina kunder.
+                Vi bygger en AI som jobbar åt dig dygnet runt, bokar in möten, svarar på vanliga frågor och följer upp leads precis som en receptionist skulle göra. Helt anpassad efter ditt företag och hur du pratar med dina kunder.
               </p>
               <p>
-                Du behöver inte kunna ett dugg om teknik. Vi sköter allt — från upplägg till lansering. Du loggar in, ser dina bokningar och kör på.
+                Du behöver inte kunna ett dugg om teknik. Vi sköter allt, från upplägg till lansering. Du loggar in, ser dina bokningar och kör på.
               </p>
               <p>
-                Oavsett om du driver klinik, är coach, byrå eller restaurang — systemet anpassas efter dig och är igång på 7 dagar.
+                Oavsett om du driver klinik, är coach, byrå eller restaurang, systemet anpassas efter dig och är igång på 7 dagar.
               </p>
               <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>
                 Kom i kontakt →
@@ -412,7 +412,7 @@ export default function Home() {
           <h2 className="section__h2">Boka ett gratis 30-minutersmöte</h2>
           <p className="section__sub">
             Vi går igenom dina mål och visar vad vi kan göra för just ditt
-            företag — inga förpliktelser, inga tekniska förkunskaper krävs.
+            företag, inga förpliktelser, inga tekniska förkunskaper krävs.
           </p>
           <div className="book-cta-wrap">
             <a
