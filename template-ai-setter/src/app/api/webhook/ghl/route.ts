@@ -983,8 +983,8 @@ async function runReplyGeneration(params: {
           ghl_api_key: client.ghl_api_key,
           ghl_location_id: client.ghl_location_id,
           ghl_contact_id: lead.ghl_contact_id,
-          rawReply: farewell,
-          channel: "IG",
+          items: [{ message: farewell }],
+          type: "IG",
         });
         await saveMessage({ lead_id: lead.id, client_id: client.id, role: "ai", content: farewell, channel: "instagram", model_used: "farewell" });
       }
