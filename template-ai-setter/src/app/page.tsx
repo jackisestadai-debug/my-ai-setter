@@ -199,19 +199,19 @@ export default function Home() {
           <h2 className="section__h2">Du är duktig på det du gör.<br />Men försäljningen tar all din tid.</h2>
           <div className="pain-grid">
             <div className="pain-card">
-              <span className="pain-card__icon">😩</span>
+              
               <p>Du svarar på samma frågor om och om igen i meddelanden, men hinner aldrig följa upp</p>
             </div>
             <div className="pain-card">
-              <span className="pain-card__icon">📉</span>
+              
               <p>Leads faller bort för att du inte har tid att svara snabbt nog, de går vidare till konkurrenten</p>
             </div>
             <div className="pain-card">
-              <span className="pain-card__icon">🕐</span>
+              
               <p>Du jobbar kvällar och helger för att hänga med, men kalender&shy;en fylls ändå inte</p>
             </div>
             <div className="pain-card">
-              <span className="pain-card__icon">💸</span>
+              
               <p>Du betalar för annonser men ingen hanterar de leads som faktiskt hör av sig</p>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function Home() {
           </p>
           <div className="services-grid">
             <div className="service-card" onClick={() => go(aiRef)}>
-              <div className="service-card__icon">🤖</div>
+              
               <h3 className="service-card__title">AI-säljare</h3>
               <p className="service-card__desc">
                 En fullt tränad AI-assistent som hanterar meddelanden på alla plattformar, Instagram, Facebook, SMS, hemsidechatt och mer, kvalificerar leads och bokar möten dygnet runt, i din röst.
@@ -238,7 +238,7 @@ export default function Home() {
               <span className="service-card__link">Läs mer →</span>
             </div>
             <div className="service-card" onClick={() => go(webRef)}>
-              <div className="service-card__icon">💻</div>
+              
               <h3 className="service-card__title">Hemsidor</h3>
               <p className="service-card__desc">
                 Moderna, snabba hemsidor byggda med Next.js och driftsatta på
@@ -268,7 +268,7 @@ export default function Home() {
                 className={`niche-btn ${activeNiche === key ? "niche-btn--active" : ""}`}
                 onClick={() => setActiveNiche(key)}
               >
-                <span className="niche-btn__icon">{NICHES[key].icon}</span>
+
                 <span className="niche-btn__label">{NICHES[key].label}</span>
               </button>
             ))}
@@ -318,12 +318,12 @@ export default function Home() {
             Google-ranking och konvertering. Precis som den här sidan.
           </p>
           <div className="web-grid">
-            <WebFeature icon="⚡" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund, Google älskar det." />
-            <WebFeature icon="📱" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
-            <WebFeature icon="🔍" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
-            <WebFeature icon="🎨" title="Skräddarsydd design" desc="Ingen mall, varje sida designas utifrån ditt varumärke." />
-            <WebFeature icon="🔗" title="Integrationer" desc="Kopplas ihop med bokningssystem, CRM och betalningar." />
-            <WebFeature icon="🚀" title="Live på 7 dagar" desc="Från första möte till publicerad sida på en vecka." />
+            <WebFeature icon="" title="Blixtsnabb" desc="Next.js och Vercel ger laddningstider under 1 sekund, Google älskar det." />
+            <WebFeature icon="" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, från mobil till desktop." />
+            <WebFeature icon="" title="SEO-optimerad" desc="Byggd för att ranka högt på Google från dag ett." />
+            <WebFeature icon="" title="Skräddarsydd design" desc="Ingen mall, varje sida designas utifrån ditt varumärke." />
+            <WebFeature icon="" title="Integrationer" desc="Kopplas ihop med bokningssystem, CRM och betalningar." />
+            <WebFeature icon="" title="Live på 7 dagar" desc="Från första möte till publicerad sida på en vecka." />
           </div>
           <div className="web-case">
             <div className="web-case__label">Case, rekvo.se</div>
@@ -405,9 +405,9 @@ export default function Home() {
               </button>
             </div>
             <div className="about-values">
-              <ValueCard icon="⚡" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
-              <ValueCard icon="🎯" title="Resultat" desc="Vi mäter allt och optimerar kontinuerligt." />
-              <ValueCard icon="🤝" title="Enkelhet" desc="Inga tekniska förkunskaper krävs." />
+              <ValueCard icon="" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
+              <ValueCard icon="" title="Resultat" desc="Vi mäter allt och optimerar kontinuerligt." />
+              <ValueCard icon="" title="Enkelhet" desc="Inga tekniska förkunskaper krävs." />
             </div>
           </div>
         </div>
