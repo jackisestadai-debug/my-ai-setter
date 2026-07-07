@@ -392,7 +392,7 @@ export default function Home() {
                 <strong>AI-säljare.</strong> En AI-assistent som svarar på varje meddelande, på alla plattformar, dygnet runt. Instagram, Facebook, SMS, hemsidechatt. Den kvalificerar leads och bokar möten i din röst, medan du gör annat.
               </p>
               <p>
-                <strong>Hemsidor.</strong> Snabba, moderna hemsidor byggda med Next.js. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
+                <strong>Hemsidor.</strong> Snabba, moderna hemsidor. Inte bara snygga, byggda för att synas på Google och faktiskt konvertera besökare till kunder.
               </p>
 
               <p>
