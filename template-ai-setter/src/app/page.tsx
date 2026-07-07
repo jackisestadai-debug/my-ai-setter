@@ -431,10 +431,6 @@ export default function Home() {
             </a>
             <p className="book-cta-note">Öppnas i Google Kalender · Gratis · 30 min</p>
           </div>
-          <p className="calendly-fallback">
-            Fungerar inte bokningsformuläret?{" "}
-            <a href="mailto:hej@rekvo.se">Maila oss på hej@rekvo.se →</a>
-          </p>
         </div>
       </section>
 
