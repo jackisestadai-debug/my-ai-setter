@@ -290,7 +290,7 @@ export default function Home() {
 
             <div className="demo-info">
               <h3 className="demo-info__h3">Som att anställa någon som aldrig slutar jobba</h3>
-              <p className="demo-info__intro">Det pratar som en människa, känner till ditt företag utan och innan, och hanterar kontakten med kunder från första meddelande till bokat möte.</p>
+              <p className="demo-info__intro">Helt anpassad efter ditt företag, svarar i din ton och hanterar kontakten med kunder från första meddelande till bokat möte.</p>
               <ul className="demo-info__list">
                 <FeatureItem>Svarar direkt, oavsett om det är mitt på dagen eller 3 på natten</FeatureItem>
                 <FeatureItem>Svarar på vanliga frågor om ditt företag, priser och tider</FeatureItem>
