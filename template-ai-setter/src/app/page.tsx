@@ -921,7 +921,7 @@ const css = `
   .reveal--in { opacity: 1; transform: translateY(0); }
 
   /* PHONE FRAME */
-  .phone-frame { position: relative; background: #111; border-radius: 44px; padding: 14px 10px 20px; box-shadow: 0 0 0 2px #2a2a2a, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1px #3a3a3a; max-width: 360px; margin: 0 auto; }
+  .phone-frame { position: relative; background: #111; border-radius: 44px; padding: 12px 8px 16px; box-shadow: 0 0 0 2px #2a2a2a, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1px #3a3a3a; max-width: 280px; margin: 0 auto; }
   .phone-frame__notch { display: flex; justify-content: center; align-items: center; height: 28px; margin-bottom: 6px; }
   .phone-frame__speaker { width: 60px; height: 6px; background: #222; border-radius: 3px; }
   .phone-frame__home { width: 40px; height: 5px; background: #2a2a2a; border-radius: 3px; margin: 10px auto 0; }
