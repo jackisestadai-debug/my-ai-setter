@@ -41,9 +41,9 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Hejsan, vi ska ha bröllop i sommar och letar efter livemusik, är ni tillgängliga?" },
       { from: "aura", text: "Hej, vad roligt! Grattis till bröllopet. Vilket datum tänker ni?" },
       { from: "lead", text: "14 juni, vi är ungefär 70 till 80 gäster" },
-      { from: "aura", text: "14 juni är ledigt! Vi har spelat på många bröllop och vet hur man sätter rätt stämning. Vill du att jag bokar ett kort samtal så vi kan gå igenom vad ni vill ha?" },
+      { from: "aura", text: "14 juni är ledigt! Vi spelar allt från ceremony till fest och anpassar helt efter er kväll. Vill du boka ett kort samtal så vi går igenom vad ni vill ha?" },
       { from: "lead", text: "Ja absolut, det vore bra" },
-      { from: "aura", text: "Toppen! Välj en tid här 👉 [länk] så hör vi av oss inom kort." },
+      { from: "aura", text: "Vi har tisdag 10:00 eller torsdag 13:00 ledigt. Vilken passar bäst?" },
     ],
   },
   maklare: {
