@@ -644,6 +644,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="section section--dark">
+        <div className="container">
+          <p className="section__label">Vanliga frågor</p>
+          <h2 className="section__h2">Svar på det du undrar</h2>
+          <div className="faq-list">
+            <FaqItem q="Behöver jag kunna något om teknik?" a="Nej, ingenting. Vi sköter allt från start till mål. Du behöver bara berätta om ditt företag, sen tar vi hand om resten." />
+            <FaqItem q="Hur snabbt är systemet igång?" a="Inom 7 dagar. Vi lär oss ditt företag, bygger systemet och sätter igång det. Du ser resultat från dag ett." />
+            <FaqItem q="Vad kostar det?" a="Vi prissätter efter ditt behov. Boka ett gratis 30-minutersmöte så går vi igenom vad som passar dig och vad det kostar, utan förpliktelser." />
+            <FaqItem q="Vilka plattformar fungerar det på?" a="Instagram, Facebook Messenger, SMS och WhatsApp. Vi kopplar upp det på de kanaler dina kunder redan använder." />
+            <FaqItem q="Kan systemet svara fel och skada mitt varumärke?" a="Systemet tränas specifikt på ditt företag och svarar bara på sådant vi vet hur du vill svara. Allt granskas innan det går live." />
+            <FaqItem q="Vad händer om jag vill avsluta?" a="Ingen bindning. Du kan avsluta när du vill utan extra kostnader eller krångel." />
+          </div>
+        </div>
+      </section>
+
       {/* BOKA MÖTE */}
       <section ref={bokRef} className="section section--cta">
         <div className="container">
@@ -674,6 +690,13 @@ export default function Home() {
         </div>
       </footer>
 
+      {/* STICKY MOBILE CTA */}
+      <div className="sticky-cta">
+        <a href="https://calendar.app.google/UDJT2g5qk4x4TTHx8" target="_blank" rel="noopener noreferrer" className="sticky-cta__btn">
+          Boka gratis möte →
+        </a>
+      </div>
+
       <style>{css}</style>
     </>
   );
@@ -701,6 +724,18 @@ function ProcessStep({ num, title, desc }: { num: number; title: string; desc: s
       <div className="process-step__num">{num}</div>
       <h3 className="process-step__title">{title}</h3>
       <p className="process-step__desc">{desc}</p>
+    </div>
+  );
+}
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`faq-item reveal ${open ? "faq-item--open" : ""}`}>
+      <button className="faq-item__q" onClick={() => setOpen(v => !v)}>
+        <span>{q}</span>
+        <span className="faq-item__arrow">{open ? "−" : "+"}</span>
+      </button>
+      {open && <div className="faq-item__a">{a}</div>}
     </div>
   );
 }
@@ -949,6 +984,20 @@ const css = `
   .book-cta-btn { display: inline-block; background: linear-gradient(135deg,#818cf8,#c084fc); color: #fff; font-size: 20px; font-weight: 600; padding: 20px 48px; border-radius: 14px; text-decoration: none; transition: opacity .2s, transform .2s; }
   .book-cta-btn:hover { opacity: .88; transform: translateY(-2px); }
   .book-cta-note { margin-top: 14px; color: #505070; font-size: 14px; }
+
+  /* FAQ */
+  .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { background: #0a0a1e; border: 1px solid #141430; border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
+  .faq-item--open { border-color: rgba(99,102,241,0.4); }
+  .faq-item__q { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; background: none; border: none; color: #e0e0f0; font-size: 16px; font-weight: 600; padding: 20px 24px; cursor: pointer; text-align: left; }
+  .faq-item__q:hover { color: #fff; }
+  .faq-item__arrow { font-size: 22px; color: #6366f1; flex-shrink: 0; line-height: 1; }
+  .faq-item__a { padding: 0 24px 20px; color: #8090b8; font-size: 15px; line-height: 1.75; }
+
+  /* STICKY MOBILE CTA */
+  .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 12px 16px; background: rgba(4,4,15,0.95); backdrop-filter: blur(12px); border-top: 1px solid #141430; }
+  .sticky-cta__btn { display: block; width: 100%; text-align: center; background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff; font-size: 16px; font-weight: 700; padding: 16px; border-radius: 12px; text-decoration: none; }
+  @media (max-width: 768px) { .sticky-cta { display: block; } }
 
   /* FOOTER */
   .footer { border-top: 1px solid #0e0e24; padding: 48px 0; background: #04040f; }
