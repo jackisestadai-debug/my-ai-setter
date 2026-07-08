@@ -241,7 +241,7 @@ function AnimatedChat({ messages, nicheLabel }: { messages: Msg[]; nicheLabel: s
           <div key={i} className={`plat-row plat-row--${isAura ? "recv" : "sent"}`}>
             {showLabel && (
               <div className={`plat-label ${isAura ? "plat-label--recv" : "plat-label--sent"}`}>
-                {isAura ? nicheLabel : "Kund"}
+                {isAura ? "Rekvo AI" : "Kund"}
               </div>
             )}
             <div className={`plat-bubble plat-bubble--${isAura ? "recv" : "sent"}`}>{m.text}</div>
@@ -584,7 +584,7 @@ export default function Home() {
       <section ref={processRef} className="section">
         <div className="container">
           <p className="section__label">Process</p>
-          <h2 className="section__h2">Från idé till live på 7 dagar</h2>
+          <h2 className="section__h2">Från idé till kund på 7 dagar</h2>
           <p className="section__sub">Inga långa projekt. Vi rör oss snabbt och levererar resultat.</p>
           <div className="process-steps">
             <ProcessStep num={1} title="Vi lär känna dig" desc="Vi lär oss ditt företag, dina mål och dina kunder på ett kort möte." />
@@ -650,7 +650,7 @@ export default function Home() {
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}><Image src="/logo.svg" alt="Rekvo" width={160} height={60} /></div>
           <p className="section__label">Kom igång</p>
           <h2 className="section__h2">Boka ett gratis 30-minutersmöte</h2>
-          <p className="section__sub">Vi går igenom dina mål och visar vad vi kan göra för just ditt företag, inga förpliktelser, inga tekniska förkunskaper krävs.</p>
+          <p className="section__sub">Vi går igenom ditt företag och visar konkret vad som är möjligt. Gratis, utan bindning och utan krav på förkunskaper.</p>
           <div className="book-cta-wrap">
             <a href="https://calendar.app.google/UDJT2g5qk4x4TTHx8" target="_blank" rel="noopener noreferrer" className="book-cta-btn">
               Välj en tid som passar dig →
