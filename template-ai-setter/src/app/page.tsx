@@ -416,7 +416,7 @@ export default function Home() {
       <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
         <div className="nav__inner">
           <div className="nav__logo">
-            <Image src="/logo-dark.svg" alt="Rekvo" width={140} height={52} priority />
+            <Image src="/logo.svg" alt="Rekvo" width={140} height={52} priority />
           </div>
           <nav className={`nav__links ${menuOpen ? "nav__links--open" : ""}`}>
             <button className="nav__link" onClick={() => go(tjänsterRef)}>Tjänster</button>
@@ -625,7 +625,7 @@ export default function Home() {
       <section ref={omRef} className="section">
         <div className="container">
           <p className="section__label">Om oss</p>
-          <div style={{ marginBottom: 24 }}><Image src="/logo-dark.svg" alt="Rekvo" width={120} height={45} /></div>
+          <div style={{ marginBottom: 24 }}><Image src="/logo.svg" alt="Rekvo" width={120} height={45} /></div>
           <div className="about-wrap">
             <div className="about-text">
               <p>Vi hjälper företag att sluta tappa kunder till dålig digital närvaro.</p>
@@ -647,7 +647,7 @@ export default function Home() {
       {/* BOKA MÖTE */}
       <section ref={bokRef} className="section section--cta">
         <div className="container">
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}><Image src="/logo-dark.svg" alt="Rekvo" width={110} height={42} /></div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}><Image src="/logo.svg" alt="Rekvo" width={110} height={42} /></div>
           <p className="section__label">Kom igång</p>
           <h2 className="section__h2">Boka ett gratis 30-minutersmöte</h2>
           <p className="section__sub">Vi går igenom dina mål och visar vad vi kan göra för just ditt företag, inga förpliktelser, inga tekniska förkunskaper krävs.</p>
@@ -663,7 +663,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="footer">
         <div className="container footer__inner">
-          <Image src="/logo-dark.svg" alt="Rekvo" width={120} height={45} />
+          <Image src="/logo.svg" alt="Rekvo" width={120} height={45} />
           <div className="footer__links">
             <button onClick={() => go(tjänsterRef)}>Tjänster</button>
             <button onClick={() => go(aiRef)}>AI-säljare</button>
