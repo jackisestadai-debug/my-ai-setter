@@ -28,11 +28,11 @@ const NICHES: Record<NicheKey, NicheData> = {
     icon: "🏋️", label: "Coach & PT",
     conversation: [
       { from: "lead", text: "Hej! Jag har försökt träna själv men det händer ingenting, lite osäker på vad jag gör fel" },
-      { from: "aura", text: "Hej! Det är faktiskt väldigt vanligt, de flesta fastnar just där. Vad är det du vill uppnå, handlar det om vikt, styrka eller något annat?" },
+      { from: "aura", text: "Hej! Det är faktiskt väldigt vanligt. Vad är det du vill uppnå, handlar det om vikt, styrka eller något annat?" },
       { from: "lead", text: "Mest gå ner lite i vikt och bara känna mig starkare generellt" },
-      { from: "aura", text: "Perfekt, det är precis vad vi jobbar med. Många av våra kunder ser tydlig skillnad redan inom 6 till 8 veckor när de får ett upplägg som faktiskt passar dem. Vill du boka ett gratis samtal så vi kan se vad som passar dig?" },
-      { from: "lead", text: "Ja det vill jag, hur gör man?" },
-      { from: "aura", text: "Du väljer bara en tid här 👉 [länk], tar 20 minuter och kostar ingenting. Vi ses!" },
+      { from: "aura", text: "Perfekt, det är precis vad vi jobbar med. Vi erbjuder personlig träning och kostupplägg helt anpassat efter dig. Vill du boka ett gratis samtal så vi ser vad som passar?" },
+      { from: "lead", text: "Ja det vill jag, hur snabbt kan ni ta emot?" },
+      { from: "aura", text: "Vi har måndag 07:00 eller onsdag 17:30 ledigt denna vecka. Vilken passar?" },
     ],
   },
   artist: {
