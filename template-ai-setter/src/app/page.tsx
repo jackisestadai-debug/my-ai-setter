@@ -337,7 +337,6 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeNiche, setActiveNiche] = useState<NicheKey>("klinik");
-  const [activePlatform, setActivePlatform] = useState<PlatformKey>("instagram");
 
   const tjänsterRef = useRef<HTMLElement>(null);
   const aiRef = useRef<HTMLElement>(null);
@@ -451,21 +450,6 @@ export default function Home() {
           <h2 className="section__h2">Se hur det ser ut på riktigt</h2>
           <p className="section__sub">Välj en plattform och en bransch för att se exakt hur systemet pratar med dina kunder.</p>
 
-          {/* Platform picker */}
-          <div className="platform-picker">
-            {PLATFORM_KEYS.map(key => (
-              <button
-                key={key}
-                className={`platform-btn ${activePlatform === key ? "platform-btn--active" : ""}`}
-                data-p={key}
-                onClick={() => setActivePlatform(key)}
-              >
-                <span className={`picon picon--${key}`} />
-                <span className="platform-btn__label">{PLATFORMS[key].label}</span>
-              </button>
-            ))}
-          </div>
-
           {/* Niche picker */}
           <div className="niche-picker">
             {NICHE_KEYS.map(key => (
@@ -481,7 +465,7 @@ export default function Home() {
 
           {/* Demo */}
           <div className="demo-wrap">
-            <PlatformDemo platform={activePlatform} niche={activeNiche} />
+            <PlatformDemo platform="instagram" niche={activeNiche} />
             <div className="demo-info">
               <h3 className="demo-info__h3">Som att anställa någon som aldrig slutar jobba</h3>
               <p className="demo-info__intro">Helt anpassad efter ditt företag, svarar i din ton och hanterar kontakten med kunder från första meddelande till bokat möte.</p>
