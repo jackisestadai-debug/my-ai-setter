@@ -65,7 +65,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Måste man boka långt i förväg?" },
       { from: "aura", text: "Nej, vi har tider den här veckan. Onsdag 14:00 eller torsdag 09:00 – vad passar?" },
       { from: "lead", text: "Onsdag funkar!" },
-      { from: "aura", text: "Perfekt, bokat onsdag 14:00. Bekräftelse kommer nu." },
+      { from: "aura", text: "Perfekt, bokat onsdag 14:00. Bekräftelse skickas till dig via SMS nu." },
     ],
     sms: [
       { from: "lead", text: "Hej, vad kostar botox?" },
@@ -73,7 +73,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Runt ögonen" },
       { from: "aura", text: "Toppen. Onsdag 14:00 eller torsdag 09:00?" },
       { from: "lead", text: "Onsdag" },
-      { from: "aura", text: "Bokat! Onsdag 14:00. Bekräftelse kommer." },
+      { from: "aura", text: "Bokat! Onsdag 14:00. Bekräftelse skickas till dig via SMS direkt." },
     ],
     email: {
       subject: "Fråga om botoxbehandling",
@@ -157,7 +157,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "20 min" },
       { from: "aura", text: "Stämmer bra. Torsdag 10 eller fredag 13 för möte?" },
       { from: "lead", text: "Fredag" },
-      { from: "aura", text: "Bokat! Fredag 13:00. Bekräftelse kommer." },
+      { from: "aura", text: "Bokat! Fredag 13:00. Bekräftelse skickas till dig via SMS direkt." },
     ],
     email: {
       subject: "Söker villa – 5 rum, trädgård, nära stan",
@@ -187,7 +187,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Redovisning, ca 20 000 kr/år per kund" },
       { from: "aura", text: "Stor potential. Gratis annonsgenomgång – onsdag 09 eller fredag 13?" },
       { from: "lead", text: "Fredag" },
-      { from: "aura", text: "Bokat! Fredag 13:00. Bekräftelse skickas." },
+      { from: "aura", text: "Bokat! Fredag 13:00. Bekräftelse skickas till dig via SMS direkt." },
     ],
     email: {
       subject: "Fråga om betalda annonser",
@@ -207,7 +207,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Perfekt! Vad passar för tid?" },
       { from: "aura", text: "18:00 brukar fungera bra för en grupp – gott om tid utan stress." },
       { from: "lead", text: "Det passar. Bokning på Anna Lindström" },
-      { from: "aura", text: "Klart! Anna Lindström, 12 pers, lördag 18:00 med tårta. Bekräftelse kommer nu." },
+      { from: "aura", text: "Klart! Anna Lindström, 12 pers, lördag 18:00 med tårta. Bekräftelse skickas till din mail nu." },
     ],
     sms: [
       { from: "lead", text: "Hej, bord för 12 nästa lördag?" },
@@ -215,7 +215,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "40-årsdag. Kan man ha tårta?" },
       { from: "aura", text: "Självklart! Namn och klockslag?" },
       { from: "lead", text: "Anna Lindström, 18:00" },
-      { from: "aura", text: "Bokat! Anna Lindström, 12 pers, lördag 18:00 med tårta." },
+      { from: "aura", text: "Bokat! Anna Lindström, 12 pers, lördag 18:00 med tårta. Bekräftelse skickas till din mail nu." },
     ],
     email: {
       subject: "Bordsbokning 12 personer – lördag",
