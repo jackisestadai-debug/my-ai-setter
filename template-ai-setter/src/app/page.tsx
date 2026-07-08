@@ -50,11 +50,11 @@ const NICHES: Record<NicheKey, NicheData> = {
     icon: "🏠", label: "Mäklare & Fastighet",
     conversation: [
       { from: "lead", text: "Hej! Vi har letat hus ett tag men inget har passat, börjar bli lite stressande" },
-      { from: "aura", text: "Hej! Det förstår jag, det kan verkligen kännas tungt när letandet drar ut på tiden. Vad är det viktigaste för er i ett hus?" },
-      { from: "lead", text: "Minst 5 rum, trädgård och helst inte för långt från stan, budget runt 6 miljoner" },
-      { from: "aura", text: "Okej, det finns bra alternativ inom den ramen. Vi har faktiskt några objekt på gång som inte kommit ut än. Vill du att vi hör av oss när något dyker upp som matchar?" },
-      { from: "lead", text: "Ja det skulle vara toppen!" },
-      { from: "aura", text: "Perfekt! Jag bokar också ett snabbt möte med oss så vi lär känna er bättre 👉 [länk]" },
+      { from: "aura", text: "Hej! Det förstår jag. Vad är det viktigaste för er, storlek, område, pris?" },
+      { from: "lead", text: "Minst 5 rum, trädgård och helst nära stan, budget runt 6 miljoner" },
+      { from: "aura", text: "Okej, det finns bra alternativ inom den ramen. Vi har faktiskt några objekt på gång som inte kommit ut än. Vill du boka ett möte så vi går igenom dem?" },
+      { from: "lead", text: "Ja det låter bra, när kan ni ta emot?" },
+      { from: "aura", text: "Vi har torsdag 10:00 eller fredag 13:00 ledigt. Vilken passar?" },
     ],
   },
   byra: {
