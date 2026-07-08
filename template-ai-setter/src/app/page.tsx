@@ -31,9 +31,9 @@ const NICHES: Record<NicheKey, NicheData> = {
     icon: "🏥", label: "Klinik & Hälsa",
     conversation: [
       { from: "lead", text: "Hej! Jag funderar på botox runt ögonen, har aldrig gjort det innan" },
-      { from: "aura", text: "Hej! Kul att du hör av dig. Ögonpartiet är ett av det vanligaste vi behandlar. Vill du ha ett naturligt resultat eller mer märkbar skillnad?" },
-      { from: "lead", text: "Naturligt, vill inte se övergjord ut" },
-      { from: "aura", text: "Det är precis så vi jobbar. Vi erbjuder botox från 1 500 kr och börjar alltid med en gratis konsultation. Vill du boka?" },
+      { from: "aura", text: "Hej! Kul att du hör av dig. Ögonpartiet är ett av det vanligaste vi behandlar. Vi börjar alltid med en gratis konsultation så du vet exakt vad du får innan du bestämmer dig." },
+      { from: "lead", text: "Okej det låter bra, vad kostar det?" },
+      { from: "aura", text: "Botox kostar från 1 500 kr. Vill du boka in ett konsultationssamtal?" },
       { from: "lead", text: "Ja gärna, hur snabbt kan ni ta emot?" },
       { from: "aura", text: "Vi har onsdag 14:00 eller torsdag 09:00 ledigt. Vilken passar bäst? 😊" },
     ],
@@ -176,7 +176,7 @@ const NICHES: Record<NicheKey, NicheData> = {
 const NICHE_KEYS = Object.keys(NICHES) as NicheKey[];
 
 /* ── Animated chat (Instagram / Messenger / SMS / WhatsApp) ── */
-function AnimatedChat({ messages }: { messages: Msg[] }) {
+function AnimatedChat({ messages, nicheLabel }: { messages: Msg[]; nicheLabel: string }) {
   const [visible, setVisible] = useState(0);
   const [typing, setTyping] = useState(false);
 
@@ -201,14 +201,30 @@ function AnimatedChat({ messages }: { messages: Msg[] }) {
     return () => { cancelled = true; };
   }, [messages]);
 
+  const visibleMsgs = messages.slice(0, visible);
+
   return (
     <div className="plat-chat">
-      {messages.slice(0, visible).map((m, i) => (
-        <div key={i} className={`plat-bubble plat-bubble--${m.from === "aura" ? "recv" : "sent"}`}>{m.text}</div>
-      ))}
+      {visibleMsgs.map((m, i) => {
+        const isAura = m.from === "aura";
+        const prev = visibleMsgs[i - 1];
+        const showLabel = !prev || prev.from !== m.from;
+        return (
+          <div key={i} className={`plat-row plat-row--${isAura ? "recv" : "sent"}`}>
+            {showLabel && (
+              <div className={`plat-label ${isAura ? "plat-label--recv" : "plat-label--sent"}`}>
+                {isAura ? nicheLabel : "Kund"}
+              </div>
+            )}
+            <div className={`plat-bubble plat-bubble--${isAura ? "recv" : "sent"}`}>{m.text}</div>
+          </div>
+        );
+      })}
       {typing && (
-        <div className="plat-bubble plat-bubble--recv plat-typing">
-          <span /><span /><span />
+        <div className="plat-row plat-row--recv">
+          <div className="plat-bubble plat-bubble--recv plat-typing">
+            <span /><span /><span />
+          </div>
         </div>
       )}
     </div>
@@ -326,7 +342,7 @@ function PlatformDemo({ platform, niche }: { platform: PlatformKey; niche: Niche
   return (
     <div className={`plat-shell plat--${platform}`}>
       <PlatformHeader platform={platform} label={nd.label} />
-      <AnimatedChat key={`${platform}-${niche}`} messages={msgs} />
+      <AnimatedChat key={`${platform}-${niche}`} messages={msgs} nicheLabel={nd.label} />
       <PlatformInput platform={platform} />
     </div>
   );
@@ -739,10 +755,16 @@ const css = `
   .plat--whatsapp  { --sb:#005C4B; --sc:#e9edef; --rb:#1E2B33; --rc:#e9edef; }
 
   /* Chat area */
-  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 7px; min-height: 260px; }
+  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 260px; }
+  .plat-row { display: flex; flex-direction: column; margin-bottom: 6px; }
+  .plat-row--recv { align-items: flex-start; }
+  .plat-row--sent { align-items: flex-end; }
+  .plat-label { font-size: 11px; font-weight: 600; opacity: 0.5; margin-bottom: 4px; letter-spacing: 0.2px; }
+  .plat-label--recv { color: var(--rc, #fff); padding-left: 4px; }
+  .plat-label--sent { color: var(--sc, #fff); padding-right: 4px; }
   .plat-bubble { padding: 9px 13px; border-radius: 18px; max-width: 80%; font-size: 14px; line-height: 1.5; animation: fadeUp 0.25s ease; }
-  .plat-bubble--recv { align-self: flex-start; background: var(--rb); color: var(--rc); border-bottom-left-radius: 4px; }
-  .plat-bubble--sent { align-self: flex-end; background: var(--sb); color: var(--sc); border-bottom-right-radius: 4px; }
+  .plat-bubble--recv { background: var(--rb); color: var(--rc); border-bottom-left-radius: 4px; }
+  .plat-bubble--sent { background: var(--sb); color: var(--sc); border-bottom-right-radius: 4px; }
   .plat-typing { display: flex; gap: 4px; align-items: center; min-width: 48px; }
   .plat-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--rc,#888); opacity: 0.5; animation: typingPulse 1.2s infinite; }
   .plat-typing span:nth-child(2) { animation-delay: 0.2s; }
