@@ -578,7 +578,7 @@ export default function Home() {
             <div className="about-values">
               <ValueCard icon="" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
               <ValueCard icon="" title="Resultat" desc="Vi följer upp och justerar tills det fungerar." />
-              <ValueCard icon="" title="Enkelhet" desc="Du behöver inte kunna ett dugg om teknik." />
+              <ValueCard icon="" title="Enkelhet" desc="Vi sköter allt, du fokuserar på ditt företag." />
             </div>
           </div>
         </div>
