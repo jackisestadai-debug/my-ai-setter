@@ -16,12 +16,12 @@ const NICHES: Record<NicheKey, NicheData> = {
   klinik: {
     icon: "🏥", label: "Klinik & Hälsa",
     conversation: [
-      { from: "lead", text: "Hej, har haft ont i nacken ett tag nu, vet inte riktigt vad jag ska göra" },
-      { from: "aura", text: "Hej! Det låter jobbigt, nackbesvär som dröjer kvar brukar behöva ses över ordentligt. Har du träffat någon för det tidigare?" },
-      { from: "lead", text: "Nej inte alls, vet inte ens vad som hjälper" },
-      { from: "aura", text: "Då passar ett första besök hos oss bra, vi går igenom vad som orsakar besvären och lägger upp en plan. Vi har tider redan den här veckan. Vill du att jag kollar vad som passar?" },
-      { from: "lead", text: "Ja gärna, vad kostar det ungefär?" },
-      { from: "aura", text: "Första besöket kostar 595 kr och tar 45 minuter. Här kan du välja en tid direkt 👉 [länk]" },
+      { from: "lead", text: "Hej! Jag funderar på botox runt ögonen, har aldrig gjort det innan" },
+      { from: "aura", text: "Hej! Kul att du hör av dig. Ögonpartiet är ett av det vanligaste vi behandlar. Vill du ha ett naturligt resultat eller mer märkbar skillnad?" },
+      { from: "lead", text: "Naturligt, vill inte se övergjord ut" },
+      { from: "aura", text: "Det är precis så vi jobbar. Vi erbjuder botox från 1 500 kr och börjar alltid med en gratis konsultation så du vet exakt vad du får. Vill du boka en tid?" },
+      { from: "lead", text: "Ja gärna, hur snabbt kan ni ta emot?" },
+      { from: "aura", text: "Vi har onsdag 14:00 eller torsdag 09:00 ledigt denna vecka. Vilken passar bäst?" },
     ],
   },
   coach: {
