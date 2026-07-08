@@ -955,9 +955,9 @@ const css = `
   .hf-card__icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .hf-card__title { font-size: 13px; font-weight: 600; color: #e2e8f0; }
   .hf-card__sub { font-size: 11px; color: #64748b; margin-top: 2px; }
-  .hf-card--1 { top: 18%; left: 2%; animation: floatA 4s ease-in-out infinite; }
+  .hf-card--1 { top: 38%; left: 2%; animation: floatA 4s ease-in-out infinite; }
   .hf-card--2 { top: 52%; right: 2%; animation: floatB 5s ease-in-out infinite; }
-  .hf-card--3 { bottom: 20%; left: 4%; animation: floatC 4.5s ease-in-out infinite; }
+  .hf-card--3 { bottom: 14%; left: 4%; animation: floatC 4.5s ease-in-out infinite; }
 
   /* BENEFIT ICON */
   .benefit-card__icon { margin-bottom: 16px; }
