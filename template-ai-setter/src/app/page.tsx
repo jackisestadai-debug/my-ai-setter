@@ -289,14 +289,15 @@ export default function Home() {
             </div>
 
             <div className="demo-info">
-              <h3 className="demo-info__h3">Vad Rekvo Systems gör åt dig</h3>
+              <h3 className="demo-info__h3">Som att anställa någon som aldrig slutar jobba</h3>
+              <p className="demo-info__intro">Det pratar som en människa, känner till ditt företag utan och innan, och hanterar kontakten med kunder från första meddelande till bokat möte.</p>
               <ul className="demo-info__list">
-                <FeatureItem>Svarar på meddelanden inom sekunder, dygnet runt</FeatureItem>
-                <FeatureItem>Ställer rätt frågor och sållar ut seriösa kunder</FeatureItem>
-                <FeatureItem>Bokar möten direkt i din kalender</FeatureItem>
-                <FeatureItem>Skickar påminnelser och följer upp automatiskt</FeatureItem>
-                <FeatureItem>Tränas på ditt erbjudande och dina kunder</FeatureItem>
-                <FeatureItem>Igång på 7 dagar, utan tekniska förkunskaper</FeatureItem>
+                <FeatureItem>Svarar direkt, oavsett om det är mitt på dagen eller 3 på natten</FeatureItem>
+                <FeatureItem>Svarar på vanliga frågor om ditt företag, priser och tider</FeatureItem>
+                <FeatureItem>Följer upp kunder som inte svarat, precis som du skulle göra</FeatureItem>
+                <FeatureItem>Påminner kunder om bokade möten så ingen glömmer</FeatureItem>
+                <FeatureItem>Bokar in möten direkt i din kalender utan att du behöver göra något</FeatureItem>
+                <FeatureItem>Anpassad till hur du pratar och vad just ditt företag säljer</FeatureItem>
               </ul>
               <button className="btn btn--primary" onClick={() => go(bokRef)}>
                 Boka en AI-demo →
@@ -596,7 +597,8 @@ const css = `
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
   .demo-phone__footer { padding: 12px 20px; border-top: 1px solid #131330; background: #070720; }
   .demo-phone__note { font-size: 12px; color: #444464; }
-  .demo-info__h3 { font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 22px; }
+  .demo-info__h3 { font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 12px; }
+  .demo-info__intro { font-size: 15px; color: #7080a0; line-height: 1.7; margin: 0 0 24px; }
   .demo-info__list { list-style: none; padding: 0; margin: 0 0 32px; display: flex; flex-direction: column; gap: 14px; }
   .feature-item { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: #9090b0; line-height: 1.5; }
   .feature-item__check { color: #6366f1; font-weight: 700; flex-shrink: 0; }
