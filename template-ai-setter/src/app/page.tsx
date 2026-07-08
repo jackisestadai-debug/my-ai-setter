@@ -414,11 +414,11 @@ export default function Home() {
             </button>
           </div>
           <div className="stats">
-            <Stat value="24/7" label="Alltid tillgänglig" />
+            <Stat value="Gratis i 7 dagar" label="Testa utan risk" />
             <div className="stats__divider" />
-            <Stat value="7 dagar" label="Från möte till klar" />
+            <Stat value="Ingen bindning" label="Avsluta när du vill" />
             <div className="stats__divider" />
-            <Stat value="3×" label="Fler bokade möten" />
+            <Stat value="Klar på 7 dagar" label="Från möte till live" />
           </div>
         </div>
       </section>
@@ -690,7 +690,7 @@ const css = `
   .btn--ghost:hover { background: rgba(255,255,255,0.04); }
   .stats { display: flex; align-items: center; justify-content: center; margin-top: 60px; flex-wrap: wrap; }
   .stat { text-align: center; padding: 12px 40px; }
-  .stat__value { font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+  .stat__value { font-size: clamp(18px, 2.5vw, 26px); font-weight: 800; color: #fff; letter-spacing: -0.5px; }
   .stat__label { font-size: 13px; color: #606080; margin-top: 4px; }
   .stats__divider { width: 1px; height: 48px; background: #1a1a3a; }
 
