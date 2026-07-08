@@ -644,22 +644,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="section section--dark">
-        <div className="container">
-          <p className="section__label">Vanliga frågor</p>
-          <h2 className="section__h2">Svar på det du undrar</h2>
-          <div className="faq-list">
-            <FaqItem q="Behöver jag kunna något om teknik?" a="Nej, ingenting. Vi sköter allt från start till mål. Du behöver bara berätta om ditt företag, sen tar vi hand om resten." />
-            <FaqItem q="Hur snabbt är systemet igång?" a="Inom 7 dagar. Vi lär oss ditt företag, bygger systemet och sätter igång det. Du ser resultat från dag ett." />
-            <FaqItem q="Vad kostar det?" a="Vi prissätter efter ditt behov. Boka ett gratis 30-minutersmöte så går vi igenom vad som passar dig och vad det kostar, utan förpliktelser." />
-            <FaqItem q="Vilka plattformar fungerar det på?" a="Instagram, Facebook Messenger, SMS och WhatsApp. Vi kopplar upp det på de kanaler dina kunder redan använder." />
-            <FaqItem q="Kan systemet svara fel och skada mitt varumärke?" a="Systemet tränas specifikt på ditt företag och svarar bara på sådant vi vet hur du vill svara. Allt granskas innan det går live." />
-            <FaqItem q="Vad händer om jag vill avsluta?" a="Ingen bindning. Du kan avsluta när du vill utan extra kostnader eller krångel." />
-          </div>
-        </div>
-      </section>
-
       {/* BOKA MÖTE */}
       <section ref={bokRef} className="section section--cta">
         <div className="container">
@@ -689,13 +673,6 @@ export default function Home() {
           <p className="footer__copy">© {new Date().getFullYear()} Rekvo · Alla rättigheter förbehålls</p>
         </div>
       </footer>
-
-      {/* STICKY MOBILE CTA */}
-      <div className="sticky-cta">
-        <a href="https://calendar.app.google/UDJT2g5qk4x4TTHx8" target="_blank" rel="noopener noreferrer" className="sticky-cta__btn">
-          Boka gratis möte →
-        </a>
-      </div>
 
       <style>{css}</style>
     </>
@@ -850,7 +827,7 @@ const css = `
   .plat--whatsapp  { --sb:#005C4B; --sc:#e9edef; --rb:#1E2B33; --rc:#e9edef; }
 
   /* Chat area */
-  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 260px; }
+  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 200px; max-height: 320px; overflow-y: auto; }
   .plat-row { display: flex; flex-direction: column; margin-bottom: 6px; }
   .plat-row--recv { align-items: flex-start; }
   .plat-row--sent { align-items: flex-end; }
