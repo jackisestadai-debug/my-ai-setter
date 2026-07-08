@@ -76,7 +76,7 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Vi är 12 personer" },
       { from: "aura", text: "Vi har plats för 12 nästa lördag. Vill ni ha något extra till firandet, tårta, välkomstdrink eller annat?" },
       { from: "lead", text: "Tårta vore perfekt!" },
-      { from: "aura", text: "Det fixar vi. Jag skickar en bokningsbekräftelse nu 👉 [länk], välkommen!" },
+      { from: "aura", text: "Det fixar vi. Ska jag bekräfta bokningen nu, vilket namn ska den stå på?" },
     ],
   },
 };
