@@ -551,7 +551,7 @@ export default function Home() {
             </div>
             <div className="benefit-card">
               <h3 className="benefit-card__title">Helt skräddarsytt</h3>
-              <p className="benefit-card__desc">Vi bygger inte en generisk bot. Varje system tränas på ditt företag, dina erbjudanden och hur du pratar med dina kunder.</p>
+              <p className="benefit-card__desc">Varje system byggs från grunden efter ditt företag, dina erbjudanden och hur du pratar med dina kunder.</p>
             </div>
             <div className="benefit-card">
               <h3 className="benefit-card__title">Igång på 7 dagar</h3>
