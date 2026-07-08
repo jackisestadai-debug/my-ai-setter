@@ -813,7 +813,7 @@ const css = `
   .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; max-width: 960px; margin: 0 auto; }
 
   /* PLATFORM SHELL */
-  .plat-shell { border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.6); width: 100%; max-width: 340px; margin: 0 auto; }
+  .plat-shell { border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.6); width: 100%; max-width: 340px; margin: 0 auto; height: 480px; display: flex; flex-direction: column; }
   .plat--instagram { background: #000; }
   .plat--facebook  { background: #fff; }
   .plat--sms       { background: #f2f2f7; }
@@ -827,7 +827,7 @@ const css = `
   .plat--whatsapp  { --sb:#005C4B; --sc:#e9edef; --rb:#1E2B33; --rc:#e9edef; }
 
   /* Chat area */
-  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 200px; max-height: 320px; overflow-y: auto; }
+  .plat-chat { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
   .plat-row { display: flex; flex-direction: column; margin-bottom: 6px; }
   .plat-row--recv { align-items: flex-start; }
   .plat-row--sent { align-items: flex-end; }
