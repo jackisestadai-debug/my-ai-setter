@@ -418,7 +418,7 @@ export default function Home() {
             <div className="stats__divider" />
             <Stat value="Ingen bindning" label="Avsluta när du vill" />
             <div className="stats__divider" />
-            <Stat value="Klar på 7 dagar" label="Från möte till live" />
+            <Stat value="Klar på 7 dagar" label="Vi sköter allt" />
           </div>
         </div>
       </section>
