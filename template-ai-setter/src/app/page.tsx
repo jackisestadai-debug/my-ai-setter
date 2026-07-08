@@ -3,6 +3,34 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
+/* ── SVG Icons ── */
+function Ico({ name, size = 24, color = "currentColor" }: { name: string; size?: number; color?: string }) {
+  const paths: Record<string, string> = {
+    bolt:     "M13 2L4.5 13H11L10 22L19.5 11H13L13 2Z",
+    clock:    "M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm0 4v6l4 2-1 2-5-2.5V6h2Z",
+    message:  "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10Z",
+    calendar: "M8 2v3M16 2v3M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z",
+    bell:     "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0",
+    zap:      "M13 2L3 14h9l-1 8 10-12h-9l1-8Z",
+    star:     "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z",
+    check:    "M20 6L9 17l-5-5",
+    users:    "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+    trending: "M23 6l-9.5 9.5-5-5L1 18M17 6h6v6",
+    globe:    "M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm-6.9 4h3.5c.3 1.5.7 2.9 1.4 4.2H4.2A8.1 8.1 0 0 1 5.1 6ZM4.2 14h3.8c-.7 1.3-1.1 2.7-1.4 4.2H5.1A8.1 8.1 0 0 1 4.2 14Zm7.8 6c-1-.1-2.1-1.6-2.8-4h5.6c-.7 2.4-1.8 3.9-2.8 4Zm-3-6h6c.1-.6.2-1.3.2-2s-.1-1.4-.2-2H9c-.1.6-.2 1.3-.2 2s.1 1.4.2 2Zm2.2-10c1 .1 2.1 1.6 2.8 4H9.2c.7-2.4 1.8-3.9 2.8-4Zm3 10c-.3 1.5-.7 2.9-1.4 4.2h3.8a8.1 8.1 0 0 0 .9-4.2h-3.3Zm1.7-6a8.1 8.1 0 0 0-.9-2H15.9c.7 1.3 1.1 2.7 1.4 4.2h3.5a8.1 8.1 0 0 0-.9-2.2Z",
+    mobile:   "M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Zm-5 18a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z",
+    speed:    "M13 2L3 14h9l-1 8 10-12h-9l1-8Z",
+    shield:   "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z",
+    edit:     "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z",
+    link:     "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
+  };
+  const d = paths[name] || paths.check;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} />
+    </svg>
+  );
+}
+
 /* ── Types ── */
 type NicheKey = "klinik" | "coach" | "artist" | "maklare" | "byra" | "restaurant";
 type PlatformKey = "instagram" | "facebook" | "sms" | "whatsapp" | "email";
@@ -367,6 +395,16 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Scroll reveal */
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal");
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { (e.target as HTMLElement).classList.add("reveal--in"); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
   function go(ref: React.RefObject<HTMLElement | null>) {
     setMenuOpen(false);
     setTimeout(() => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 10);
@@ -420,6 +458,21 @@ export default function Home() {
             <div className="stats__divider" />
             <Stat value="Klar på 7 dagar" label="Vi sköter allt" />
           </div>
+          {/* Floating notification cards */}
+          <div className="hero-floats" aria-hidden>
+            <div className="hf-card hf-card--1">
+              <div className="hf-card__icon"><Ico name="calendar" size={18} color="#818cf8" /></div>
+              <div><div className="hf-card__title">Möte bokat automatiskt</div><div className="hf-card__sub">Klinik · 14:00 onsdag</div></div>
+            </div>
+            <div className="hf-card hf-card--2">
+              <div className="hf-card__icon"><Ico name="message" size={18} color="#34d399" /></div>
+              <div><div className="hf-card__title">Nytt meddelande besvaras</div><div className="hf-card__sub">Instagram DM · 03:42</div></div>
+            </div>
+            <div className="hf-card hf-card--3">
+              <div className="hf-card__icon"><Ico name="trending" size={18} color="#f472b6" /></div>
+              <div><div className="hf-card__title">+3 nya leads i veckan</div><div className="hf-card__sub">Följde upp automatiskt</div></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -429,10 +482,10 @@ export default function Home() {
           <p className="section__label">Känner du igen dig?</p>
           <h2 className="section__h2">Du är duktig på det du gör.<br />Men försäljningen tar all din tid.</h2>
           <div className="pain-grid">
-            <div className="pain-card"><p>Du svarar på samma frågor om och om igen i meddelanden, men hinner aldrig följa upp</p></div>
-            <div className="pain-card"><p>Leads faller bort för att du inte har tid att svara snabbt nog, de går vidare till konkurrenten</p></div>
-            <div className="pain-card"><p>Du jobbar kvällar och helger för att hänga med, men kalen&shy;dern fylls ändå inte</p></div>
-            <div className="pain-card"><p>Du betalar för annonser men ingen hanterar de leads som faktiskt hör av sig</p></div>
+            <div className="pain-card reveal"><p>Du svarar på samma frågor om och om igen i meddelanden, men hinner aldrig följa upp</p></div>
+            <div className="pain-card reveal"><p>Leads faller bort för att du inte har tid att svara snabbt nog, de går vidare till konkurrenten</p></div>
+            <div className="pain-card reveal"><p>Du jobbar kvällar och helger för att hänga med, men kalen&shy;dern fylls ändå inte</p></div>
+            <div className="pain-card reveal"><p>Du betalar för annonser men ingen hanterar de leads som faktiskt hör av sig</p></div>
           </div>
           <p className="pain-solution">Rekvo löser det här, utan att du behöver anställa eller lära dig ny teknik.</p>
         </div>
@@ -445,12 +498,12 @@ export default function Home() {
           <h2 className="section__h2">Två tjänster, ett mål, din tillväxt</h2>
           <p className="section__sub">Vi kombinerar smarta säljverktyg och webbdesign för att ge ditt företag en digital närvaro som faktiskt säljer.</p>
           <div className="services-grid">
-            <div className="service-card" onClick={() => go(aiRef)}>
+            <div className="service-card reveal" onClick={() => go(aiRef)}>
               <h3 className="service-card__title">AI-säljare</h3>
               <p className="service-card__desc">Ett system som svarar på meddelanden, sorterar ut seriösa kunder och bokar möten åt dig, dygnet runt. Helt anpassat till hur du pratar och vad du säljer.</p>
               <span className="service-card__link">Läs mer →</span>
             </div>
-            <div className="service-card" onClick={() => go(webRef)}>
+            <div className="service-card reveal" onClick={() => go(webRef)}>
               <h3 className="service-card__title">Hemsidor</h3>
               <p className="service-card__desc">Moderna, snabba hemsidor som syns på Google och förvandlar besökare till kunder. Designade från grunden utifrån ditt företag.</p>
               <span className="service-card__link">Läs mer →</span>
@@ -481,7 +534,11 @@ export default function Home() {
 
           {/* Demo */}
           <div className="demo-wrap">
-            <PlatformDemo platform="instagram" niche={activeNiche} />
+            <div className="phone-frame">
+              <div className="phone-frame__notch"><div className="phone-frame__speaker" /></div>
+              <PlatformDemo platform="instagram" niche={activeNiche} />
+              <div className="phone-frame__home" />
+            </div>
             <div className="demo-info">
               <h3 className="demo-info__h3">Som att anställa någon som aldrig slutar jobba</h3>
               <p className="demo-info__intro">Helt anpassad efter ditt företag, svarar i din ton och hanterar kontakten med kunder från första meddelande till bokat möte.</p>
@@ -508,12 +565,12 @@ export default function Home() {
           <h2 className="section__h2">Hemsidor som faktiskt konverterar</h2>
           <p className="section__sub">Vi designar och bygger moderna hemsidor som laddar snabbt, syns när folk söker på Google och faktiskt förvandlar besökare till kunder.</p>
           <div className="web-grid">
-            <WebFeature icon="" title="Blixtsnabb" desc="Laddar på under en sekund. Besökare stannar kvar och Google gillar det." />
-            <WebFeature icon="" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, oavsett om man använder mobil eller dator." />
-            <WebFeature icon="" title="Syns på Google" desc="Din sida dyker upp när folk söker efter det du erbjuder, från dag ett." />
-            <WebFeature icon="" title="Skräddarsydd design" desc="Ingen mall. Varje sida designas från grunden utifrån ditt företag." />
-            <WebFeature icon="" title="Kopplas till dina verktyg" desc="Fungerar med din kalender, ditt bokningssystem och betalningar." />
-            <WebFeature icon="" title="Klar på 7 dagar" desc="Från första möte till en färdig sida på en vecka." />
+            <WebFeature icon="speed" title="Blixtsnabb" desc="Laddar på under en sekund. Besökare stannar kvar och Google gillar det." />
+            <WebFeature icon="mobile" title="Mobilanpassad" desc="Ser perfekt ut på alla skärmar, oavsett om man använder mobil eller dator." />
+            <WebFeature icon="globe" title="Syns på Google" desc="Din sida dyker upp när folk söker efter det du erbjuder, från dag ett." />
+            <WebFeature icon="edit" title="Skräddarsydd design" desc="Ingen mall. Varje sida designas från grunden utifrån ditt företag." />
+            <WebFeature icon="link" title="Kopplas till dina verktyg" desc="Fungerar med din kalender, ditt bokningssystem och betalningar." />
+            <WebFeature icon="bolt" title="Klar på 7 dagar" desc="Från första möte till en färdig sida på en vecka." />
           </div>
           <div className="web-case">
             <div className="web-case__label">Case, rekvo.se</div>
@@ -545,15 +602,18 @@ export default function Home() {
           <p className="section__label">Varför Rekvo</p>
           <h2 className="section__h2">Tre saker vi gör annorlunda</h2>
           <div className="benefits-grid">
-            <div className="benefit-card">
+            <div className="benefit-card reveal">
+              <div className="benefit-card__icon"><Ico name="clock" size={28} color="#818cf8" /></div>
               <h3 className="benefit-card__title">Alltid tillgänglig</h3>
               <p className="benefit-card__desc">Systemet svarar på varje meddelande direkt, dygnet runt, utan pauser. Inga leads tappas bort för att du sover eller är upptagen.</p>
             </div>
-            <div className="benefit-card">
+            <div className="benefit-card reveal">
+              <div className="benefit-card__icon"><Ico name="star" size={28} color="#818cf8" /></div>
               <h3 className="benefit-card__title">Helt skräddarsytt</h3>
               <p className="benefit-card__desc">Varje system byggs från grunden efter ditt företag, dina erbjudanden och hur du pratar med dina kunder.</p>
             </div>
-            <div className="benefit-card">
+            <div className="benefit-card reveal">
+              <div className="benefit-card__icon"><Ico name="zap" size={28} color="#818cf8" /></div>
               <h3 className="benefit-card__title">Igång på 7 dagar</h3>
               <p className="benefit-card__desc">Du behöver inte vänta månader eller lära dig någon teknik. Vi sköter allt, och du ser resultat från dag ett.</p>
             </div>
@@ -576,9 +636,9 @@ export default function Home() {
               <button className="btn btn--primary" style={{ marginTop: 24 }} onClick={() => go(bokRef)}>Kom i kontakt →</button>
             </div>
             <div className="about-values">
-              <ValueCard icon="" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
-              <ValueCard icon="" title="Resultat" desc="Vi följer upp och justerar tills det fungerar." />
-              <ValueCard icon="" title="Enkelhet" desc="Vi sköter allt, du fokuserar på ditt företag." />
+              <ValueCard icon="bolt" title="Snabbhet" desc="Vi levererar på dagar, inte månader." />
+              <ValueCard icon="trending" title="Resultat" desc="Vi följer upp och justerar tills det fungerar." />
+              <ValueCard icon="shield" title="Enkelhet" desc="Vi sköter allt, du fokuserar på ditt företag." />
             </div>
           </div>
         </div>
@@ -628,8 +688,8 @@ function FeatureItem({ children }: { children: React.ReactNode }) {
 }
 function WebFeature({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <div className="web-feature">
-      <div className="web-feature__icon">{icon}</div>
+    <div className="web-feature reveal">
+      <div className="web-feature__icon"><Ico name={icon} size={26} color="#818cf8" /></div>
       <h4 className="web-feature__title">{title}</h4>
       <p className="web-feature__desc">{desc}</p>
     </div>
@@ -646,8 +706,8 @@ function ProcessStep({ num, title, desc }: { num: number; title: string; desc: s
 }
 function ValueCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <div className="value-card">
-      <span className="value-card__icon">{icon}</span>
+    <div className="value-card reveal">
+      <span className="value-card__icon"><Ico name={icon} size={22} color="#818cf8" /></span>
       <div><div className="value-card__title">{title}</div><div className="value-card__desc">{desc}</div></div>
     </div>
   );
@@ -855,6 +915,34 @@ const css = `
   .value-card__icon { font-size: 24px; flex-shrink: 0; }
   .value-card__title { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 4px; }
   .value-card__desc { font-size: 14px; color: #707090; }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+  .reveal--in { opacity: 1; transform: translateY(0); }
+
+  /* PHONE FRAME */
+  .phone-frame { position: relative; background: #111; border-radius: 44px; padding: 14px 10px 20px; box-shadow: 0 0 0 2px #2a2a2a, 0 32px 80px rgba(0,0,0,0.8), inset 0 0 0 1px #3a3a3a; max-width: 360px; margin: 0 auto; }
+  .phone-frame__notch { display: flex; justify-content: center; align-items: center; height: 28px; margin-bottom: 6px; }
+  .phone-frame__speaker { width: 60px; height: 6px; background: #222; border-radius: 3px; }
+  .phone-frame__home { width: 40px; height: 5px; background: #2a2a2a; border-radius: 3px; margin: 10px auto 0; }
+  .phone-frame .plat-shell { border-radius: 12px; max-width: 100%; }
+
+  /* HERO FLOATS */
+  @keyframes floatA { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+  @keyframes floatB { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(8px); } }
+  @keyframes floatC { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+  .hero-floats { position: absolute; inset: 0; pointer-events: none; display: none; }
+  @media (min-width: 1024px) { .hero-floats { display: block; } }
+  .hf-card { position: absolute; display: flex; align-items: center; gap: 12px; background: rgba(10,10,30,0.85); border: 1px solid rgba(99,102,241,0.3); backdrop-filter: blur(12px); border-radius: 14px; padding: 12px 18px; min-width: 210px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .hf-card__icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(79,70,229,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hf-card__title { font-size: 13px; font-weight: 600; color: #e0e0f0; }
+  .hf-card__sub { font-size: 11px; color: #606080; margin-top: 2px; }
+  .hf-card--1 { top: 18%; left: 2%; animation: floatA 4s ease-in-out infinite; }
+  .hf-card--2 { top: 52%; right: 2%; animation: floatB 5s ease-in-out infinite; }
+  .hf-card--3 { bottom: 20%; left: 4%; animation: floatC 4.5s ease-in-out infinite; }
+
+  /* BENEFIT ICON */
+  .benefit-card__icon { margin-bottom: 16px; }
 
   /* BOKA */
   .book-cta-wrap { text-align: center; padding: 20px 0 10px; }
