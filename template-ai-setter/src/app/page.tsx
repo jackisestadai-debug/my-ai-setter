@@ -964,9 +964,9 @@ const css = `
 
   /* BOKA */
   .book-cta-wrap { text-align: center; padding: 20px 0 10px; }
-  .book-cta-btn { display: inline-block; background: linear-gradient(135deg,#3b82f6,#818cf8); color: #fff; font-size: 20px; font-weight: 600; padding: 20px 48px; border-radius: 14px; text-decoration: none; transition: opacity .2s, transform .2s; box-shadow: 0 8px 30px rgba(59,130,246,0.3); }
+  .book-cta-btn { display: inline-block; background: linear-gradient(135deg,#3b82f6,#818cf8); color: #fff; font-size: 20px; font-weight: 600; padding: 20px 48px; border-radius: 14px; text-decoration: none; transition: opacity .2s, transform .2s; box-shadow: 0 8px 30px rgba(59,130,246,0.3); max-width: 100%; }
   .book-cta-btn:hover { opacity: .88; transform: translateY(-2px); }
-  .book-cta-note { margin-top: 14px; color: #475569; font-size: 14px; }
+  .book-cta-note { margin-top: 14px; color: #94a3b8; font-size: 14px; }
 
   /* FAQ */
   .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
@@ -983,7 +983,7 @@ const css = `
   .footer__links { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
   .footer__links button { background: none; border: none; color: #475569; font-size: 14px; cursor: pointer; transition: color 0.2s; }
   .footer__links button:hover { color: #94a3b8; }
-  .footer__copy { font-size: 13px; color: #1e2d45; margin: 0; }
+  .footer__copy { font-size: 13px; color: #475569; margin: 0; }
 
   /* RESPONSIVE */
   @media (max-width: 768px) {
@@ -1001,10 +1001,17 @@ const css = `
     .platform-picker { gap: 6px; }
     .platform-btn { padding: 8px 12px; font-size: 13px; }
     .platform-btn__label { display: none; }
+    .book-cta-btn { font-size: 17px; padding: 16px 32px; }
+    .hero__h1 { letter-spacing: -1px; }
+    .section { padding: 72px 0; }
+    .service-card { padding: 28px 24px; }
   }
   @media (max-width: 480px) {
     .web-grid { grid-template-columns: 1fr; }
     .niche-picker { gap: 6px; }
     .niche-btn { font-size: 12px; padding: 7px 12px; }
+    .hero__btns { flex-direction: column; align-items: center; }
+    .hero__btns .btn { width: 100%; max-width: 320px; }
+    .stats { border-radius: 14px; }
   }
 `;
