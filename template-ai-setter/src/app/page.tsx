@@ -60,12 +60,12 @@ const NICHES: Record<NicheKey, NicheData> = {
   byra: {
     icon: "📈", label: "Digital byrå",
     conversation: [
-      { from: "lead", text: "Hej, vi lägger tid på sociala medier men får inte ut något av det, vet inte vad vi gör fel" },
-      { from: "aura", text: "Hej! Det är ett vanligt problem, ofta handlar det inte om hur mycket man postar utan vad man postar och till vem. Vad säljer ni?" },
-      { from: "lead", text: "Vi säljer kontorsmöbler till företag" },
-      { from: "aura", text: "Okej, då finns det tydliga saker att göra för att nå rätt personer. Vi hjälper liknande företag att faktiskt få kunder från sina kanaler. Vill du boka 20 minuter så vi tittar på er situation?" },
-      { from: "lead", text: "Ja det vill vi, kostar det något?" },
-      { from: "aura", text: "Första samtalet är helt gratis, ingen sälj, bara en genomgång. Välj tid här 👉 [länk]" },
+      { from: "lead", text: "Hej! Vi har en byrå som hanterar vår marknadsföring men känner att vi inte riktigt får ut det vi betalar för, svårt att veta om det ens funkar" },
+      { from: "aura", text: "Hej! Det är tyvärr vanligt, många byråer levererar rapporter men det syns ingenting på omsättningen. Vad är det ni säljer och till vem?" },
+      { from: "lead", text: "Vi säljer redovisningstjänster till småföretag, kör Meta-annonser och lite Google" },
+      { from: "aura", text: "Okej, det är en köpstark målgrupp om man gör det rätt. Problemet brukar vara att annonserna når fel personer eller att budskapet inte landar. Vi tar över hela marknadsföringen och ni ser exakt vad ni får för pengarna. Vill du boka ett möte?" },
+      { from: "lead", text: "Ja absolut, hur snabbt kan ni ta emot?" },
+      { from: "aura", text: "Vi har onsdag 09:00 eller fredag 13:00 ledigt denna vecka. Vilken passar?" },
     ],
   },
   restaurant: {
