@@ -97,9 +97,9 @@ const NICHES: Record<NicheKey, NicheData> = {
       { from: "lead", text: "Okej, det kan jag göra. När?" },
       { from: "aura", text: "Måndag 07:00 eller onsdag 17:30. Vilket passar?" },
       { from: "lead", text: "Onsdag" },
-      { from: "aura", text: "Toppen! Vad är ditt telefonnummer så vi kan skicka en bekräftelse?" },
-      { from: "lead", text: "070-987 65 43" },
-      { from: "aura", text: "Perfekt! Bokat onsdag 17:30. SMS-bekräftelse skickas till 070-987 65 43." },
+      { from: "aura", text: "Toppen! Vad är din mailadress så vi kan skicka en bekräftelse?" },
+      { from: "lead", text: "erik@exempel.se" },
+      { from: "aura", text: "Perfekt! Bokat onsdag 17:30. Bekräftelse skickas till erik@exempel.se." },
     ],
     sms: [
       { from: "lead", text: "Hej, söker PT. Vad kostar det?" },
