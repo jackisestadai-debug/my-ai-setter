@@ -611,7 +611,7 @@ export default function Home() {
       <section ref={processRef} className="section">
         <div className="container">
           <p className="section__label">Process</p>
-          <h2 className="section__h2">Klart på 7 dagar. Inte 7 månader.</h2>
+          <h2 className="section__h2">Från idé till verklighet på 7 dagar</h2>
           <p className="section__sub">Inga långa projekt. Vi rör oss snabbt och levererar resultat.</p>
           <div className="process-steps">
             <ProcessStep num={1} title="Vi lär känna dig" desc="Vi lär oss ditt företag, dina mål och dina kunder på ett kort möte." />
