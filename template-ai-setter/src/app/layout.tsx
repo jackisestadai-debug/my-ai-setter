@@ -2,23 +2,17 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rekvo Partners – AI-säljare som bokar möten åt dig",
-  description:
-    "Rekvo bygger smarta AI-system som svarar på kundmeddelanden, kvalificerar leads och bokar möten automatiskt – dygnet runt, på svenska.",
+  title: "Rekvo Partners",
   openGraph: {
-    title: "Rekvo Partners – AI-säljare som bokar möten åt dig",
-    description:
-      "Rekvo bygger smarta AI-system som svarar på kundmeddelanden, kvalificerar leads och bokar möten automatiskt – dygnet runt, på svenska.",
+    title: "Rekvo Partners",
     url: "https://rekvo.se",
     siteName: "Rekvo Partners",
     locale: "sv_SE",
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Rekvo Partners – AI-säljare som bokar möten åt dig",
-    description:
-      "Rekvo bygger smarta AI-system som svarar på kundmeddelanden, kvalificerar leads och bokar möten automatiskt – dygnet runt, på svenska.",
+    card: "summary",
+    title: "Rekvo Partners",
   },
 };
 
