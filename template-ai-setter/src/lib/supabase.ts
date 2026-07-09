@@ -63,6 +63,7 @@ export type Client = {
   whale_radar_enabled?: boolean;
   screener_enabled?: boolean;
   farewell_message?: string | null;
+  language?: string | null;
   created_at: string;
   updated_at: string;
 };

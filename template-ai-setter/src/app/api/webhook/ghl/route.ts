@@ -1042,29 +1042,36 @@ async function runReplyGeneration(params: {
   // --- Conversation language: detect Swedish, ask "snackar du svenska?" once,
   //     then LOCK the thread to Swedish and remember it. Runs only when there's
   //     a Swedish hint (or we're awaiting an answer), so plain English threads
-  //     pay nothing extra. Best-effort: on any error it leaves language as-is. ---
-  const knownLocation =
-    lead.stage_data?.location ?? stageContext?.knownFacts?.location;
-  const lang = await resolveConversationLanguage({
-    current: lead.conversation_language,
-    history,
-    knownLocation,
-  });
-  if (lang.state !== (lead.conversation_language ?? "en")) {
-    await updateLeadLanguage(lead.id, lang.state);
-    await logEvent({
-      client_id: client.id,
-      lead_id: lead.id,
-      event_type:
-        lang.state === "sv"
-          ? "language_locked_sv"
-          : lang.state === "sv_pending"
-          ? "language_ask_swedish"
-          : lang.state === "en_declined"
-          ? "language_declined"
-          : "language_changed",
-      metadata: { from: lead.conversation_language ?? "en", to: lang.state },
+  //     pay nothing extra. Best-effort: on any error it leaves language as-is.
+  //     If the client has language='sv' set, skip detection and always use Swedish. ---
+  const clientLanguage = (client as typeof client & { language?: string | null }).language;
+  let lang: { state: import("@/lib/language").LanguageState; directive: import("@/lib/prompts/master").LanguageDirective | null };
+  if (clientLanguage === "sv") {
+    lang = { state: "sv", directive: "lock_sv" };
+  } else {
+    const knownLocation =
+      lead.stage_data?.location ?? stageContext?.knownFacts?.location;
+    lang = await resolveConversationLanguage({
+      current: lead.conversation_language,
+      history,
+      knownLocation,
     });
+    if (lang.state !== (lead.conversation_language ?? "en")) {
+      await updateLeadLanguage(lead.id, lang.state);
+      await logEvent({
+        client_id: client.id,
+        lead_id: lead.id,
+        event_type:
+          lang.state === "sv"
+            ? "language_locked_sv"
+            : lang.state === "sv_pending"
+            ? "language_ask_swedish"
+            : lang.state === "en_declined"
+            ? "language_declined"
+            : "language_changed",
+        metadata: { from: lead.conversation_language ?? "en", to: lang.state },
+      });
+    }
   }
 
   const genClient = {
