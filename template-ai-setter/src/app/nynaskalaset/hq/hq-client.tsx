@@ -334,10 +334,10 @@ gl_FragColor=vec4(col,a);}`;
   }, [isActive]);
 
   const Stat = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
-    <div style={{ background: `rgba(${rgbO},0.07)`, border: `1px solid rgba(${rgbO},0.22)`, borderRadius: 12, padding: "16px 20px", minWidth: 140 }}>
-      <div style={{ fontSize: 10, color: `rgba(${rgbOL},0.7)`, letterSpacing: 2, fontFamily: "monospace", marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 800, color: `rgb(${rgbOL})`, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: `rgba(${rgbO},0.7)`, marginTop: 4 }}>{sub}</div>}
+    <div style={{ background: `rgba(${rgbO},0.10)`, border: `1px solid rgba(${rgbO},0.35)`, borderRadius: 14, padding: "20px 24px", minWidth: 155 }}>
+      <div style={{ fontSize: 10, color: `rgba(255,210,160,0.85)`, letterSpacing: 2, fontFamily: "monospace", marginBottom: 8, textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: 36, fontWeight: 900, color: "#fff", lineHeight: 1, textShadow: `0 0 20px rgba(${rgbO},0.8)` }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: `rgba(255,200,140,0.65)`, marginTop: 6 }}>{sub}</div>}
     </div>
   );
 
@@ -554,55 +554,73 @@ gl_FragColor=vec4(col,a);}`;
 
         {/* TEST TAB */}
         {tab === "test" && (
-          <div style={{ width: "100%", maxWidth: 700, padding: "0 24px" }}>
-            <div style={{ fontSize: 11, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 16, textAlign: "center" }}>
-              TESTA AI · SIMULERA EN FESTIVALBESÖKARE
+          <div style={{ width: "100%", maxWidth: 520, padding: "0 16px" }}>
+            {/* Facebook Messenger style header */}
+            <div style={{ background: "#1877F2", borderRadius: "16px 16px 0 0", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🎪</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#fff" }}>Nynäskalaset</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)" }}>Svarar vanligtvis direkt</div>
+              </div>
+              <div style={{ marginLeft: "auto", fontSize: 10, color: "rgba(255,255,255,0.5)", fontFamily: "monospace", letterSpacing: 1 }}>SIMULERING</div>
             </div>
-            <div style={{ background: `rgba(${rgbO},0.04)`, border: `1px solid rgba(${rgbO},0.15)`, borderRadius: 16, overflow: "hidden" }}>
-              <div style={{ height: 380, overflowY: "auto", padding: 16 }}>
-                {testMsgs.length === 0 && (
-                  <div style={{ color: `rgba(${rgbO},0.4)`, fontSize: 13, fontStyle: "italic" }}>
-                    Skriv ett meddelande som om du vore en festivalbesökare — t.ex. "vad kostar biljetter?" eller "BILJETT"
-                  </div>
-                )}
-                {testMsgs.map((m, i) => (
-                  <div key={i} style={{ marginBottom: 12, display: "flex", flexDirection: m.role === "lead" ? "row-reverse" : "row" }}>
-                    <div>
-                      <div style={{ fontSize: 10, letterSpacing: 1, fontFamily: "monospace", color: `rgba(${rgbO},0.5)`, marginBottom: 4, textAlign: m.role === "lead" ? "right" : "left" }}>
-                        {m.role === "lead" ? "DU (BESÖKARE)" : "AI (NYNÄSKALASET)"}
-                      </div>
-                      <div style={{
-                        maxWidth: 420, padding: "10px 14px", borderRadius: 12, fontSize: 13, lineHeight: 1.6,
-                        background: m.role === "lead" ? `rgba(${rgbO},0.2)` : `rgba(255,255,255,0.06)`,
-                        border: `1px solid rgba(${rgbO},${m.role === "lead" ? 0.35 : 0.12})`,
-                        color: "#f0e8d8",
-                      }}>
-                        {m.content}
-                      </div>
+
+            {/* Chat area */}
+            <div style={{ background: "#fff", height: 420, overflowY: "auto", padding: "16px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+              {testMsgs.length === 0 && (
+                <div style={{ color: "#8a8a8a", fontSize: 13, textAlign: "center", marginTop: 80, lineHeight: 1.6 }}>
+                  Skriv precis som en festivalbesökare skulle på Facebook<br/>
+                  <span style={{ fontSize: 12, color: "#bbb" }}>t.ex. "BILJETT" eller "vad kostar fredag?"</span>
+                </div>
+              )}
+              {testMsgs.map((m, i) => {
+                const isLead = m.role === "lead";
+                const parts = m.content.split("[[SPLIT]]").map(s => s.trim()).filter(Boolean);
+                return (
+                  <div key={i} style={{ display: "flex", flexDirection: isLead ? "row-reverse" : "row", alignItems: "flex-end", gap: 6 }}>
+                    {!isLead && <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#1877F2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>🎪</div>}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: isLead ? "flex-end" : "flex-start", maxWidth: "72%" }}>
+                      {parts.map((p, pi) => (
+                        <div key={pi} style={{
+                          padding: "10px 14px", borderRadius: isLead ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                          background: isLead ? "#1877F2" : "#f0f0f0",
+                          color: isLead ? "#fff" : "#050505",
+                          fontSize: 14, lineHeight: 1.5,
+                        }}>{p}</div>
+                      ))}
                     </div>
                   </div>
-                ))}
-                {testLoading && (
-                  <div style={{ color: `rgba(${rgbO},0.6)`, fontSize: 13 }}>AI svarar...</div>
-                )}
-                <div ref={testEndRef} />
-              </div>
-              <div style={{ padding: "12px 16px", borderTop: `1px solid rgba(${rgbO},0.1)`, display: "flex", gap: 8 }}>
-                <input
-                  value={testInput} onChange={(e) => setTestInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendTest()}
-                  placeholder='T.ex. "vad kostar fredag?" eller "BILJETT"'
-                  style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 8, padding: "8px 14px", color: "#f0e8d8", fontSize: 13, outline: "none" }}
-                />
-                <button onClick={sendTest} disabled={testLoading} style={{
-                  padding: "8px 18px", borderRadius: 8, background: `linear-gradient(90deg,rgb(${rgbO}),rgb(${Math.floor(O.r * 0.7)},${Math.floor(O.g * 0.5)},0))`,
-                  border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", letterSpacing: 1,
-                }}>
-                  SKICKA
-                </button>
-              </div>
+                );
+              })}
+              {testLoading && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#1877F2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🎪</div>
+                  <div style={{ background: "#f0f0f0", borderRadius: "18px 18px 18px 4px", padding: "12px 16px" }}>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#999", animation: `bounce 1.2s ${i*0.2}s infinite` }} />)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={testEndRef} />
+              <style>{`@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}`}</style>
             </div>
-            <div style={{ marginTop: 12, textAlign: "center" }}>
+
+            {/* Input bar */}
+            <div style={{ background: "#fff", borderTop: "1px solid #e0e0e0", borderRadius: "0 0 16px 16px", padding: "10px 12px", display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                value={testInput} onChange={(e) => setTestInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendTest()}
+                placeholder="Aa"
+                style={{ flex: 1, background: "#f0f0f0", border: "none", borderRadius: 20, padding: "9px 16px", color: "#050505", fontSize: 14, outline: "none" }}
+              />
+              <button onClick={sendTest} disabled={testLoading} style={{
+                width: 36, height: 36, borderRadius: "50%", background: "#1877F2",
+                border: "none", color: "#fff", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              }}>➤</button>
+            </div>
+
+            <div style={{ marginTop: 8, textAlign: "center" }}>
               <button onClick={() => setTestMsgs([])} style={{ background: "none", border: "none", color: `rgba(${rgbO},0.5)`, fontSize: 11, cursor: "pointer", letterSpacing: 1, fontFamily: "monospace" }}>
                 RENSA KONVERSATION
               </button>
