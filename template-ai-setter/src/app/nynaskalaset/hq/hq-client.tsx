@@ -174,7 +174,7 @@ export default function HqClient() {
 
   // 2D orb canvas
   useEffect(() => {
-    if (tab !== "kala") return;
+    if (tab !== "rekvo") return;
     const c = orbCanvas.current; if (!c) return;
     const ctx = c.getContext("2d"); if (!ctx) return;
     let t = 0;
@@ -238,7 +238,7 @@ export default function HqClient() {
 
   // WebGL volumetric core — festival orange plasma
   useEffect(() => {
-    if (tab !== "kala") return;
+    if (tab !== "rekvo") return;
     const c = glCanvas.current; if (!c) return;
     const gl = c.getContext("webgl", { alpha: true, premultipliedAlpha: false }); if (!gl) return;
     const VS = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
