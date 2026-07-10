@@ -5,15 +5,23 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 const KEY = (): string =>
   typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("k") || "";
 
-type Tab = "kala" | "stats" | "test";
+type Tab = "rekvo" | "stats" | "test";
 type OrbState = "idle" | "thinking" | "speaking" | "asleep";
 
+interface TicketBreakdown {
+  type: string;
+  count: number;
+}
 interface Stats {
   totalLeads: number;
   leadsToday: number;
   activeConvs: number;
   dmsSentTotal: number;
   dmsSentToday: number;
+  ticketsSold: number;
+  ticketsByType: TicketBreakdown[];
+  fbFollowers: number;
+  fbFollowersYesterday: number;
 }
 interface Countdown { daysLeft: number; hoursLeft: number }
 interface ChatMsg { role: "user" | "assistant"; content: string }
@@ -26,7 +34,7 @@ const rgbO = `${O.r},${O.g},${O.b}`;
 const rgbOL = `${OL.r},${OL.g},${OL.b}`;
 
 export default function HqClient() {
-  const [tab, setTab] = useState<Tab>("kala");
+  const [tab, setTab] = useState<Tab>("rekvo");
   const [orb, setOrb] = useState<OrbState>("idle");
   const [stats, setStats] = useState<Stats | null>(null);
   const [countdown, setCountdown] = useState<Countdown>({ daysLeft: 0, hoursLeft: 0 });
@@ -294,7 +302,7 @@ gl_FragColor=vec4(col,a);}`;
       setChatHistory([...newHistory, { role: "assistant", content: data.reply ?? "Fel — kunde inte svara." }]);
       setOrb("speaking"); setTimeout(() => setOrb("idle"), 2000);
     } catch {
-      setChatHistory([...newHistory, { role: "assistant", content: "Fel — kunde inte nå KALA." }]);
+      setChatHistory([...newHistory, { role: "assistant", content: "Fel — kunde inte nå Rekvo." }]);
       setOrb("idle");
     } finally { setChatLoading(false); }
   }, [chatInput, chatHistory, chatLoading]);
@@ -358,7 +366,7 @@ gl_FragColor=vec4(col,a);}`;
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 8 }}>
-          {(["kala", "stats", "test"] as Tab[]).map((t) => (
+          {(["rekvo", "stats", "test"] as Tab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding: "7px 18px", borderRadius: 20, fontSize: 11, letterSpacing: 2, fontFamily: "monospace", fontWeight: 700, cursor: "pointer",
               border: `1px solid rgba(${rgbO},${tab === t ? 0.9 : 0.25})`,
@@ -367,7 +375,7 @@ gl_FragColor=vec4(col,a);}`;
               boxShadow: tab === t ? `0 0 20px rgba(${rgbO},0.4)` : "none",
               transition: "all .2s",
             }}>
-              {t === "kala" ? "KALA" : t === "stats" ? "STATISTIK" : "TESTA AI"}
+              {t === "rekvo" ? "REKVO" : t === "stats" ? "STATISTIK" : "TESTA AI"}
             </button>
           ))}
         </div>
@@ -402,8 +410,8 @@ gl_FragColor=vec4(col,a);}`;
       {/* Main content */}
       <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 80 }}>
 
-        {/* KALA TAB — orb + chat */}
-        {tab === "kala" && (
+        {/* REKVO TAB — orb + chat */}
+        {tab === "rekvo" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: 800, gap: 24 }}>
             {/* Orb */}
             <div style={{ position: "relative", width: 260, height: 260, cursor: "pointer" }} onClick={() => {}}>
@@ -411,7 +419,7 @@ gl_FragColor=vec4(col,a);}`;
               <canvas ref={orbCanvas} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 4, pointerEvents: "none" }}>
                 <div style={{ fontSize: 12, letterSpacing: 4, fontFamily: "monospace", color: `rgba(${rgbOL},0.9)`, textShadow: `0 0 14px rgba(${rgbO},0.8)` }}>
-                  {orb === "thinking" ? "TÄNKER" : orb === "speaking" ? "SVARAR" : orb === "asleep" ? "VILOLÄGE" : "KALA"}
+                  {orb === "thinking" ? "TÄNKER" : orb === "speaking" ? "SVARAR" : orb === "asleep" ? "VILOLÄGE" : "REKVO"}
                 </div>
               </div>
             </div>
@@ -419,12 +427,12 @@ gl_FragColor=vec4(col,a);}`;
             {/* Chat */}
             <div style={{ width: "100%", background: `rgba(${rgbO},0.04)`, border: `1px solid rgba(${rgbO},0.15)`, borderRadius: 16, overflow: "hidden" }}>
               <div style={{ padding: "12px 16px", borderBottom: `1px solid rgba(${rgbO},0.1)`, fontSize: 10, letterSpacing: 2, fontFamily: "monospace", color: `rgba(${rgbO},0.6)` }}>
-                KALA · FESTIVAL AI-ASSISTENT
+                REKVO · FESTIVAL AI-ASSISTENT
               </div>
               <div style={{ height: 200, overflowY: "auto", padding: "16px" }}>
                 {chatHistory.length === 0 && (
                   <div style={{ color: `rgba(${rgbO},0.4)`, fontSize: 13, fontStyle: "italic" }}>
-                    Fråga KALA om konversationer, statistik eller vad som händer just nu...
+                    Fråga Rekvo om konversationer, statistik eller vad som händer just nu...
                   </div>
                 )}
                 {chatHistory.map((m, i) => (
@@ -440,7 +448,7 @@ gl_FragColor=vec4(col,a);}`;
                   </div>
                 ))}
                 {chatLoading && (
-                  <div style={{ color: `rgba(${rgbO},0.6)`, fontSize: 13 }}>KALA tänker...</div>
+                  <div style={{ color: `rgba(${rgbO},0.6)`, fontSize: 13 }}>Rekvo tänker...</div>
                 )}
                 <div ref={chatEndRef} />
               </div>
@@ -448,7 +456,7 @@ gl_FragColor=vec4(col,a);}`;
                 <input
                   value={chatInput} onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendChat()}
-                  placeholder="Fråga KALA något..."
+                  placeholder="Fråga Rekvo något..."
                   style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 8, padding: "8px 14px", color: "#f0e8d8", fontSize: 13, outline: "none" }}
                 />
                 <button onClick={sendChat} disabled={chatLoading} style={{
@@ -464,11 +472,13 @@ gl_FragColor=vec4(col,a);}`;
 
         {/* STATS TAB */}
         {tab === "stats" && (
-          <div style={{ width: "100%", maxWidth: 900, padding: "0 24px" }}>
-            <div style={{ fontSize: 11, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 24, textAlign: "center" }}>
+          <div style={{ width: "100%", maxWidth: 980, padding: "0 24px", overflowY: "auto", maxHeight: "calc(100vh - 120px)" }}>
+            <div style={{ fontSize: 11, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 20, textAlign: "center" }}>
               LIVE STATISTIK · NYNÄSKALASET
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", marginBottom: 32 }}>
+
+            {/* DM Stats */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 20 }}>
               <Stat label="KONVERSATIONER TOTALT" value={stats?.totalLeads ?? "–"} sub="alla DMs via AI" />
               <Stat label="NYA IDAG" value={stats?.leadsToday ?? "–"} sub="sedan midnatt" />
               <Stat label="AKTIVA (24H)" value={stats?.activeConvs ?? "–"} sub="aktiva konversationer" />
@@ -477,8 +487,52 @@ gl_FragColor=vec4(col,a);}`;
               <Stat label="DAGAR TILL EVENT" value={countdown.daysLeft} sub={`${countdown.hoursLeft}h kvar`} />
             </div>
 
+            {/* Facebook Followers */}
+            <div style={{ marginBottom: 20, padding: "14px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.18)`, borderRadius: 12 }}>
+              <div style={{ fontSize: 10, letterSpacing: 2, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 10 }}>FACEBOOK · FÖLJARE</div>
+              <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: `rgb(${rgbOL})`, lineHeight: 1 }}>{stats?.fbFollowers != null ? stats.fbFollowers.toLocaleString("sv-SE") : "–"}</div>
+                  <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>totalt antal följare</div>
+                </div>
+                {stats && stats.fbFollowers > 0 && stats.fbFollowersYesterday > 0 && (
+                  <div>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: stats.fbFollowers >= stats.fbFollowersYesterday ? "#4ade80" : "#f87171", lineHeight: 1 }}>
+                      {stats.fbFollowers >= stats.fbFollowersYesterday ? "+" : ""}{(stats.fbFollowers - stats.fbFollowersYesterday).toLocaleString("sv-SE")}
+                    </div>
+                    <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>sedan igår</div>
+                  </div>
+                )}
+                <div style={{ fontSize: 10, color: `rgba(${rgbO},0.4)`, fontFamily: "monospace", marginLeft: "auto" }}>uppdateras via Facebook API</div>
+              </div>
+            </div>
+
+            {/* Ticket Sales */}
+            <div style={{ marginBottom: 20, padding: "14px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.18)`, borderRadius: 12 }}>
+              <div style={{ fontSize: 10, letterSpacing: 2, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 10 }}>SÅLDA BILJETTER VIA AI</div>
+              <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: `rgb(${rgbOL})`, lineHeight: 1 }}>{stats?.ticketsSold ?? 0}</div>
+                  <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>biljetter totalt</div>
+                </div>
+                {stats && stats.ticketsByType && stats.ticketsByType.length > 0 && (
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    {stats.ticketsByType.map((t) => (
+                      <div key={t.type} style={{ background: `rgba(${rgbO},0.1)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 8, padding: "8px 14px", textAlign: "center" }}>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: `rgb(${rgbOL})` }}>{t.count}</div>
+                        <div style={{ fontSize: 10, color: `rgba(${rgbO},0.7)`, fontFamily: "monospace", letterSpacing: 1 }}>{t.type.toUpperCase()}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {(!stats || !stats.ticketsByType || stats.ticketsByType.length === 0) && (
+                  <div style={{ fontSize: 12, color: `rgba(${rgbO},0.4)`, fontStyle: "italic", alignSelf: "center" }}>inga biljetter sålda via AI ännu</div>
+                )}
+              </div>
+            </div>
+
             {/* AI toggle */}
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <button onClick={toggleAI} style={{
                 padding: "12px 32px", borderRadius: 12, border: `1px solid rgba(${isActive ? "248,113,113" : "74,222,128"},0.5)`,
                 background: `rgba(${isActive ? "248,113,113" : "74,222,128"},0.1)`, color: isActive ? "#f87171" : "#4ade80",
@@ -488,7 +542,7 @@ gl_FragColor=vec4(col,a);}`;
               </button>
             </div>
 
-            <div style={{ marginTop: 32, padding: 16, background: `rgba(${rgbO},0.05)`, border: `1px solid rgba(${rgbO},0.12)`, borderRadius: 12, fontSize: 12, color: `rgba(${rgbO},0.6)`, fontFamily: "monospace", lineHeight: 1.8 }}>
+            <div style={{ padding: 16, background: `rgba(${rgbO},0.05)`, border: `1px solid rgba(${rgbO},0.12)`, borderRadius: 12, fontSize: 12, color: `rgba(${rgbO},0.6)`, fontFamily: "monospace", lineHeight: 1.8 }}>
               <div style={{ color: `rgb(${rgbOL})`, marginBottom: 8, letterSpacing: 2 }}>FESTIVALINFO</div>
               <div>Fredag 7 aug — Rockparty · 14:00–02:00</div>
               <div>Lördag 8 aug — Summerfest · 11:00–02:00</div>

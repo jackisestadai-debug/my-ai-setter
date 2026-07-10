@@ -1,6 +1,6 @@
 /**
  * Nynäskalaset HQ — live pulse.
- * Returns DM stats and active conversation counts for the festival client.
+ * Returns DM stats, ticket sales, and follower counts for the festival client.
  * GET /api/nynaskalaset/pulse?k=<key>&since=<ISO>
  */
 import { NextRequest, NextResponse } from "next/server";
@@ -23,10 +23,10 @@ export async function GET(req: NextRequest) {
   const sinceMs = Math.max(new Date(sinceParam || 0).getTime() || floor, floor);
   const since = new Date(sinceMs).toISOString();
 
-  // Get client row
+  // Get client row including follower counts
   const { data: client } = await supabase
     .from("clients")
-    .select("id, is_active")
+    .select("id, is_active, fb_followers, fb_followers_yesterday")
     .eq("slug", CLIENT_SLUG)
     .maybeSingle();
 
@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
     { count: dmsSentTotal },
     { count: dmsSentToday },
     { data: recentLeads },
+    { data: ticketRows },
   ] = await Promise.all([
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("client_id", clientId),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("client_id", clientId).gte("created_at", todayISO),
@@ -54,7 +55,16 @@ export async function GET(req: NextRequest) {
     supabase.from("messages").select("id", { count: "exact", head: true }).eq("client_id", clientId).eq("role", "ai"),
     supabase.from("messages").select("id", { count: "exact", head: true }).eq("client_id", clientId).eq("role", "ai").gte("created_at", todayISO),
     supabase.from("leads").select("created_at").eq("client_id", clientId).gt("created_at", since).order("created_at", { ascending: true }).limit(10),
+    supabase.from("leads").select("ticket_type").eq("client_id", clientId).eq("ticket_purchased", true),
   ]);
+
+  // Aggregate ticket sales by type
+  const ticketsByType: Record<string, number> = {};
+  for (const row of ticketRows ?? []) {
+    const t = row.ticket_type ?? "okänd";
+    ticketsByType[t] = (ticketsByType[t] ?? 0) + 1;
+  }
+  const ticketsByTypeArr = Object.entries(ticketsByType).map(([type, count]) => ({ type, count }));
 
   const eventDate = new Date("2026-08-07T14:00:00+02:00"); // Friday opens 14:00
   const msLeft = eventDate.getTime() - Date.now();
@@ -70,6 +80,10 @@ export async function GET(req: NextRequest) {
       activeConvs: activeConvs ?? 0,
       dmsSentTotal: dmsSentTotal ?? 0,
       dmsSentToday: dmsSentToday ?? 0,
+      ticketsSold: ticketRows?.length ?? 0,
+      ticketsByType: ticketsByTypeArr,
+      fbFollowers: client.fb_followers ?? 0,
+      fbFollowersYesterday: client.fb_followers_yesterday ?? 0,
     },
     countdown: { daysLeft, hoursLeft },
     recent: (recentLeads ?? []).map((l) => ({ kind: "lead", at: l.created_at })),

@@ -174,20 +174,28 @@ export async function POST(req: NextRequest) {
   }
 
   // Conversation language (detect Swedish, ask once, then lock) — same as live.
+  // If client.language === 'sv', the whole conversation is Swedish — skip resolver.
   let languageDirective: LanguageDirective | undefined;
-  try {
-    const knownLocation = resolvedStageData?.location ?? lead.stage_data?.location;
-    const lang = await resolveConversationLanguage({
-      current: lead.conversation_language,
-      history,
-      knownLocation: typeof knownLocation === "string" ? knownLocation : undefined,
-    });
-    languageDirective = lang.directive ?? undefined;
-    if (lang.state !== (lead.conversation_language ?? "en")) {
-      await supabase.from("leads").update({ conversation_language: lang.state }).eq("id", lead.id);
+  if (client.language === "sv") {
+    languageDirective = "lock_sv";
+    if ((lead.conversation_language ?? "en") !== "sv") {
+      await supabase.from("leads").update({ conversation_language: "sv" }).eq("id", lead.id);
     }
-  } catch (err) {
-    console.error("[test] language resolution failed:", err);
+  } else {
+    try {
+      const knownLocation = resolvedStageData?.location ?? lead.stage_data?.location;
+      const lang = await resolveConversationLanguage({
+        current: lead.conversation_language,
+        history,
+        knownLocation: typeof knownLocation === "string" ? knownLocation : undefined,
+      });
+      languageDirective = lang.directive ?? undefined;
+      if (lang.state !== (lead.conversation_language ?? "en")) {
+        await supabase.from("leads").update({ conversation_language: lang.state }).eq("id", lead.id);
+      }
+    } catch (err) {
+      console.error("[test] language resolution failed:", err);
+    }
   }
 
   // Voice notes: same decision as live (enabled + clone id + English thread).
