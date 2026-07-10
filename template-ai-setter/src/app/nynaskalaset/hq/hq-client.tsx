@@ -8,10 +8,7 @@ const KEY = (): string =>
 type Tab = "rekvo" | "stats" | "test";
 type OrbState = "idle" | "thinking" | "speaking" | "asleep";
 
-interface TicketBreakdown {
-  type: string;
-  count: number;
-}
+interface TicketBreakdown { type: string; count: number }
 interface Stats {
   totalLeads: number;
   leadsToday: number;
@@ -20,6 +17,9 @@ interface Stats {
   dmsSentToday: number;
   ticketsSold: number;
   ticketsByType: TicketBreakdown[];
+  estimatedRevenue: number;
+  linkSentCount: number;
+  stageCount: Record<string, number>;
   fbFollowers: number;
   fbFollowersYesterday: number;
 }
@@ -472,82 +472,136 @@ gl_FragColor=vec4(col,a);}`;
 
         {/* STATS TAB */}
         {tab === "stats" && (
-          <div style={{ width: "100%", maxWidth: 980, padding: "0 24px", overflowY: "auto", maxHeight: "calc(100vh - 120px)" }}>
-            <div style={{ fontSize: 11, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 20, textAlign: "center" }}>
-              LIVE STATISTIK · NYNÄSKALASET
+          <div style={{ width: "100%", maxWidth: 1100, padding: "0 24px", overflowY: "auto", maxHeight: "calc(100vh - 120px)" }}>
+            <div style={{ fontSize: 10, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.5)`, marginBottom: 20, textAlign: "center" }}>
+              LIVE STATISTIK · NYNÄSKALASET · {new Date().toLocaleDateString("sv-SE")}
             </div>
 
-            {/* DM Stats */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 20 }}>
-              <Stat label="KONVERSATIONER TOTALT" value={stats?.totalLeads ?? "–"} sub="alla DMs via AI" />
-              <Stat label="NYA IDAG" value={stats?.leadsToday ?? "–"} sub="sedan midnatt" />
-              <Stat label="AKTIVA (24H)" value={stats?.activeConvs ?? "–"} sub="aktiva konversationer" />
-              <Stat label="AI-SVAR TOTALT" value={stats?.dmsSentTotal ?? "–"} sub="meddelanden skickade" />
-              <Stat label="AI-SVAR IDAG" value={stats?.dmsSentToday ?? "–"} sub="sedan midnatt" />
-              <Stat label="DAGAR TILL EVENT" value={countdown.daysLeft} sub={`${countdown.hoursLeft}h kvar`} />
-            </div>
-
-            {/* Facebook Followers */}
-            <div style={{ marginBottom: 20, padding: "14px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.18)`, borderRadius: 12 }}>
-              <div style={{ fontSize: 10, letterSpacing: 2, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 10 }}>FACEBOOK · FÖLJARE</div>
-              <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: 32, fontWeight: 800, color: `rgb(${rgbOL})`, lineHeight: 1 }}>{stats?.fbFollowers != null ? stats.fbFollowers.toLocaleString("sv-SE") : "–"}</div>
-                  <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>totalt antal följare</div>
-                </div>
-                {stats && stats.fbFollowers > 0 && stats.fbFollowersYesterday > 0 && (
-                  <div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: stats.fbFollowers >= stats.fbFollowersYesterday ? "#4ade80" : "#f87171", lineHeight: 1 }}>
-                      {stats.fbFollowers >= stats.fbFollowersYesterday ? "+" : ""}{(stats.fbFollowers - stats.fbFollowersYesterday).toLocaleString("sv-SE")}
+            {/* FUNNEL FLOW */}
+            <div style={{ marginBottom: 20, padding: "18px 24px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 14 }}>
+              <div style={{ fontSize: 10, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 16 }}>FESTIVALFUNNEL — DM → BILJETT</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 0, overflowX: "auto" }}>
+                {[
+                  { label: "DMs MOTTAGNA", value: stats?.totalLeads ?? 0, sub: "totalt" },
+                  { label: "ENGAGERADE", value: stats?.activeConvs ?? 0, sub: "senaste 24h" },
+                  { label: "LÄNK SKICKAD", value: stats?.linkSentCount ?? 0, sub: "rekommenderade" },
+                  { label: "BILJETTER SÅLDA", value: stats?.ticketsSold ?? 0, sub: "bekräftade" },
+                  { label: "INTÄKT (EST.)", value: stats ? `${(stats.estimatedRevenue ?? 0).toLocaleString("sv-SE")} kr` : "0 kr", sub: "via AI" },
+                ].map((s, i, arr) => (
+                  <div key={s.label} style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 120 }}>
+                    <div style={{ flex: 1, textAlign: "center", padding: "12px 8px", background: `rgba(${rgbO},${0.06 + i * 0.04})`, borderRadius: 10, border: `1px solid rgba(${rgbO},0.25)` }}>
+                      <div style={{ fontSize: 9, letterSpacing: 2, fontFamily: "monospace", color: `rgba(255,210,160,0.7)`, marginBottom: 6 }}>{s.label}</div>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, textShadow: `0 0 16px rgba(${rgbO},0.7)` }}>{s.value}</div>
+                      <div style={{ fontSize: 10, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>{s.sub}</div>
                     </div>
-                    <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>sedan igår</div>
+                    {i < arr.length - 1 && (
+                      <div style={{ color: `rgba(${rgbO},0.4)`, fontSize: 18, padding: "0 4px", flexShrink: 0 }}>→</div>
+                    )}
                   </div>
-                )}
-                <div style={{ fontSize: 10, color: `rgba(${rgbO},0.4)`, fontFamily: "monospace", marginLeft: "auto" }}>uppdateras via Facebook API</div>
+                ))}
               </div>
-            </div>
-
-            {/* Ticket Sales */}
-            <div style={{ marginBottom: 20, padding: "14px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.18)`, borderRadius: 12 }}>
-              <div style={{ fontSize: 10, letterSpacing: 2, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 10 }}>SÅLDA BILJETTER VIA AI</div>
-              <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
-                <div>
-                  <div style={{ fontSize: 32, fontWeight: 800, color: `rgb(${rgbOL})`, lineHeight: 1 }}>{stats?.ticketsSold ?? 0}</div>
-                  <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 4 }}>biljetter totalt</div>
+              {stats && stats.totalLeads > 0 && (
+                <div style={{ display: "flex", gap: 32, marginTop: 14, paddingTop: 14, borderTop: `1px solid rgba(${rgbO},0.12)` }}>
+                  <div style={{ fontSize: 11, color: `rgba(255,200,140,0.7)` }}>
+                    Konverteringsgrad: <strong style={{ color: "#fff" }}>{stats.ticketsSold > 0 ? ((stats.ticketsSold / stats.totalLeads) * 100).toFixed(1) : "0"}%</strong>
+                  </div>
+                  <div style={{ fontSize: 11, color: `rgba(255,200,140,0.7)` }}>
+                    AI-svar skickade: <strong style={{ color: "#fff" }}>{stats.dmsSentTotal}</strong>
+                  </div>
+                  <div style={{ fontSize: 11, color: `rgba(255,200,140,0.7)` }}>
+                    Nya idag: <strong style={{ color: "#fff" }}>{stats.leadsToday}</strong>
+                  </div>
+                  <div style={{ fontSize: 11, color: `rgba(255,200,140,0.7)` }}>
+                    AI-svar idag: <strong style={{ color: "#fff" }}>{stats.dmsSentToday}</strong>
+                  </div>
                 </div>
-                {stats && stats.ticketsByType && stats.ticketsByType.length > 0 && (
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    {stats.ticketsByType.map((t) => (
-                      <div key={t.type} style={{ background: `rgba(${rgbO},0.1)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 8, padding: "8px 14px", textAlign: "center" }}>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: `rgb(${rgbOL})` }}>{t.count}</div>
-                        <div style={{ fontSize: 10, color: `rgba(${rgbO},0.7)`, fontFamily: "monospace", letterSpacing: 1 }}>{t.type.toUpperCase()}</div>
-                      </div>
-                    ))}
+              )}
+            </div>
+
+            {/* ROW: BILJETTER + FACEBOOK */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+              {/* Ticket breakdown */}
+              <div style={{ padding: "18px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 14 }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 14 }}>BILJETTER PER TYP</div>
+                {(!stats?.ticketsByType?.length) ? (
+                  <div style={{ fontSize: 13, color: `rgba(${rgbO},0.4)`, fontStyle: "italic" }}>inga sålda via AI ännu</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {stats.ticketsByType.map((t) => {
+                      const pct = stats.ticketsSold > 0 ? (t.count / stats.ticketsSold) * 100 : 0;
+                      return (
+                        <div key={t.type}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                            <span style={{ fontSize: 12, color: "rgba(255,210,160,0.9)", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>{t.type}</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{t.count}</span>
+                          </div>
+                          <div style={{ height: 4, background: `rgba(${rgbO},0.15)`, borderRadius: 2 }}>
+                            <div style={{ height: "100%", width: `${pct}%`, background: `rgb(${rgbO})`, borderRadius: 2, boxShadow: `0 0 8px rgba(${rgbO},0.6)` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid rgba(${rgbO},0.12)`, fontSize: 12, color: "rgba(255,200,140,0.7)" }}>
+                      Estimerad intäkt: <strong style={{ color: "#fff" }}>{(stats.estimatedRevenue ?? 0).toLocaleString("sv-SE")} kr</strong>
+                    </div>
                   </div>
                 )}
-                {(!stats || !stats.ticketsByType || stats.ticketsByType.length === 0) && (
-                  <div style={{ fontSize: 12, color: `rgba(${rgbO},0.4)`, fontStyle: "italic", alignSelf: "center" }}>inga biljetter sålda via AI ännu</div>
+              </div>
+
+              {/* Facebook followers */}
+              <div style={{ padding: "18px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 14 }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 14 }}>FACEBOOK · FÖLJARE</div>
+                <div style={{ fontSize: 48, fontWeight: 900, color: "#fff", lineHeight: 1, textShadow: `0 0 20px rgba(${rgbO},0.7)` }}>
+                  {(stats?.fbFollowers ?? 0).toLocaleString("sv-SE")}
+                </div>
+                <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)`, marginTop: 6, marginBottom: 16 }}>totalt antal följare</div>
+                {stats && stats.fbFollowersYesterday > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: stats.fbFollowers >= stats.fbFollowersYesterday ? "#4ade80" : "#f87171" }}>
+                      {stats.fbFollowers >= stats.fbFollowersYesterday ? "▲" : "▼"} {Math.abs(stats.fbFollowers - stats.fbFollowersYesterday).toLocaleString("sv-SE")}
+                    </div>
+                    <div style={{ fontSize: 11, color: `rgba(${rgbO},0.6)` }}>sedan igår</div>
+                  </div>
                 )}
+                <div style={{ marginTop: 12, fontSize: 10, color: `rgba(${rgbO},0.35)`, fontFamily: "monospace" }}>uppdateras manuellt · FB API kommer</div>
               </div>
             </div>
 
-            {/* AI toggle */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <button onClick={toggleAI} style={{
-                padding: "12px 32px", borderRadius: 12, border: `1px solid rgba(${isActive ? "248,113,113" : "74,222,128"},0.5)`,
-                background: `rgba(${isActive ? "248,113,113" : "74,222,128"},0.1)`, color: isActive ? "#f87171" : "#4ade80",
-                fontSize: 12, letterSpacing: 2, fontFamily: "monospace", fontWeight: 700, cursor: "pointer",
-              }}>
-                {isActive ? "⏸ PAUSA AI" : "▶ STARTA AI"}
-              </button>
-            </div>
-
-            <div style={{ padding: 16, background: `rgba(${rgbO},0.05)`, border: `1px solid rgba(${rgbO},0.12)`, borderRadius: 12, fontSize: 12, color: `rgba(${rgbO},0.6)`, fontFamily: "monospace", lineHeight: 1.8 }}>
-              <div style={{ color: `rgb(${rgbOL})`, marginBottom: 8, letterSpacing: 2 }}>FESTIVALINFO</div>
-              <div>Fredag 7 aug — Rockparty · 14:00–02:00</div>
-              <div>Lördag 8 aug — Summerfest · 11:00–02:00</div>
-              <div>Plats: Svandammsparken, Nynäshamn</div>
-              <div style={{ marginTop: 8 }}>Biljetter: nortic.se/ticket/event/78408</div>
+            {/* ROW: Stage breakdown + AI toggle */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 16, marginBottom: 20 }}>
+              <div style={{ padding: "18px 20px", background: `rgba(${rgbO},0.06)`, border: `1px solid rgba(${rgbO},0.2)`, borderRadius: 14 }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, fontFamily: "monospace", color: `rgba(${rgbO},0.6)`, marginBottom: 14 }}>VAR LEADS BEFINNER SIG</div>
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                  {[
+                    { key: "opener", label: "OPENER" },
+                    { key: "qualify_day", label: "VILKEN DAG" },
+                    { key: "recommend", label: "REKOMMENDERAT" },
+                    { key: "handle_question", label: "FRÅGOR" },
+                    { key: "close", label: "AVSLUT" },
+                    { key: "nurture", label: "NURTURE" },
+                  ].map(({ key, label }) => {
+                    const count = stats?.stageCount?.[key] ?? 0;
+                    return (
+                      <div key={key} style={{ background: `rgba(${rgbO},${count > 0 ? 0.15 : 0.05})`, border: `1px solid rgba(${rgbO},${count > 0 ? 0.4 : 0.15})`, borderRadius: 8, padding: "8px 14px", textAlign: "center", minWidth: 90 }}>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: count > 0 ? "#fff" : `rgba(${rgbO},0.4)` }}>{count}</div>
+                        <div style={{ fontSize: 9, letterSpacing: 1, fontFamily: "monospace", color: `rgba(255,200,140,0.6)`, marginTop: 3 }}>{label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 12 }}>
+                <button onClick={toggleAI} style={{
+                  padding: "14px 28px", borderRadius: 12, border: `1px solid rgba(${isActive ? "248,113,113" : "74,222,128"},0.5)`,
+                  background: `rgba(${isActive ? "248,113,113" : "74,222,128"},0.1)`, color: isActive ? "#f87171" : "#4ade80",
+                  fontSize: 12, letterSpacing: 2, fontFamily: "monospace", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
+                }}>
+                  {isActive ? "⏸ PAUSA AI" : "▶ STARTA AI"}
+                </button>
+                <div style={{ textAlign: "center", fontSize: 10, fontFamily: "monospace", color: `rgba(${rgbO},0.5)` }}>
+                  {countdown.daysLeft}d {countdown.hoursLeft}h kvar
+                </div>
+              </div>
             </div>
           </div>
         )}

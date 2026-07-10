@@ -48,6 +48,7 @@ export async function GET(req: NextRequest) {
     { count: dmsSentToday },
     { data: recentLeads },
     { data: ticketRows },
+    { data: stageRows },
   ] = await Promise.all([
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("client_id", clientId),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("client_id", clientId).gte("created_at", todayISO),
@@ -56,6 +57,7 @@ export async function GET(req: NextRequest) {
     supabase.from("messages").select("id", { count: "exact", head: true }).eq("client_id", clientId).eq("role", "ai").gte("created_at", todayISO),
     supabase.from("leads").select("created_at").eq("client_id", clientId).gt("created_at", since).order("created_at", { ascending: true }).limit(10),
     supabase.from("leads").select("ticket_type").eq("client_id", clientId).eq("ticket_purchased", true),
+    supabase.from("leads").select("funnel_stage").eq("client_id", clientId),
   ]);
 
   // Aggregate ticket sales by type
@@ -65,6 +67,23 @@ export async function GET(req: NextRequest) {
     ticketsByType[t] = (ticketsByType[t] ?? 0) + 1;
   }
   const ticketsByTypeArr = Object.entries(ticketsByType).map(([type, count]) => ({ type, count }));
+
+  // Ticket price map for revenue estimate
+  const avgPrice: Record<string, number> = {
+    "2-dagars": 1795, fredag: 995, lördag: 1195, vip: 2495, okänd: 1200,
+  };
+  const estimatedRevenue = (ticketRows ?? []).reduce((sum, r) => {
+    const key = (r.ticket_type ?? "okänd").toLowerCase();
+    return sum + (avgPrice[key] ?? 1200);
+  }, 0);
+
+  // Stage breakdown
+  const stageCount: Record<string, number> = {};
+  for (const row of stageRows ?? []) {
+    const s = row.funnel_stage ?? "opener";
+    stageCount[s] = (stageCount[s] ?? 0) + 1;
+  }
+  const linkSentCount = (stageCount["close"] ?? 0) + (stageCount["nurture"] ?? 0) + (stageCount["recommend"] ?? 0);
 
   const eventDate = new Date("2026-08-07T14:00:00+02:00"); // Friday opens 14:00
   const msLeft = eventDate.getTime() - Date.now();
@@ -82,6 +101,9 @@ export async function GET(req: NextRequest) {
       dmsSentToday: dmsSentToday ?? 0,
       ticketsSold: ticketRows?.length ?? 0,
       ticketsByType: ticketsByTypeArr,
+      estimatedRevenue,
+      linkSentCount,
+      stageCount,
       fbFollowers: client.fb_followers ?? 0,
       fbFollowersYesterday: client.fb_followers_yesterday ?? 0,
     },
