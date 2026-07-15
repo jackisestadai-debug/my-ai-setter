@@ -2069,6 +2069,25 @@ function HqStyles() {
       @keyframes hqIgnite { 0%, 58% { opacity: 0; } 64% { opacity: 0.9; } 80% { opacity: 0.12; } 100% { opacity: 0; } }
       @keyframes hqShake { 0%, 61.5% { transform: none; } 63% { transform: translate(4px,-3px); } 64.5% { transform: translate(-4px,2px); } 66% { transform: translate(3px,2px); } 67.5% { transform: translate(-2px,-2px); } 69% { transform: translate(1px,1px); } 70.5%, 100% { transform: none; } }
       @keyframes hqCheckIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+      /* ── MOBILE ──────────────────────────────────────────────────────────── */
+      @media (max-width: 640px) {
+        .hq-top { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+        .hq-top img { height: 36px !important; }
+        .hq-tabs { margin: 0; flex-wrap: wrap; gap: 5px; width: 100%; order: 3; }
+        .hq-tab { padding: 7px 11px; font-size: 10px; letter-spacing: 0.1em; }
+        .hq-state { min-width: auto; font-size: 10px; }
+        .hq-orbwrap { width: min(300px, 55vw); height: min(300px, 55vw); }
+        .hq-panel { width: 88vw !important; max-width: 88vw !important; }
+        .hq-panel--report { width: 92vw !important; max-width: 92vw !important; }
+        .hq-panel.cine { width: 88vw !important; max-width: 88vw !important; }
+        .hq-said { font-size: 15px; }
+        .hq-textinput { width: 90vw; }
+        .hq-frame { inset: 100px 8px 8px 8px; }
+        .hq-checks { left: 10px; bottom: 10px; font-size: 9px; }
+        .hq-hud { right: 10px; bottom: 10px; font-size: 9px; }
+        .hq-corner { width: 16px; height: 16px; }
+      }
     `}</style>
   );
 }
