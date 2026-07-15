@@ -115,6 +115,7 @@ export default function CrmClient() {
   const [week, setWeek] = useState<WeekDay[]>([]);
   const [showStats, setShowStats] = useState(false);
   const [showWeek, setShowWeek] = useState(true);
+  const [showScript, setShowScript] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "">("");
@@ -451,6 +452,30 @@ export default function CrmClient() {
           </div>
         )}
       </div>
+
+      {/* call script — only on TELEFON tab */}
+      {channel === "call" && (
+        <div style={S.section}>
+          <div style={{ ...S.sectionTitle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>MANUS</span>
+            <button style={S.toggleBtn} onClick={() => setShowScript((v) => !v)}>
+              {showScript ? "Dölj" : "Visa"}
+            </button>
+          </div>
+          {showScript && (
+            <div style={S.scriptBox}>
+              <ScriptBlock step="INTRO" text={`"Hej, jag heter Jack och ringer från Rekvo. Stör jag?"`} />
+              <ScriptBlock step="ANLEDNING" text={`"Jag ringde för att vi såg att [företag] inte har någon hemsida — vi hjälper just den typen av företag att komma igång snabbt. Passar det att jag berättar kort?"`} />
+              <ScriptBlock step="PITCH" text={`"Vi bygger en enkel, professionell hemsida — klar på några dagar. Inga konstiga avtal, ni betalar bara om ni är nöjda. Skulle det passa att ta 30 minuter den här veckan så visar jag hur det skulle se ut för er?"`} />
+              <div style={S.scriptDivider}>INVÄNDNINGAR</div>
+              <ObjectionRow q="Behöver ingen hemsida" a={`"Hur hittar era kunder er idag?"`} />
+              <ObjectionRow q="Hinner inte" a={`"Därför sköter vi allt — ni behöver inte göra nånting."`} />
+              <ObjectionRow q="Vad kostar det?" a={`"Det beror på vad ni behöver — därför vill jag ta 30 min, så ni ser exakt vad ni får."`} />
+              <ObjectionRow q="Skicka mail" a={`"Självklart — men om det ser bra ut, är ni öppna för ett möte då?"`} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* leads section */}
       <div style={S.section}>
@@ -796,6 +821,26 @@ function Input({
       autoFocus={autoFocus}
       onChange={(e) => onChange(e.target.value)}
     />
+  );
+}
+
+// ── ScriptBlock component ─────────────────────────────────────────────────────
+
+function ScriptBlock({ step, text }: { step: string; text: string }) {
+  return (
+    <div style={S.scriptStep}>
+      <div style={S.scriptStepLabel}>{step}</div>
+      <div style={S.scriptStepText}>{text}</div>
+    </div>
+  );
+}
+
+function ObjectionRow({ q, a }: { q: string; a: string }) {
+  return (
+    <div style={S.objRow}>
+      <div style={S.objQ}>{q}</div>
+      <div style={S.objA}>{a}</div>
+    </div>
   );
 }
 
@@ -1174,6 +1219,55 @@ const S: Record<string, React.CSSProperties> = {
   demoRight: { display: "flex", flexDirection: "column" as const, alignItems: "flex-end", gap: 2 },
   demoDate: { fontSize: 11, color: "#5ab87a", fontWeight: 700 },
   demoNext: { fontSize: 10, color: MUTED },
+
+  // call script
+  scriptBox: {
+    background: CARD,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 8,
+    padding: "14px 16px",
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: 12,
+  },
+  scriptStep: {},
+  scriptStepLabel: {
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: "0.15em",
+    color: G,
+    marginBottom: 4,
+  },
+  scriptStepText: {
+    fontSize: 13,
+    color: TEXT,
+    lineHeight: 1.55,
+  },
+  scriptDivider: {
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: "0.15em",
+    color: MUTED,
+    borderTop: `1px solid ${BORDER}`,
+    paddingTop: 10,
+    marginTop: 2,
+  },
+  objRow: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: 2,
+  },
+  objQ: {
+    fontSize: 10,
+    color: MUTED,
+    fontWeight: 700,
+    letterSpacing: "0.05em",
+  },
+  objA: {
+    fontSize: 12,
+    color: TEXT,
+    lineHeight: 1.5,
+  },
 
   // stats
   toggleBtn: {
