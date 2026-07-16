@@ -538,6 +538,7 @@ export default function CrmClient() {
           onUpdate={(patch) => updateLead(modal.id, patch)}
           onDelete={() => deleteLead(modal.id)}
           onClose={() => setModal(null)}
+          onBump={bumpActivity}
         />
       )}
 
@@ -612,13 +613,14 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
 // ── LeadModal component ───────────────────────────────────────────────────────
 
 function LeadModal({
-  lead, saving, onUpdate, onDelete, onClose,
+  lead, saving, onUpdate, onDelete, onClose, onBump,
 }: {
   lead: Lead;
   saving: boolean;
   onUpdate: (patch: Partial<Lead>) => void;
   onDelete: () => void;
   onClose: () => void;
+  onBump: (key: keyof Activity, delta: number) => void;
 }) {
   const [form, setForm] = useState({
     company_name: lead.company_name || "",
@@ -662,6 +664,17 @@ function LeadModal({
             <button style={S.closeBtn} onClick={handleClose}>✕</button>
           </div>
         </div>
+
+        {/* quick-log bar — only for call leads */}
+        {lead.crm_channel === "call" && (
+          <div style={S.quickLog}>
+            <QuickBtn label="Ringde" onTap={() => onBump("dials", 1)} />
+            <QuickBtn label="Svar" onTap={() => onBump("pickups", 1)} />
+            <QuickBtn label="Samtal" onTap={() => onBump("conversations", 1)} />
+            <QuickBtn label="Pitchade" onTap={() => onBump("demos_pitched", 1)} />
+            <QuickBtn label="Demo Bokad" onTap={() => { onBump("demos_booked", 1); set("status", "booked"); }} accent />
+          </div>
+        )}
 
         <div style={S.modalBody}>
           <Label>Företag</Label>
@@ -821,6 +834,42 @@ function Input({
       autoFocus={autoFocus}
       onChange={(e) => onChange(e.target.value)}
     />
+  );
+}
+
+// ── QuickBtn component ────────────────────────────────────────────────────────
+
+function QuickBtn({ label, onTap, accent }: { label: string; onTap: () => void; accent?: boolean }) {
+  const [flash, setFlash] = React.useState(false);
+  const tap = () => {
+    onTap();
+    setFlash(true);
+    setTimeout(() => setFlash(false), 300);
+  };
+  return (
+    <button
+      style={{
+        flex: 1,
+        padding: "10px 4px",
+        border: `1px solid ${accent ? G : "rgba(201,168,76,0.3)"}`,
+        borderRadius: 8,
+        background: flash
+          ? accent ? G : "rgba(201,168,76,0.3)"
+          : accent ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)",
+        color: flash ? (accent ? "#0d0d0f" : G) : accent ? G : "#9da8b8",
+        fontFamily: "ui-monospace,'SF Mono',Menlo,monospace",
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.04em",
+        cursor: "pointer",
+        transition: "background 0.15s, color 0.15s",
+        lineHeight: 1.3,
+        textAlign: "center" as const,
+      }}
+      onClick={tap}
+    >
+      + {label}
+    </button>
   );
 }
 
@@ -1219,6 +1268,16 @@ const S: Record<string, React.CSSProperties> = {
   demoRight: { display: "flex", flexDirection: "column" as const, alignItems: "flex-end", gap: 2 },
   demoDate: { fontSize: 11, color: "#5ab87a", fontWeight: 700 },
   demoNext: { fontSize: 10, color: MUTED },
+
+  // quick log bar
+  quickLog: {
+    display: "flex",
+    gap: 6,
+    padding: "10px 16px",
+    borderBottom: `1px solid rgba(201,168,76,0.12)`,
+    background: "rgba(0,0,0,0.2)",
+    flexShrink: 0,
+  },
 
   // call script
   scriptBox: {
