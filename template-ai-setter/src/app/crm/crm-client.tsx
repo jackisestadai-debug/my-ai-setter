@@ -464,13 +464,15 @@ export default function CrmClient() {
           </div>
           {showScript && (
             <div style={S.scriptBox}>
-              <ScriptBlock step="INTRO" text={`"Hej, jag heter Jack och ringer från Rekvo. Stör jag?"`} />
-              <ScriptBlock step="ANLEDNING" text={`"Jag ringde för att vi såg att [företag] inte har någon hemsida — vi hjälper just den typen av företag att komma igång snabbt. Passar det att jag berättar kort?"`} />
-              <ScriptBlock step="PITCH" text={`"Vi bygger en enkel, professionell hemsida — klar på några dagar. Inga konstiga avtal, ni betalar bara om ni är nöjda. Skulle det passa att ta 30 minuter den här veckan så visar jag hur det skulle se ut för er?"`} />
+              <ScriptBlock step="INTRO" text={`"Hej, det är Jack från Rekvo! Jag såg att ni inte har någon hemsida och ville höra om det är något ni funderat på?"`} />
+              <ScriptBlock step="OM DE SVARAR JA / KANSKE" text={`"Vi bygger hemsidor för småföretag — helt riskfritt, ni betalar bara om ni gillar resultatet. Skulle det funka att ta 30 minuter så visar jag hur det skulle se ut för er?"`} />
+              <ScriptBlock step="OM DE SVARAR NEJ" text={`"Okej förstår det — hur hittar era kunder er idag då, tipsar folk om er?"`} />
+              <ScriptBlock step="OM DE SVARAR VIA TIPS" text={`"Ja precis, och det är just det — ni missar alla som googlar efter [bransch] i [stad]. Skulle det vara okej att ta 30 min och kika?"`} />
               <div style={S.scriptDivider}>INVÄNDNINGAR</div>
+              <ObjectionRow q="Vad gäller det?" a={`"Jag såg att ni inte har hemsida och ville höra om det är något ni funderat på?"`} />
               <ObjectionRow q="Behöver ingen hemsida" a={`"Hur hittar era kunder er idag?"`} />
-              <ObjectionRow q="Hinner inte" a={`"Därför sköter vi allt — ni behöver inte göra nånting."`} />
-              <ObjectionRow q="Vad kostar det?" a={`"Det beror på vad ni behöver — därför vill jag ta 30 min, så ni ser exakt vad ni får."`} />
+              <ObjectionRow q="Hinner inte" a={`"Vi sköter allt, ni behöver inte göra nånting."`} />
+              <ObjectionRow q="Vad kostar det?" a={`"Det beror på vad ni behöver — därför vill jag ta 30 min så ni ser exakt vad ni får."`} />
               <ObjectionRow q="Skicka mail" a={`"Självklart — men om det ser bra ut, är ni öppna för ett möte då?"`} />
             </div>
           )}
