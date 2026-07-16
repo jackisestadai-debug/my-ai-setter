@@ -671,10 +671,9 @@ function LeadModal({
         {lead.crm_channel === "call" && (
           <div style={S.quickLog}>
             <QuickBtn label="Ringde" onTap={() => onBump("dials", 1)} />
-            <QuickBtn label="Svar" onTap={() => onBump("pickups", 1)} />
-            <QuickBtn label="Samtal" onTap={() => onBump("conversations", 1)} />
-            <QuickBtn label="Pitchade" onTap={() => onBump("demos_pitched", 1)} />
-            <QuickBtn label="Demo Bokad" onTap={() => { onBump("demos_booked", 1); set("status", "booked"); }} accent />
+            <QuickBtn label="Samtal startade" onTap={() => { onBump("conversations", 1); onBump("pickups", 1); }} />
+            <QuickBtn label="Demo bokad" onTap={() => { onBump("demos_booked", 1); set("status", "booked"); }} accent />
+            <QuickBtn label="Tackat nej" onTap={() => { set("status", "lost"); save(); onClose(); }} negative />
           </div>
         )}
 
@@ -841,24 +840,26 @@ function Input({
 
 // ── QuickBtn component ────────────────────────────────────────────────────────
 
-function QuickBtn({ label, onTap, accent }: { label: string; onTap: () => void; accent?: boolean }) {
+function QuickBtn({ label, onTap, accent, negative }: { label: string; onTap: () => void; accent?: boolean; negative?: boolean }) {
   const [flash, setFlash] = React.useState(false);
   const tap = () => {
     onTap();
-    setFlash(true);
-    setTimeout(() => setFlash(false), 300);
+    if (!negative) { setFlash(true); setTimeout(() => setFlash(false), 300); }
   };
+  const borderColor = negative ? "rgba(192,57,43,0.4)" : accent ? G : "rgba(201,168,76,0.3)";
+  const bgDefault = negative ? "rgba(192,57,43,0.1)" : accent ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)";
+  const bgFlash = accent ? G : "rgba(201,168,76,0.3)";
+  const colorDefault = negative ? "#e74c3c" : accent ? G : "#9da8b8";
+  const colorFlash = accent ? "#0d0d0f" : G;
   return (
     <button
       style={{
         flex: 1,
         padding: "10px 4px",
-        border: `1px solid ${accent ? G : "rgba(201,168,76,0.3)"}`,
+        border: `1px solid ${borderColor}`,
         borderRadius: 8,
-        background: flash
-          ? accent ? G : "rgba(201,168,76,0.3)"
-          : accent ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)",
-        color: flash ? (accent ? "#0d0d0f" : G) : accent ? G : "#9da8b8",
+        background: flash ? bgFlash : bgDefault,
+        color: flash ? colorFlash : colorDefault,
         fontFamily: "ui-monospace,'SF Mono',Menlo,monospace",
         fontSize: 10,
         fontWeight: 700,
@@ -870,7 +871,7 @@ function QuickBtn({ label, onTap, accent }: { label: string; onTap: () => void; 
       }}
       onClick={tap}
     >
-      + {label}
+      {negative ? "✗ " : "+ "}{label}
     </button>
   );
 }
